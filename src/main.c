@@ -60,13 +60,24 @@ void GameOnline(int argc, char *argv[]){
     init_connection2server(argv[0],argv[1],argv[2]);
     
     printf("running game online\n");
+    printf("\ntry to login: michaelz, 25619\n");
     PackUnamePasswd up={"michaelz","25619"};
     char str_up[MAX_UP_SIZE];
     memset(str_up,'\0',sizeof(str_up));
     encodePackUnamePasswd(str_up,&up);
-    printf("%s\n",str_up);
-    up=decodeStrUP(str_up);
+    printf("%s\n",str_up);//just for test decode
+    up=decodeStrUP(str_up);//just for test decode
     char RecvBuf[BUFFERSIZE];
+    sendToServer(str_up,RecvBuf);
+
+    printf("\ntry to login: michaelz, 25618\n");
+    strcpy(up.Password,"25618");
+    encodePackUnamePasswd(str_up,&up);
+    sendToServer(str_up,RecvBuf);
+
+    printf("\ntry to login: keenan, 25618\n");
+    strcpy(up.UserName,"keenan");
+    encodePackUnamePasswd(str_up,&up);
     sendToServer(str_up,RecvBuf);
     int hit=1;
 

@@ -8,6 +8,6 @@
 
 void encodePackUnamePasswd(char *str_encodedPUP, PackUnamePasswd *pack);
 
-PackUnamePasswd decodeStrUP(char *str_encodedPUP);
-
 //Decode Functions
+
+PackUnamePasswd decodeStrUP(char *str_encodedPUP);

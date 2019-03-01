@@ -32,7 +32,7 @@ char *Talk2Server(		/* communicate with the server */
     if (SocketFD < 0)
     {   FatalError("socket creation failed");
     }
-#ifdef DEBUG
+#ifdef PRINT_LOG
     printf("%s: Connecting to the server at port %d...\n",
 		Program, ntohs(ServerAddress.sin_port));
 #endif
@@ -40,14 +40,14 @@ char *Talk2Server(		/* communicate with the server */
 		sizeof(struct sockaddr_in)) < 0)
     {   FatalError("connecting to server failed");
     }
-#ifdef DEBUG
+#ifdef PRINT_LOG
     printf("%s: Sending message '%s'...\n", Program, Message);
 #endif
     n = write(SocketFD, Message, strlen(Message));
     if (n < 0)
     {   FatalError("writing to socket failed");
     }
-#ifdef DEBUG
+#ifdef PRINT_LOG
     printf("%s: Waiting for response...\n", Program);
 #endif
     n = read(SocketFD, RecvBuf, BUFFERSIZE-1);
@@ -55,7 +55,7 @@ char *Talk2Server(		/* communicate with the server */
     {   FatalError("reading from socket failed");
     }
     RecvBuf[n] = 0;
-#ifdef DEBUG
+#ifdef PRINT_LOG
     printf("%s: Received response: %s\n", Program, RecvBuf);
     printf("%s: Closing the connection...\n", Program);
 #endif
