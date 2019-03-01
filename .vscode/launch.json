@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/chess",
-            "args": [],
+            "args": ["zuma.eecs.uci.edu","11000"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
