@@ -36,14 +36,6 @@ constant.h
 assert.h
 -
 
-/home/michaelz/Desktop/projects/courses/22L/k-chat-server/src/decode.c
-codec.h
-/home/michaelz/Desktop/projects/courses/22L/k-chat-server/src/codec.h
-
-/home/michaelz/Desktop/projects/courses/22L/k-chat-server/src/encode.c
-codec.h
-/home/michaelz/Desktop/projects/courses/22L/k-chat-server/src/codec.h
-
 /home/michaelz/Desktop/projects/courses/22L/k-chat-server/src/main.c
 codec.h
 /home/michaelz/Desktop/projects/courses/22L/k-chat-server/src/codec.h

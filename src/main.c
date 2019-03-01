@@ -83,7 +83,7 @@ void ProcessRequest(		/* process a time request by a client */
     PackUnamePasswd packUP=decodeStrUP(RecvBuf);
     if(strcmp(packUP.UserName,"michaelz")==0){
         if(strcmp(packUP.Password,"25619")==0){
-            sprintf(SendBuf,"User: %d just login",packUP.UserName);
+            sprintf(SendBuf,"User: %s just login",packUP.UserName);
         }
         else strcpy(SendBuf,"Invalid Password");
     }
