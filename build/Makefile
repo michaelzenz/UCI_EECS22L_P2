@@ -67,17 +67,6 @@ rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
 
-# Special rule for the target test
-test:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
-	/usr/local/bin/ctest --force-new-ctest-process $(ARGS)
-.PHONY : test
-
-# Special rule for the target test
-test/fast: test
-
-.PHONY : test/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -88,6 +77,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/local/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -122,17 +122,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named kchat-client
+# Target rules for targets named kchat-server
 
 # Build rule for target.
-kchat-client: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 kchat-client
-.PHONY : kchat-client
+kchat-server: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 kchat-server
+.PHONY : kchat-server
 
 # fast build rule for target.
-kchat-client/fast:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/build
-.PHONY : kchat-client/fast
+kchat-server/fast:
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/build
+.PHONY : kchat-server/fast
 
 #=============================================================================
 # Target rules for targets named tar
@@ -153,7 +153,7 @@ src/decode.o: src/decode.c.o
 
 # target to build an object file
 src/decode.c.o:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/decode.c.o
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/decode.c.o
 .PHONY : src/decode.c.o
 
 src/decode.i: src/decode.c.i
@@ -162,7 +162,7 @@ src/decode.i: src/decode.c.i
 
 # target to preprocess a source file
 src/decode.c.i:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/decode.c.i
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/decode.c.i
 .PHONY : src/decode.c.i
 
 src/decode.s: src/decode.c.s
@@ -171,7 +171,7 @@ src/decode.s: src/decode.c.s
 
 # target to generate assembly for a file
 src/decode.c.s:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/decode.c.s
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/decode.c.s
 .PHONY : src/decode.c.s
 
 src/encode.o: src/encode.c.o
@@ -180,7 +180,7 @@ src/encode.o: src/encode.c.o
 
 # target to build an object file
 src/encode.c.o:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/encode.c.o
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/encode.c.o
 .PHONY : src/encode.c.o
 
 src/encode.i: src/encode.c.i
@@ -189,7 +189,7 @@ src/encode.i: src/encode.c.i
 
 # target to preprocess a source file
 src/encode.c.i:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/encode.c.i
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/encode.c.i
 .PHONY : src/encode.c.i
 
 src/encode.s: src/encode.c.s
@@ -198,7 +198,7 @@ src/encode.s: src/encode.c.s
 
 # target to generate assembly for a file
 src/encode.c.s:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/encode.c.s
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/encode.c.s
 .PHONY : src/encode.c.s
 
 src/jsmn.o: src/jsmn.c.o
@@ -207,7 +207,7 @@ src/jsmn.o: src/jsmn.c.o
 
 # target to build an object file
 src/jsmn.c.o:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/jsmn.c.o
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/jsmn.c.o
 .PHONY : src/jsmn.c.o
 
 src/jsmn.i: src/jsmn.c.i
@@ -216,7 +216,7 @@ src/jsmn.i: src/jsmn.c.i
 
 # target to preprocess a source file
 src/jsmn.c.i:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/jsmn.c.i
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/jsmn.c.i
 .PHONY : src/jsmn.c.i
 
 src/jsmn.s: src/jsmn.c.s
@@ -225,7 +225,7 @@ src/jsmn.s: src/jsmn.c.s
 
 # target to generate assembly for a file
 src/jsmn.c.s:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/jsmn.c.s
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/jsmn.c.s
 .PHONY : src/jsmn.c.s
 
 src/main.o: src/main.c.o
@@ -234,7 +234,7 @@ src/main.o: src/main.c.o
 
 # target to build an object file
 src/main.c.o:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/main.c.o
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/main.c.o
 .PHONY : src/main.c.o
 
 src/main.i: src/main.c.i
@@ -243,7 +243,7 @@ src/main.i: src/main.c.i
 
 # target to preprocess a source file
 src/main.c.i:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/main.c.i
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/main.c.i
 .PHONY : src/main.c.i
 
 src/main.s: src/main.c.s
@@ -252,7 +252,7 @@ src/main.s: src/main.c.s
 
 # target to generate assembly for a file
 src/main.c.s:
-	$(MAKE) -f CMakeFiles/kchat-client.dir/build.make CMakeFiles/kchat-client.dir/src/main.c.s
+	$(MAKE) -f CMakeFiles/kchat-server.dir/build.make CMakeFiles/kchat-server.dir/src/main.c.s
 .PHONY : src/main.c.s
 
 # Help Target
@@ -262,10 +262,10 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... kchat-client"
+	@echo "... edit_cache"
+	@echo "... kchat-server"
 	@echo "... tar"
 	@echo "... test"
-	@echo "... edit_cache"
 	@echo "... src/decode.o"
 	@echo "... src/decode.i"
 	@echo "... src/decode.s"

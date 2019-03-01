@@ -138,7 +138,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=kchat-client
+CMAKE_PROJECT_NAME:STATIC=kchat-server
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -339,6 +339,12 @@ kchat-client_BINARY_DIR:STATIC=/home/michaelz/Desktop/projects/courses/22L/k-cha
 
 //Value Computed by CMake
 kchat-client_SOURCE_DIR:STATIC=/home/michaelz/Desktop/projects/courses/22L/k-chat-server
+
+//Value Computed by CMake
+kchat-server_BINARY_DIR:STATIC=/home/michaelz/Desktop/projects/courses/22L/k-chat-server/build
+
+//Value Computed by CMake
+kchat-server_SOURCE_DIR:STATIC=/home/michaelz/Desktop/projects/courses/22L/k-chat-server
 
 //Path to a library.
 pkgcfg_lib_GLIB_glib-2.0:FILEPATH=/usr/lib/x86_64-linux-gnu/libglib-2.0.so

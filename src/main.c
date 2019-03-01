@@ -33,6 +33,10 @@ void FatalError(		/* print error diagnostics and abort */
     exit(20);
 } /* end of FatalError */
 
+void TimeOutHandleFunc(){
+    printf("still waiting ...\n");
+}
+
 int MakeServerSocket(		/* create a socket on this server */
 	uint16_t PortNo)
 {
@@ -79,9 +83,6 @@ void ProcessRequest(		/* process a time request by a client */
     if (0 != strcmp(RecvBuf, uname)){
         printf("Unknown User\n");
     }
-    if (0 != strcmp(RecvBuf, uname)){
-        printf("Unknown User\n");
-    }
     #endif
 
     l = strlen(SendBuf);
@@ -117,7 +118,7 @@ void ServerMainLoop(		/* simple server main loop */
 	ReadFDs = ActiveFDs;
     TimeVal.tv_sec  = Timeout / 1000000;
 	TimeVal.tv_usec = Timeout % 1000000;
-    
+
 	/* block until input arrives on active sockets or until timeout */
 	res = select(FD_SETSIZE, &ReadFDs, NULL, NULL, &TimeVal);
 	if (res < 0)
@@ -193,10 +194,13 @@ int main(int argc, char *argv[]){
     ServSocketFD = MakeServerSocket(PortNo);
 
     #ifdef PRINT_LOG
-    printf("%s: Creating the server window...\n", Program);
-    #endif
+    printf("%s: Creating the server ...\n", Program);
 
-    #ifdef DEBUG
+    printf("%s: Providing current time at port %d...\n", Program, PortNo);
+    #endif
+    ServerMainLoop(ServSocketFD, ProcessRequest,
+			TimeOutHandleFunc, 250000);
+    #ifdef PRINT_LOG
     printf("\n%s: Shutting down.\n", Program);
     #endif
     close(ServSocketFD);
