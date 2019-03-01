@@ -62,4 +62,12 @@ typedef struct _GameState
 
 typedef unsigned char uchar;
 
+typedef struct _PackUnamePasswd
+{
+    char UserName[30];
+    char Password[30];
+} PackUnamePasswd;
+
+
+
 #endif

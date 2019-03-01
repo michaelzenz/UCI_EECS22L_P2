@@ -35,7 +35,7 @@
 
 void gui_init_window(int argc, char*argv[]);
 
-void gui_init(GameState *gameState,Player player_arr[2]);
+void gui_init_offline(GameState *gameState,Player player_arr[2]);
 
 int gui_main_menu();
 
