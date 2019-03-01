@@ -1,6 +1,5 @@
 #include"codec.h"
 
-
 //Convert the PackUnamePasswd into a json string
 void encodePackUnamePasswd(char *str_encodedPUP, PackUnamePasswd *pack)
 {

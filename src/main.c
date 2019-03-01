@@ -80,8 +80,15 @@ void ProcessRequest(		/* process a time request by a client */
 #endif
 
     #ifdef TEST1
-    if (0 != strcmp(RecvBuf, uname)){
-        printf("Unknown User\n");
+    PackUnamePasswd packUP=decodeStrUP(RecvBuf);
+    if(strcmp(packUP.UserName,"michaelz")==0){
+        if(strcmp(packUP.Password,"25619")==0){
+            sprintf(SendBuf,"User: %d just login",packUP.UserName);
+        }
+        else strcpy(SendBuf,"Invalid Password");
+    }
+    else{
+        strcpy(SendBuf,"Unknown User");
     }
     #endif
 
@@ -90,9 +97,7 @@ void ProcessRequest(		/* process a time request by a client */
     printf("%s: Sending response: %s.\n", Program, SendBuf);
 #endif
     n = write(DataSocketFD, SendBuf, l);
-    if (n < 0)
-    {   FatalError("writing to data socket failed");
-    }
+    if (n < 0)FatalError("writing to data socket failed");
 } /* end of ProcessRequest */
 
 void ServerMainLoop(		/* simple server main loop */
