@@ -139,7 +139,7 @@ void ServerMainLoop(		/* simple server main loop */
 		{   if (i == ServSocketFD)
 		    {	/* connection request on server socket */
 #ifdef DEBUG
-			printf("%s: Accepting new client...\n", Program);
+			printf("\n%s: Accepting new client...\n", Program);
 #endif
 			ClientLen = sizeof(ClientAddress);
 			DataSocketFD = accept(ServSocketFD,
@@ -163,7 +163,7 @@ void ServerMainLoop(		/* simple server main loop */
 #endif
 			HandleClient(i);
 #ifdef DEBUG
-			printf("%s: Closing client connection FD%d.\n",
+			printf("%s: Closing client connection FD%d.\n\n",
 				Program, i);
 #endif
 			close(i);
