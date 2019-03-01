@@ -12,4 +12,5 @@
 #define BUFFERSIZE 256
 
 void init_connection2server(char *program,char *host, char *port);
-void sendToServer(char* msg);
+
+void sendToServer(char* msg,char*RecvBuf);

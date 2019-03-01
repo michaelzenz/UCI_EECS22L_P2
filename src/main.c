@@ -65,8 +65,9 @@ void GameOnline(int argc, char *argv[]){
     memset(str_up,'\0',sizeof(str_up));
     encodePackUnamePasswd(str_up,&up);
     printf("%s\n",str_up);
-    PackUnamePasswd test=decodeStrUP(str_up);
-    sendToServer(str_up);
+    up=decodeStrUP(str_up);
+    char RecvBuf[BUFFERSIZE];
+    sendToServer(str_up,RecvBuf);
     int hit=1;
 
 }

@@ -63,13 +63,10 @@ char *Talk2Server(		/* communicate with the server */
     return(RecvBuf);
 } /* end of Talk2Server */
 
-void sendToServer(char* msg)
+void sendToServer(char* msg,char*RecvBuf)
 {
-    char RecvBuf[BUFFERSIZE];
-    const char *Response;
-
-    Response = Talk2Server(msg, RecvBuf);
-    printf(Response);
+    
+    Talk2Server(msg, RecvBuf);
 }
 
 void ShutdownServer(		/* ask server to shutdown */
