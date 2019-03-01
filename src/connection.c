@@ -21,9 +21,7 @@ void FatalError(		/* print error diagnostics and abort */
     exit(20);
 } /* end of FatalError */
 
-char *Talk2Server(		/* communicate with the server */
-	const char *Message,
-	char *RecvBuf)
+void sendToServer(char* msg,char*RecvBuf)
 {
     int n;
     int SocketFD;
@@ -41,9 +39,9 @@ char *Talk2Server(		/* communicate with the server */
     {   FatalError("connecting to server failed");
     }
 #ifdef PRINT_LOG
-    printf("%s: Sending message '%s'...\n", Program, Message);
+    printf("%s: Sending message '%s'...\n", Program, msg);
 #endif
-    n = write(SocketFD, Message, strlen(Message));
+    n = write(SocketFD, msg, strlen(msg));
     if (n < 0)
     {   FatalError("writing to socket failed");
     }
@@ -60,13 +58,6 @@ char *Talk2Server(		/* communicate with the server */
     printf("%s: Closing the connection...\n", Program);
 #endif
     close(SocketFD);
-    return(RecvBuf);
-} /* end of Talk2Server */
-
-void sendToServer(char* msg,char*RecvBuf)
-{
-    
-    Talk2Server(msg, RecvBuf);
 }
 
 void ShutdownServer(		/* ask server to shutdown */
@@ -79,14 +70,8 @@ void ShutdownServer(		/* ask server to shutdown */
 #ifdef DEBUG
     printf("%s: ShutdownServer callback starting...\n", Program);
 #endif
-    Response = Talk2Server("SHUTDOWN", RecvBuf);
-    if (0 == strcmp(Response, "OK SHUTDOWN"))
-    {	/* ok, the server shuts down, so should this client */
-	gtk_main_quit();
-    }
-    else
-    {	/* unexpected response, ignore it as invalid */
-    }
+    sendToServer("SHUTDOWN", RecvBuf);
+
 #ifdef DEBUG
     printf("%s: ShutdownServer callback done.\n", Program);
 #endif
