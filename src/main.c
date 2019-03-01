@@ -201,7 +201,7 @@ int main(int argc, char *argv[]){
     #ifdef PRINT_LOG
     printf("%s: Creating the server ...\n", Program);
 
-    printf("%s: Providing current time at port %d...\n", Program, PortNo);
+    printf("%s: Providing service at port %d...\n", Program, PortNo);
     #endif
     ServerMainLoop(ServSocketFD, ProcessRequest,
 			TimeOutHandleFunc, 250000);
