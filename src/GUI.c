@@ -90,11 +90,7 @@ void gui_init_window(int argc, char*argv[])
 #endif
 }
 
-
-
-//init menu, get infomation for players and draw gameplay window
-void gui_init(GameState *gameState,Player player_arr[2])
-{
+void gui_init_offline(GameState *gameState,Player player_arr[2]){
     //default settings
     player_arr[0].identity=HUMAN;
     player_arr[1].identity=COMPUTER;
@@ -104,7 +100,6 @@ void gui_init(GameState *gameState,Player player_arr[2])
     int play;
 
     do{
-        gui_main_menu();
         if(GameMode==GameMode_HvC)play=gui_player_HvC_menu(player_arr);
         else if(GameMode==GameMode_HvH)play=gui_player_HvH_menu(player_arr);
         else if(GameMode==GameMode_CvC)play=gui_player_CvC_menu(player_arr);
@@ -115,7 +110,6 @@ void gui_init(GameState *gameState,Player player_arr[2])
             //break;
         }
 
-        GameMode=0;//reset GameMode
     }while(play!=1);
 
     //here you use window pointer to draw gameplay window
@@ -150,6 +144,7 @@ gint main_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     GdkModifierType state;
     gdk_window_get_pointer(widget->window,&x,&y,&state);
     
+    printf("x:%d, y:%d\n",x,y);
     if(x>715&&x<879&&y>238&&y<264)
     {
         GameMode=GameMode_HvC;
@@ -161,6 +156,9 @@ gint main_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     else if(x>630&&x<958&&y>346&&y<367)
     {
         GameMode=GameMode_CvC;
+    }
+    else if(x>747&&x<837&&y>189&&y<214){
+        GameMode=GameMode_ONLINE;
     }
     printf("GameMode:%d\n",GameMode);
 }
