@@ -2,8 +2,11 @@
 #include"GUI.h"
 #include"struct.h"
 #include"constant.h"
+#include"codec.h"
+#include"connection.h"
 
 #define MODEL 1
+
 
 int play(GameState *gameState,Player *player,int model)
 {

@@ -2,7 +2,7 @@
 #include"jsmn.h"
 #include"struct.h"
 #include<stdio.h>
-#include <stdlib.h>
+#include<stdlib.h>
 #ifndef STACK_H
 #define STACK_H
 

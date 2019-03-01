@@ -9,23 +9,7 @@ jsmn_parser str_move_parser;
 char *BoardIDX[8]={"A","B","C","D","E","F","G","H"};
 char *BoardIDY[8]={"1","2","3","4","5","6","7","8"};
 
-char *my_itoa(int num, char *str)
-{
-        if(str == NULL)
-        {
-            return NULL;
-        }
-        sprintf(str, "%d", num);
-        return str;
-}
 
-static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
-	if (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&
-			strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
-		return 0;
-	}
-	return -1;
-}
 
 Node* stack_newNode(char *new_log)
 {
