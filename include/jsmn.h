@@ -29,6 +29,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -94,6 +95,13 @@ void jsmn_init(jsmn_parser *parser);
  */
 int jsmn_parse(jsmn_parser *parser, const char *js, size_t len,
 		jsmntok_t *tokens, unsigned int num_tokens);
+
+//change number to string
+//@team11@UCI EECS22L
+char *my_itoa(int num, char *str);
+
+//check jsmn tokens, provided example
+int jsoneq(const char *json, jsmntok_t *tok, const char *s);
 
 #ifdef __cplusplus
 }

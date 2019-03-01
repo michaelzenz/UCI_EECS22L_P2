@@ -368,3 +368,21 @@ static int dump(const char *js, jsmntok_t *t, size_t count, int indent) {
 	}
 	return 0;
 }
+
+char *my_itoa(int num, char *str)
+{
+        if(str == NULL)
+        {
+            return NULL;
+        }
+        sprintf(str, "%d", num);
+        return str;
+}
+
+int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
+	if (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&
+			strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
+		return 0;
+	}
+	return -1;
+}

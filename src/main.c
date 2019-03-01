@@ -2,8 +2,11 @@
 #include"GUI.h"
 #include"struct.h"
 #include"constant.h"
+#include"codec.h"
+#include"connection.h"
 
 #define MODEL 1
+
 
 int play(GameState *gameState,Player *player,int model)
 {
@@ -47,8 +50,25 @@ void GameOffline(){
     }
 }
 
-void GameOnline(){
+void GameOnline(int argc, char *argv[]){
+
+    if (argc < 3)
+    {   
+        printf("Usage: %s hostname port\n", argv[0]);
+	    exit(10);
+    }
+    init_connection2server(argv[0],argv[1],argv[2]);
+    
     printf("running game online\n");
+    PackUnamePasswd up={"michaelz","25619"};
+    char str_up[MAX_UP_SIZE];
+    memset(str_up,'\0',sizeof(str_up));
+    encodePackUnamePasswd(str_up,&up);
+    printf("%s\n",str_up);
+    PackUnamePasswd test=decodeStrUP(str_up);
+    sendToServer(str_up);
+    int hit=1;
+
 }
 
 void Game(int argc, char *argv[])
@@ -56,7 +76,7 @@ void Game(int argc, char *argv[])
     gui_init_window(argc,argv);
 
     int GameMode=gui_main_menu();
-    if(GameMode==GameMode_ONLINE)GameOnline();
+    if(GameMode==GameMode_ONLINE)GameOnline(argc,argv);
     else GameOffline();
     
 }
@@ -119,9 +139,7 @@ int main(int argc, char *argv[])
     //gui_init_window(argc,argv);
     //test_gui_menu(argc,argv);//specially created for aria to test
     // while(1)
-    while(1){
-        Game(argc,argv);
-    }
+    Game(argc,argv);
     
     
     

@@ -8,8 +8,8 @@ void encodePackUnamePasswd(char *str_encodedPUP, PackUnamePasswd *pack)
 
     memset(str_encodedPUP,'\0',sizeof(str_encodedPUP));
    str_encodedPUP[0]='{';
-   strcat(str_UserName,PackUnamePasswd.UserName);
-   strcat(str_Password,PackUnamePasswd.Password);
+   strcat(str_UserName,pack->UserName);
+   strcat(str_Password,pack->Password);
    strcat(str_encodedPUP,str_UserName);
    strcat(str_encodedPUP,"\",");
    strcat(str_encodedPUP,str_Password);
