@@ -11,6 +11,10 @@ typedef struct _PackUnamePasswd
     char Password[30];
 } PackUnamePasswd;
 
-
+typedef struct _vectorStr {
+    char** data;
+    int size;
+    int count;
+} vectorStr;
 
 #endif
