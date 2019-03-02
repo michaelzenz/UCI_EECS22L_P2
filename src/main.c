@@ -5,6 +5,7 @@
 #include<netinet/in.h>
 #include<sys/select.h>
 #include<netdb.h>
+#include<stdbool.h> 
 
 #define BUFFERSIZE 256
 #define PRINT_LOG
@@ -13,6 +14,10 @@
 const char *Program=NULL;
 int Shutdown = 0;/* keep running until Shutdown == 1 */
 char buffer[BUFFERSIZE];//the buffer to store message
+
+char RotateLine[]={'-','\\','|','/'};
+uchar RotateDirection=0;
+bool FirstTimeOut=false;
 
 #ifdef TEST1
 char uname[30]="michaelz";
@@ -34,7 +39,14 @@ void FatalError(		/* print error diagnostics and abort */
 } /* end of FatalError */
 
 void TimeOutHandleFunc(){
-    printf("still waiting ...\n");
+    if(!FirstTimeOut){
+        printf("still waiting ...");
+        FirstTimeOut=true;
+    }
+    printf("%c",RotateLine[RotateDirection]);
+    fflush(stdout);
+    printf("\b");
+    RotateDirection=++RotateDirection%4;
 }
 
 int MakeServerSocket(		/* create a socket on this server */
@@ -66,6 +78,7 @@ int MakeServerSocket(		/* create a socket on this server */
 void ProcessRequest(		/* process a time request by a client */
 	int DataSocketFD)
 {
+    FirstTimeOut=false;
     int  l, n;
     char RecvBuf[BUFFERSIZE];	/* message buffer for receiving a message */
     char SendBuf[BUFFERSIZE];	/* message buffer for sending a response */
