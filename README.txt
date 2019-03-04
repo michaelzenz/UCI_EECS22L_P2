@@ -18,6 +18,7 @@ At the moment, The program can demonstrate basic socket and package communicatio
 By selecting Online in the main menu of the client version, the GUI closes and the client will send a hardcoded series of packages with login attempts that the server will respond to. 
 After the GUI closes, the login process communication can be seen in the terminal as it is automatically demonstrated.
 
+For make, make test, make test-gui,make test-comm, make clean, make tar command, please cd into build dir where you can find the makefile(after you compile) and run these commands
 
 offline chess features are still selectable from the main menu.
 which is still under development.

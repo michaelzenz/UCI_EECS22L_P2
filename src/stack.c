@@ -36,6 +36,7 @@ void stack_push(Node** head_ref, char* new_log)
 //pop a node from stack into a string
 void stack_pop(Node** head_ref, char *ret_str)
 {
+    memset(ret_str,'\0',sizeof(ret_str));
     if(!stack_isEmpty(*head_ref))
     {
         strcpy(ret_str,(*head_ref)->log);
@@ -58,34 +59,61 @@ void stack_peek(Node* top, char *ret_str)
 //output moves to a file
 void stack_print_log(Node** head_ref)
 {
+    #ifdef PRINT_LOG
+    printf("Start printing log\n");
+    #endif
     FILE *fp;
     fp=fopen("bin/MovesLog.txt","w");
-    char TempStr[STR_NODE_SIZE],str_SID[3],str_EID[3],str_Move[11];
+    char TempStr[STR_NODE_SIZE],str_SID[4],str_EID[4],str_Move[11];
     Node *TempHead=NULL;
+    memset(TempStr,'\0',sizeof(TempStr));
     while(!stack_isEmpty(*head_ref)){
         stack_pop(head_ref,TempStr);
         stack_push(&TempHead,TempStr);
     }
+    #ifdef PRINT_LOG
+    printf("finish pushing to temp stack\n");
+    #endif
     while(!stack_isEmpty(TempHead)){
         memset(str_SID,'\0',sizeof(str_SID));
         memset(str_EID,'\0',sizeof(str_EID));
         memset(str_Move,'\0',sizeof(str_Move));
 
+        #ifdef PRINT_LOG
+        printf("start poping\n");
+        #endif
         stack_pop(&TempHead,TempStr);
         Move CurMove=string2move(TempStr);
+        #ifdef PRINT_LOG
+        printf("end decoding\n");
+        #endif
         int sx=CurMove.start_pt%8,sy=CurMove.start_pt/8;
         int ex=CurMove.end_pt%8,ey=CurMove.end_pt/8;
         strcat(str_SID,BoardIDX[sx]);
         strcat(str_SID,BoardIDY[7-sy]);
         strcat(str_EID,BoardIDX[ex]);
         strcat(str_EID,BoardIDY[7-ey]);
+
         strcat(str_Move,str_SID);
         strcat(str_Move," to ");
         strcat(str_Move,str_EID);
+
+        #ifdef PRINT_LOG
+        printf("start outputing to log.txt\n");
+        #endif
         fprintf(fp,"%s\n",str_Move);
+        #ifdef PRINT_LOG
+        printf("end outputing\nstart pushing back\n");
+        #endif
         stack_push(head_ref,TempStr);
+        #ifdef PRINT_LOG
+        printf("end pushing back\n");
+        #endif
     }
     fclose(fp);
+    #ifdef PRINT_LOG
+    printf("end printing log\n");
+    #endif
 }
 
 //convert move to string

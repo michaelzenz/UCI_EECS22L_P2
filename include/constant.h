@@ -44,4 +44,4 @@
 #define CUR_PLAYER_WIN 2
 #define QUIT 3
 
-#define PRINT_LOG
+// #define PRINT_LOG
