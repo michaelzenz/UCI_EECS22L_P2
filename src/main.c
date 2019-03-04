@@ -71,7 +71,7 @@ void GameOnline(int argc, char *argv[]){
     up=decodeStrUP(str_up);//just for test decode
     char RecvBuf[BUFFERSIZE]; 
     sendToServer(str_up,RecvBuf);
-
+    printf("recive buff %s\n", RecvBuf);
     printf("\ntry to login: michaelz, 25618\n");
     strcpy(up.Password,"25618");
     encodePackUnamePasswd(str_up,&up);
