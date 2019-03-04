@@ -33,25 +33,25 @@
 #define ACTION_UNDO 2
 #define ACTION_QUIT 3
 
+//init a new window
 void gui_init_window(int argc, char*argv[]);
 
+//init the offline players
 void gui_init_offline(GameState *gameState,Player player_arr[2]);
 
+//draws the game menu and return GameMode from user
 int gui_main_menu();
 
-int gui_player_HvC_menu(Player* player_arr);
-int gui_player_HvH_menu(Player* player_arr);
-int gui_player_CvC_menu(Player* player_arr);
-
-void gui_gameplay_window(GameState *gameState);
-
+//let human play on the gameState
 int gui_play(GameState *gameState,Player *player);
 
+//refresh the gui window
 void gui_refresh(GameState *gameState,Player *player_arr);
 
-//selects piece with click
-void Select_Piece(GtkWidget *widget, GdkEvent *event, gpointer data, GameState *gameState);
-
+//show the checkmate window if one of the player wins(not yet finish)
 void gui_checkmate_window(GameState *gameState, int winner);
+
+//draws the game play window(that contains the board)
+void gui_gameplay_window(GameState *gameState);
 
 #endif

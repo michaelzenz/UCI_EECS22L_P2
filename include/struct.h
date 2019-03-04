@@ -4,6 +4,9 @@
 #include"constant.h"
 #include<assert.h>
 
+typedef unsigned char uchar;
+
+//contains the infomation of a player
 typedef struct _Player
 {
     int id;
@@ -60,8 +63,9 @@ typedef struct _GameState
     Node *moves_stack;//the stack to record moves
 } GameState;
 
-typedef unsigned char uchar;
 
+
+//contain the info of username and password that are to send to server
 typedef struct _PackUnamePasswd
 {
     char UserName[30];

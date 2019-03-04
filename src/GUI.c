@@ -5,6 +5,13 @@
 
 #define xy21d(x,y) (y*8+x)//convert (x,y) coordinates in board to 1D coordinates
 
+//draws different player menu
+int gui_player_HvC_menu(Player* player_arr);
+int gui_player_HvH_menu(Player* player_arr);
+int gui_player_CvC_menu(Player* player_arr);
+
+
+
 /*Global Variables */
 
 //Widgets for gtk to use
@@ -36,6 +43,7 @@ char *Background_path="res/GamePlayBackground.jpg";
 char *HvH_Menu_path="res/HvH_Menu.png";
 char *CvC_Menu_path="res/CvC_Menu.png";
 
+//the Game Mode, go to constant.h for more info
 int GameMode=0;
 
 //load .png and .jpg files to pixbuf
@@ -90,6 +98,8 @@ void gui_init_window(int argc, char*argv[])
 #endif
 }
 
+
+//init the offline players
 void gui_init_offline(GameState *gameState,Player player_arr[2]){
     //default settings
     player_arr[0].identity=HUMAN;
@@ -378,9 +388,9 @@ void DrawLog (){
 //end DrawLog
 }
 
+//Draws and refresh the board
 void DrawBoard(GameState *gamestate,int start_pt,vector legal_moves)
 {
-
     table = gtk_table_new (8, 8, TRUE) ;
     gtk_widget_set_size_request (table, BOARD_WIDTH, BOARD_HEIGHT);
 
@@ -413,17 +423,16 @@ void DrawBoard(GameState *gamestate,int start_pt,vector legal_moves)
     gtk_fixed_put(GTK_FIXED(fixed), table, BOARD_BORDER_LEFT, BOARD_BORDER_UP);
     gtk_container_add(GTK_CONTAINER(layout), fixed);
     gtk_widget_show_all(window);
-
 }
 
+//window coordinates to grid coordinates
 void CoordToGrid(int c_x, int c_y, int *g_x, int *g_y)
 {
         *g_x = (c_x - BOARD_BORDER_LEFT) / SQUARE_SIZE;
         *g_y = (c_y - BOARD_BORDER_UP) / SQUARE_SIZE;
 }
 
-
-
+//draws the game play window
 void gui_gameplay_window(GameState *gameState)
 {
 	/*create a table and draw the board*/
@@ -444,11 +453,12 @@ void gui_gameplay_window(GameState *gameState)
 }
 
 int check_ActionMade=0;//1 is normal end, 2 is undo
-int check_legal_start=0;
-int move_start=-1;
-int move_end=-1;
-vector cur_legal_moves;
+int check_legal_start=0;//selecting a movable piece
+int move_start=-1;//start point
+int move_end=-1;//end poing
+vector cur_legal_moves;//legal moves from current starting position
 
+//callback for gui play
 void gui_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
     int pixelX, pixelY, gridX, gridY, index, piece;

@@ -4,13 +4,13 @@
 #include"stack.h"
 
 
-jsmn_parser str_move_parser;
+jsmn_parser str_move_parser;//the parser to parse json string
 
+//the id in char array to show
 char *BoardIDX[8]={"A","B","C","D","E","F","G","H"};
 char *BoardIDY[8]={"1","2","3","4","5","6","7","8"};
 
-
-
+//return a new stack node
 Node* stack_newNode(char *new_log)
 {
     Node *new_node=(Node*)malloc(sizeof(Node));
@@ -19,11 +19,13 @@ Node* stack_newNode(char *new_log)
     return new_node;
 }
 
+//check if stack is empty
 int stack_isEmpty(Node* node) 
 {
     return !node;
 } 
 
+//push a node into stack
 void stack_push(Node** head_ref, char* new_log)
 {
     Node *newNode=stack_newNode(new_log);
@@ -31,6 +33,7 @@ void stack_push(Node** head_ref, char* new_log)
     *head_ref=newNode;
 }
 
+//pop a node from stack into a string
 void stack_pop(Node** head_ref, char *ret_str)
 {
     if(!stack_isEmpty(*head_ref))
@@ -43,6 +46,7 @@ void stack_pop(Node** head_ref, char *ret_str)
     
 }
 
+//peek the node into a string
 void stack_peek(Node* top, char *ret_str) 
 { 
     if(!stack_isEmpty(top))
@@ -51,6 +55,7 @@ void stack_peek(Node* top, char *ret_str)
     }
 } 
 
+//output moves to a file
 void stack_print_log(Node** head_ref)
 {
     FILE *fp;
@@ -83,7 +88,7 @@ void stack_print_log(Node** head_ref)
     fclose(fp);
 }
 
-
+//convert move to string
 void move2string(char *str_move, Move *move)
 {
     char temp[2];
@@ -122,6 +127,7 @@ void move2string(char *str_move, Move *move)
     strcpy(str_move,json_str);
 }
 
+//convert and return a move from a string
 Move string2move(char *str_move)
 {
     jsmn_init(&str_move_parser);
