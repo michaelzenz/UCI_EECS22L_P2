@@ -8,20 +8,20 @@
 #include<stdbool.h> 
 
 #define BUFFERSIZE 256
-#define PRINT_LOG
-#define TEST1
+#define PRINT_LOG //if want to print log
+#define TEST1 //for alpha release
 
-const char *Program=NULL;
+const char *Program=NULL;//the name of program
 int Shutdown = 0;/* keep running until Shutdown == 1 */
 char buffer[BUFFERSIZE];//the buffer to store message
 
-char RotateLine[]={'-','\\','|','/'};
-uchar RotateDirection=0;
-bool FirstTimeOut=false;
+char RotateLine[]={'-','\\','|','/'};//for showing a rotating line after still waiting...
+uchar RotateDirection=0;//the current rotate direction
+bool FirstTimeOut=false;//if the timeout handle function is called for the first time after the last processing request
 
 #ifdef TEST1
-char uname[30]="michaelz";
-char passwd[30]="25619";
+char uname[30]="michaelz";//hard codeded user name
+char passwd[30]="25619";//hard codeded password
 #endif
 
 typedef void (*ClientHandler)(int DataSocketFD);
@@ -38,7 +38,8 @@ void FatalError(		/* print error diagnostics and abort */
     exit(20);
 } /* end of FatalError */
 
-void TimeOutHandleFunc(){
+void TimeOutHandleFunc()//the hanle function for timeout
+{
     if(!FirstTimeOut){
         printf("still waiting ...");
         FirstTimeOut=true;
@@ -56,7 +57,7 @@ int MakeServerSocket(		/* create a socket on this server */
     struct sockaddr_in ServSocketName;
 
     /* create the socket */
-    ServSocketFD = socket(PF_INET, SOCK_STREAM, 0);
+    ServSocketFD = socket(PF_INET, SOCK_STREAM, 0);//the socket descriptor representing the endpoint
     if (ServSocketFD < 0)
     {   FatalError("service socket creation failed");
     }
@@ -64,6 +65,8 @@ int MakeServerSocket(		/* create a socket on this server */
     ServSocketName.sin_family = AF_INET;
     ServSocketName.sin_port = htons(PortNo);
     ServSocketName.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    //Bind the socket
     if (bind(ServSocketFD, (struct sockaddr*)&ServSocketName,
 		sizeof(ServSocketName)) < 0)
     {   FatalError("binding the server to a socket failed");
@@ -83,9 +86,10 @@ void ProcessRequest(		/* process a time request by a client */
     char RecvBuf[BUFFERSIZE];	/* message buffer for receiving a message */
     char SendBuf[BUFFERSIZE];	/* message buffer for sending a response */
 
-    n = read(DataSocketFD, RecvBuf, sizeof(RecvBuf)-1);
+    n = read(DataSocketFD, RecvBuf, sizeof(RecvBuf)-1);//read 
     if (n < 0) 
-    {   FatalError("reading from data socket failed");
+    {   
+        FatalError("reading from data socket failed");
     }
     RecvBuf[n] = 0;
 #ifdef PRINT_LOG
@@ -93,7 +97,9 @@ void ProcessRequest(		/* process a time request by a client */
 #endif
 
     #ifdef TEST1
+    //Start decoding into a structure
     PackUnamePasswd packUP=decodeStrUP(RecvBuf);
+    //And sets the send buffer based on the content
     if(strcmp(packUP.UserName,"michaelz")==0){
         if(strcmp(packUP.Password,"25619")==0){
             sprintf(SendBuf,"User: %s just login",packUP.UserName);
@@ -109,6 +115,7 @@ void ProcessRequest(		/* process a time request by a client */
 #ifdef PRINT_LOG
     printf("%s: Sending response: %s.\n", Program, SendBuf);
 #endif
+    //send back to client
     n = write(DataSocketFD, SendBuf, l);
     if (n < 0)FatalError("writing to data socket failed");
 } /* end of ProcessRequest */
@@ -196,7 +203,7 @@ int main(int argc, char *argv[]){
     printf("K-Chat Server running\n");
     #endif
     if (argc < 2)
-    {   
+    {
         fprintf(stderr, "Usage: %s port\n", Program);
 	    exit(10);
     }
@@ -209,7 +216,7 @@ int main(int argc, char *argv[]){
     #ifdef PRINT_LOG
     printf("%s: Creating the server socket...\n", Program);
     #endif
-    ServSocketFD = MakeServerSocket(PortNo);
+    ServSocketFD = MakeServerSocket(PortNo);//Make a socket
 
     #ifdef PRINT_LOG
     printf("%s: Creating the server ...\n", Program);
@@ -217,7 +224,7 @@ int main(int argc, char *argv[]){
     printf("%s: Providing service at port %d...\n", Program, PortNo);
     #endif
     ServerMainLoop(ServSocketFD, ProcessRequest,
-			TimeOutHandleFunc, 250000);
+			TimeOutHandleFunc, 250000);//start the server main loop
     #ifdef PRINT_LOG
     printf("\n%s: Shutting down.\n", Program);
     #endif

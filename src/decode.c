@@ -6,7 +6,7 @@ PackUnamePasswd decodeStrUP(char *str_encodedPUP)
 {
     jsmn_parser json_str_parser;//create a json string parser
     jsmn_init(&json_str_parser);//init the jsmn json string parser
-    PackUnamePasswd packUnamePasswd;
+    PackUnamePasswd packUnamePasswd;//the pack to store info
     memset(packUnamePasswd.UserName,'\0',sizeof(packUnamePasswd.UserName));
     memset(packUnamePasswd.Password,'\0',sizeof(packUnamePasswd.Password));
 

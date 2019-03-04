@@ -4,6 +4,8 @@
 
 #define MAX_UP_SIZE 250
 
+//this header is for encode.c and decode.c
+
 //Encode Functions
 
 void encodePackUnamePasswd(char *str_encodedPUP, PackUnamePasswd *pack);
