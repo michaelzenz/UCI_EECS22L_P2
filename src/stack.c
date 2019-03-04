@@ -59,7 +59,7 @@ void stack_peek(Node* top, char *ret_str)
 void stack_print_log(Node** head_ref)
 {
     FILE *fp;
-    fp=fopen("MovesLog.txt","w");
+    fp=fopen("bin/MovesLog.txt","w");
     char TempStr[STR_NODE_SIZE],str_SID[3],str_EID[3],str_Move[11];
     Node *TempHead=NULL;
     while(!stack_isEmpty(*head_ref)){
