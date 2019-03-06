@@ -6,10 +6,14 @@
 #include<sys/select.h>
 #include<netdb.h>
 #include<stdbool.h> 
+#include<stdio.h>
+#include<stdlib.h>
 
 #define BUFFERSIZE 256
 #define PRINT_LOG //if want to print log
 #define TEST1 //for alpha release
+
+FILE * database;//setting up the pointer for the txt
 
 const char *Program=NULL;//the name of program
 int Shutdown = 0;/* keep running until Shutdown == 1 */
@@ -102,7 +106,9 @@ void ProcessRequest(		/* process a time request by a client */
     //And sets the send buffer based on the content
     if(strcmp(packUP.UserName,"michaelz")==0){
         if(strcmp(packUP.Password,"25619")==0){
-            sprintf(SendBuf,"User: %s just login",packUP.UserName);
+            fprintf(database, "%s ",packUP.UserName);
+            fprintf(database, "%s\n",packUP.Password);
+            sprintf(SendBuf,"User: %s has just logged in",packUP.UserName);
         }
         else strcpy(SendBuf,"Invalid Password");
     }
@@ -198,6 +204,13 @@ void ServerMainLoop(		/* simple server main loop */
 int main(int argc, char *argv[]){
     int ServSocketFD;	/* socket file descriptor for service */
     int PortNo;		/* port number */
+
+   /*global FILE * database; /*first attept at creating file for unames*/
+    database = fopen("database.txt","w");
+    /*fprintf(base, "this is line %d\n", 1);*/
+    /*fclose(base);*/
+
+
     Program=argv[0];
     #ifdef PRINT_LOG
     printf("K-Chat Server running\n");
