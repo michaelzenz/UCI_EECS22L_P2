@@ -1,4 +1,6 @@
 
+// #define PRINT_LOG
+
 //hard code for different objects and situation
 #define HUMAN 0
 #define COMPUTER 1
@@ -44,4 +46,3 @@
 #define CUR_PLAYER_WIN 2
 #define QUIT 3
 
-// #define PRINT_LOG

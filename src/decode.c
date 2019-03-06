@@ -21,16 +21,23 @@ PackUnamePasswd decodeStrUP(char *str_encodedPUP)
     //where $(UserName) means the UserName of the user (a string)
     //and $(PassWord) means the Password of the user (a string)
 
-        for(int i=1;i<r;i++)
+    for(int i=1;i<r;i++)
     {
-        if(jsoneq(str_encodedPUP,&t[i],"uname")==0)
+        if(jsoneq(str_encodedPUP,&t[i],"act")==0)
+        {
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,
+                        str_encodedPUP + t[i+1].start);
+            packUnamePasswd.action=atoi(temp);
+                i++;
+        }
+        else if(jsoneq(str_encodedPUP,&t[i],"uname")==0)
         {
             sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,
                         str_encodedPUP + t[i+1].start);
             strcpy(packUnamePasswd.UserName,temp);
                 i++;
         }
-        if(jsoneq(str_encodedPUP,&t[i],"passwd")==0)
+        else if(jsoneq(str_encodedPUP,&t[i],"passwd")==0)
         {
             sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,
                         str_encodedPUP + t[i+1].start);

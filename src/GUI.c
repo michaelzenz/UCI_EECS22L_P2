@@ -11,7 +11,6 @@ int gui_player_HvH_menu(Player* player_arr);
 int gui_player_CvC_menu(Player* player_arr);
 
 
-
 /*Global Variables */
 
 //Widgets for gtk to use
