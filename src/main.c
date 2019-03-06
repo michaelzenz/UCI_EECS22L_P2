@@ -100,7 +100,45 @@ void ProcessRequest(		/* process a time request by a client */
     printf("%s: Received message: %s\n", Program, RecvBuf);
 #endif
 
-    #ifdef TEST1
+//first attempt at actual package handling
+    //Start decoding into a structure
+    PackUnamePasswd packUP=decodeStrUP(RecvBuf);
+    //And sets the send buffer based on the content
+    //if(strcmp(packUP.action,"1")==0)//action 1 = registration
+    if(packUP.action =='0')//action 1 = registration
+    {
+                //prints the name and password to the text file, no /n characters
+                database = fopen("database.txt","a");
+                fprintf(database, "%s ",/*"name"*/packUP.UserName);
+                fprintf(database, "%s ",/*"password"*/packUP.Password);
+                fclose(database);
+                sprintf(SendBuf,"User: %s has just registered",packUP.UserName);
+    }
+    //else if(strcmp(packUP.action,"0")==0)//action 0 means login
+    if(packUP.action =='0')
+    {
+        database = fopen("database.txt","a");
+        char data[500];
+        fscanf(database, "%s",data);
+        printf(data);
+        if((strstr(data,packUP.UserName)) !=NULL){
+           if((strstr(data,packUP.Password)) !=NULL){
+                printf("User: %s has just logged in",packUP.UserName);
+                sprintf(SendBuf,"User: %s has just logged in",packUP.UserName);
+                }
+            else {
+                strcpy(SendBuf,"Invalid Password");
+                printf("Invalid Password");
+            }
+        }
+        else{
+        strcpy(SendBuf,"Unknown User");
+        printf("Unknown User");
+        }
+    }
+
+
+    #ifdef TEST12
     //Start decoding into a structure
     PackUnamePasswd packUP=decodeStrUP(RecvBuf);
     //And sets the send buffer based on the content
@@ -208,9 +246,18 @@ int main(int argc, char *argv[]){
     int PortNo;		/* port number */
 
    /*global FILE * database; /*first attept at creating file for unames*/
-    database = fopen("database.txt","w");
-    fprintf(database, "So begins the database %s\n", "now");
-    fclose(database);
+    if ((database = fopen("database.txt","a")) != NULL)
+    {
+        printf("database loaded");
+        /*fprintf(database, "So begins the database %s\n", "now");
+        fclose(database);*/
+    }
+    else
+    {
+        database = fopen("database.txt","w");
+    }
+    
+    
 
 
     Program=argv[0];
