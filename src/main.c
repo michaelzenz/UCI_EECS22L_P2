@@ -106,8 +106,10 @@ void ProcessRequest(		/* process a time request by a client */
     //And sets the send buffer based on the content
     if(strcmp(packUP.UserName,"michaelz")==0){
         if(strcmp(packUP.Password,"25619")==0){
-            fprintf(database, "%s ",packUP.UserName);
-            fprintf(database, "%s\n",packUP.Password);
+            database = fopen("database.txt","a");
+            fprintf(database, "%s ",/*"name"*/packUP.UserName);
+            fprintf(database, "%s\n",/*"number"*/packUP.Password);
+            fclose(database);
             sprintf(SendBuf,"User: %s has just logged in",packUP.UserName);
         }
         else strcpy(SendBuf,"Invalid Password");
@@ -207,8 +209,8 @@ int main(int argc, char *argv[]){
 
    /*global FILE * database; /*first attept at creating file for unames*/
     database = fopen("database.txt","w");
-    /*fprintf(base, "this is line %d\n", 1);*/
-    /*fclose(base);*/
+    fprintf(database, "So begins the database %s\n", "now");
+    fclose(database);
 
 
     Program=argv[0];
