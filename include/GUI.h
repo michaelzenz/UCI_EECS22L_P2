@@ -33,6 +33,8 @@
 #define ACTION_UNDO 2
 #define ACTION_QUIT 3
 
+GdkPixbuf *load_pixbuf_from_file (const char *filename);
+
 void gui_init_window(int argc, char*argv[]);
 
 void gui_init_offline(GameState *gameState,Player player_arr[2]);
@@ -53,5 +55,6 @@ void gui_refresh(GameState *gameState,Player *player_arr);
 void Select_Piece(GtkWidget *widget, GdkEvent *event, gpointer data, GameState *gameState);
 
 void gui_checkmate_window(GameState *gameState, int winner);
+
 
 #endif

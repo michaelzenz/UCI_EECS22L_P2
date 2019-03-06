@@ -8,8 +8,10 @@
 /*Global Variables */
 
 //Widgets for gtk to use
-GtkWidget *window=NULL;//the window
-GtkWidget *image=NULL;//the widget to load image
+
+
+GtkWidget *window=NULL;
+GtkWidget *image=NULL;
 GtkWidget *layout=NULL;//the layout to put on background and contain fixed widget
 GtkWidget *fixed=NULL;//the widget to contain table
 GtkWidget *chess_icon=NULL;//the icon to draw on the board
@@ -36,7 +38,7 @@ char *Background_path="res/GamePlayBackground.jpg";
 char *HvH_Menu_path="res/HvH_Menu.png";
 char *CvC_Menu_path="res/CvC_Menu.png";
 
-int GameMode=0;
+extern int GameMode;
 
 //load .png and .jpg files to pixbuf
 GdkPixbuf *load_pixbuf_from_file (const char *filename)

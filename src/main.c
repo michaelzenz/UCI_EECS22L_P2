@@ -51,6 +51,7 @@ void GameOffline(){
 }
 
 void GameOnline(int argc, char *argv[]){
+    Login_menu();
 
     if (argc < 3)
     {   
