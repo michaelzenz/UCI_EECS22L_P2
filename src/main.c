@@ -102,27 +102,40 @@ void ProcessRequest(		/* process a time request by a client */
 
 //first attempt at actual package handling
     //Start decoding into a structure
+    printf("beginning processing\n");
     PackUnamePasswd packUP=decodeStrUP(RecvBuf);
     //And sets the send buffer based on the content
-    //if(strcmp(packUP.action,"1")==0)//action 1 = registration
-    if(packUP.action =='0')//action 1 = registration
+
+    //bases check on atoi value 
+    if(packUP.action == atoi("1"))//action 1 = registration, I dont like casting like this but oh well
     {
-                //prints the name and password to the text file, no /n characters
+                printf("attempting to register %s/n",packUP.UserName);
                 database = fopen("database.txt","a");
+                //prints the name and password to the text file, no /n characters
                 fprintf(database, "%s ",/*"name"*/packUP.UserName);
                 fprintf(database, "%s ",/*"password"*/packUP.Password);
                 fclose(database);
                 sprintf(SendBuf,"User: %s has just registered",packUP.UserName);
     }
-    //else if(strcmp(packUP.action,"0")==0)//action 0 means login
-    if(packUP.action =='0')
+    else if(packUP.action == atoi("0"))//action 0 means login
     {
+        printf("attempting to log in %s %s\n",packUP.UserName, packUP.Password);
         database = fopen("database.txt","a");
+
         char data[500];
-        fscanf(database, "%s",data);
-        printf(data);
-        if((strstr(data,packUP.UserName)) !=NULL){
-           if((strstr(data,packUP.Password)) !=NULL){
+        //fscanf(database, "%s",data);
+        fgets(data, 500, database);
+        printf("%s",data);
+        char* u;
+        u = strstr(data,packUP.UserName);
+        printf("%s\n",u);
+
+        //char* p;
+        //p = strstr(data,packUP.Password);
+        //printf(data);
+
+        if(u){
+           if(true){
                 printf("User: %s has just logged in",packUP.UserName);
                 sprintf(SendBuf,"User: %s has just logged in",packUP.UserName);
                 }
