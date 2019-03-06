@@ -17,6 +17,8 @@ At the moment, The program can demonstrate basic socket and package communicatio
 
 This is the server program of alpha release, by start running it will constantly listen to the port and send different message based on what it received.
 
+For make, make test, make test-gui,make test-comm, make clean, make tar command, please cd into build dir where you can find the makefile(after you compile) and run these commands
+
 ++++++++++++++++++++++++++++++++++++++++++++++++++
 
 

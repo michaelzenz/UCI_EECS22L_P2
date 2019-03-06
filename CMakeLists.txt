@@ -74,11 +74,24 @@ add_custom_target(tar COMMAND
     "${PROJECT_SOURCE_DIR}/res"
     "${PROJECT_SOURCE_DIR}/src"
     "${PROJECT_SOURCE_DIR}/CMakeLists.txt"
+    "${PROJECT_SOURCE_DIR}/COPYRIGHT.txt"
+    "${PROJECT_SOURCE_DIR}/INSTALL.txt"
     "${PROJECT_SOURCE_DIR}/jsmn LICENSE"
-    "${PROJECT_SOURCE_DIR}/SuperSimpleInstallAndRun.sh")
+    "${PROJECT_SOURCE_DIR}/README.txt"
+    "${PROJECT_SOURCE_DIR}/SuperSimpleInstall.sh")
 
 ADD_TEST(NAME test 
-COMMAND "${EXECUTABLE_OUTPUT_PATH}/chess"
+COMMAND "${EXECUTABLE_OUTPUT_PATH}/kchat-server" "11000"
 WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
 ENABLE_TESTING()
+
+add_custom_target(test-gui COMMAND
+    "./kchat-server" 
+    "11000"
+    WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
+
+add_custom_target(test-comm COMMAND
+    "./kchat-server" 
+    "11000"
+    WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
 

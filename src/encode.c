@@ -3,13 +3,19 @@
 //Convert the PackUnamePasswd into a json string
 void encodePackUnamePasswd(char *str_encodedPUP, PackUnamePasswd *pack)
 {
-   char str_UserName[40]="\"uname\":\"";//which means that the length of user name must not exceed 32
+   char str_action[8]="\"act\":";
+   char str_UserName[40]="\"uname\":\"";//which means that the length of user name must not exceed 30
    char str_Password[40]="\"passwd\":\"";//which means that the length of password must not exceed 30
 
-    memset(str_encodedPUP,'\0',sizeof(str_encodedPUP));
+   char str_temp[2]="";
+
+   memset(str_encodedPUP,'\0',sizeof(str_encodedPUP));
    str_encodedPUP[0]='{';
+   strcat(str_action,my_itoa(pack->action,str_temp));
    strcat(str_UserName,pack->UserName);
    strcat(str_Password,pack->Password);
+   strcat(str_encodedPUP,str_action);
+   strcat(str_encodedPUP,",");
    strcat(str_encodedPUP,str_UserName);
    strcat(str_encodedPUP,"\",");
    strcat(str_encodedPUP,str_Password);
