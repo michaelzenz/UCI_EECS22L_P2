@@ -54,6 +54,61 @@ void GameOffline(){
 
 //a simple demo of online game(only login, and there is only one user michaelz)
 void GameOnline(int argc, char *argv[]){
+    //inserting test code here
+    vectorStr testVect;
+    vectorStr testVect2;
+    vectorStr_init(&testVect2);
+    vectorStr_init(&testVect);
+    char* testStr = "this is a test string";
+    vectorStr_add(&testVect, testStr);
+    char* getString = NULL;
+
+    //testing first vector
+    getString = vectorStr_get(&testVect, 0, &getString);
+    printf("this is what is contained in vector: %s\n", getString);
+    testStr = "2nd String";
+    vectorStr_add(&testVect, testStr);
+    getString = vectorStr_get(&testVect, 0, &getString);
+    printf("this is what is contained in vector[0]: %s\n", getString);
+    getString = vectorStr_get(&testVect, 1, &getString);
+    printf("this is what is contained in vector[1]: %s\n", getString);
+
+    //testing 2nd vector
+    testStr = "string in vector 2";
+    vectorStr_add(&testVect2, testStr);
+    testStr = "last string in vector 2";
+    vectorStr_add(&testVect2, testStr);
+    getString = vectorStr_get(&testVect2, 0, &getString);
+    printf("this is what is contained in vector2[0]: %s\n", getString);
+    getString = vectorStr_get(&testVect2, 1, &getString);
+    printf("this is what is contained in vector2[1]: %s\n", getString);
+
+    //testing Cat Function
+    vectorStr_cat(&testVect, &testVect2);
+    getString = vectorStr_get(&testVect, 0, &getString);
+    printf("this is what is contained in vector[0]: %s\n", getString);
+    getString = vectorStr_get(&testVect, 1, &getString);
+    printf("this is what is contained in vector[1]: %s\n", getString);
+    getString = vectorStr_get(&testVect, 2, &getString);
+    printf("this is what is contained in vector[2]: %s\n", getString);
+    getString = vectorStr_get(&testVect, 3, &getString);
+    printf("this is what is contained in vector[3]: %s\n", getString);
+
+    //testing free function
+    vectorStr_free(&testVect2);
+    getString = vectorStr_get(&testVect2, 0, &getString);
+    printf("this is what is contained in vector2[0]: %s\n", getString);
+    getString = vectorStr_get(&testVect2, 1, &getString);
+    printf("this is what is contained in vector2[1]: %s\n", getString);
+
+    //testing delete function
+    (vectorStr_delete(&testVect, 0));//delete first element of vector
+    getString = vectorStr_get(&testVect, 0, &getString);
+    printf("this is what is contained in vector[0]: %s\n", getString);
+    getString = vectorStr_get(&testVect, 1, &getString);
+    printf("this is what is contained in vector[1]: %s\n", getString);
+
+    //end of test code insertion
 
     if (argc < 3)
     {   
@@ -81,6 +136,8 @@ void GameOnline(int argc, char *argv[]){
     sendToServer(str_up,RecvBuf);
 
     int hit=1;
+
+    
 
 }
 

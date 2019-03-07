@@ -113,8 +113,8 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    for(int i=0;i<newMsgNb;i++){
       strcat(str_messageList,"\"");
       strcat(str_srcUserList,"\"");
-      strcat(str_messageList,vectorStr_get(&pack->messageList,i,tempMsg));
-      strcat(str_srcUserList,vectorStr_get(&pack->srcUserList,i,tempUserName));
+      strcat(str_messageList,vectorStr_get(&pack->messageList,i,&tempMsg));
+      strcat(str_srcUserList,vectorStr_get(&pack->srcUserList,i,&tempUserName));
       if(i==newMsgNb-1){
          strcat(str_messageList,"\"]");
          strcat(str_srcUserList,"\"]");

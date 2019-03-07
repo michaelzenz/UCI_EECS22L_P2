@@ -41,54 +41,51 @@ void vectorStr_set(vectorStr *v, int index, char *str)//changes value of string 
         return;
     }
 
-    
-    v->data[index] = str;
+    strcpy(v->data[index], str);
 }
 
-char *vectorStr_get(vectorStr *v, int index, char *str)//returns string from vector at given index
+char* vectorStr_get(vectorStr *v, int index, char** str)//edits str to become string from vector at given index
 {
     if (index >= v->count) {
         return NULL;
     }
-    strcpy(str,v->data[index]);
-    return str;
+    if(*str==NULL) 
+        *str=malloc(sizeof(v->data[index]));
+
+    strcpy(*str, v->data[index]);
+    return *(str);
 }
 
-void vectorStr_delete(vectorStr *v, int index)//deletes element at given index
+//deletes element at given index
+void vectorStr_delete(vectorStr *v, int index)
 {
     if (index >= v->count) {
         return;
     }
 
-    for (int i = index, j = index; i < v->count; i++) {
-        v->data[j] = v->data[i];
-        j++;
+    for (int i = index, j = index; i < v->count; i++,j++) {
+        vectorStr_set(v,j,v->data[i]);
     }
-
+    free(v->data[v->count-1]);
     v->count--;
 }
 
 void vectorStr_free(vectorStr *v)//frees memory of vector
 {
+    int size = v->count;
+    for (int i=0; i< size; i++)
+    {
+        free(v->data[i]);
+    }
     free(v->data);
 }
 
 void vectorStr_cat(vectorStr *v1, vectorStr *v2) //combines two vectors together
 {
-    char temp[MAX_NODE_SIZE];
+    char* tmp=NULL;
     for(int i=0;i<v2->count;i++)//adds every elements of v2 to end of v1
     {
-        vectorStr_add(v1,vectorStr_get(v2,i,temp));
+        tmp = vectorStr_get(v2,i, &tmp);
+        vectorStr_add(v1, tmp);
     }
 }
-
-/*unsigned char vectorStr_contain(vectorStr *v, int str)//checks if element is contained in vector
-{
-    int cnt=v->count;
-    for(int i=0;i<cnt;i++)
-    {
-        if(vectorStr_get(v,i)==str)return 1;
-    }
-    return 0;
-}
-*/
