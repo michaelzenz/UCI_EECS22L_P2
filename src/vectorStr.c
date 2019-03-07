@@ -41,16 +41,17 @@ void vectorStr_set(vectorStr *v, int index, char *str)//changes value of string 
         return;
     }
 
+    
     v->data[index] = str;
 }
 
-char *vectorStr_get(vectorStr *v, int index)//returns string from vector at given index
+char *vectorStr_get(vectorStr *v, int index, char *str)//returns string from vector at given index
 {
     if (index >= v->count) {
         return NULL;
     }
-
-    return v->data[index];
+    strcpy(str,v->data[index]);
+    return str;
 }
 
 void vectorStr_delete(vectorStr *v, int index)//deletes element at given index
@@ -74,9 +75,10 @@ void vectorStr_free(vectorStr *v)//frees memory of vector
 
 void vectorStr_cat(vectorStr *v1, vectorStr *v2) //combines two vectors together
 {
+    char temp[MAX_NODE_SIZE];
     for(int i=0;i<v2->count;i++)//adds every elements of v2 to end of v1
     {
-        vectorStr_add(v1,vectorStr_get(v2,i));
+        vectorStr_add(v1,vectorStr_get(v2,i,temp));
     }
 }
 
