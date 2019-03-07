@@ -41,42 +41,58 @@ void vectorStr_set(vectorStr *v, int index, char *str)//changes value of string 
         return;
     }
 
-    v->data[index] = str;
+    strcpy(v->data[index], str);
 }
 
-char *vectorStr_get(vectorStr *v, int index)//returns string from vector at given index
+char* vectorStr_get(vectorStr *v, int index, char** str)//edits str to become string from vector at given index
 {
     if (index >= v->count) {
         return NULL;
     }
+    if(*str==NULL) 
+        *str=malloc(sizeof(v->data[index]));
 
-    return v->data[index];
+    strcpy(*str, v->data[index]);
+    return *(str);
 }
 
-void vectorStr_delete(vectorStr *v, int index)//deletes element at given index
+vectorStr* vectorStr_delete(vectorStr *v, int index)//deletes element at given index
 {
     if (index >= v->count) {
-        return;
+        return NULL;
     }
+    vectorStr *temp;//create a temp vector
+    vectorStr_init(temp);
 
-    for (int i = index, j = index; i < v->count; i++) {
-        v->data[j] = v->data[i];
-        j++;
+    for (int i = 0; i < v->count; i++) {//stops before last one due to indexing
+        if(i == index)
+        {
+            i++;//skip the index we are deleting
+        }
+        vectorStr_add(temp, v->data[i]);//copy every element from v into temp
+        //dont use copy use add function I wrote... strcpy(temp->data[i], v->data[i]);//copy string from next one into current
     }
-
-    v->count--;
+    vectorStr_free(v);
+    return temp;//returns new vector with deleted element gone.
 }
 
 void vectorStr_free(vectorStr *v)//frees memory of vector
 {
+    int size = v->count;
+    for (int i=0; i< size; i++)
+    {
+        free(v->data[i]);
+    }
     free(v->data);
 }
 
 void vectorStr_cat(vectorStr *v1, vectorStr *v2) //combines two vectors together
 {
+    char* tmp=NULL;
     for(int i=0;i<v2->count;i++)//adds every elements of v2 to end of v1
     {
-        vectorStr_add(v1,vectorStr_get(v2,i));
+        tmp = vectorStr_get(v2,i, &tmp);
+        vectorStr_add(v1, tmp);
     }
 }
 

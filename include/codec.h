@@ -3,6 +3,7 @@
 #include<string.h>
 #include"jsmn.h"
 #include<stdlib.h>
+#include"vectorStr.h"
 
 #ifndef CODEC_H
 #define CODEC_H
