@@ -60,7 +60,7 @@ void database_set_onlineStatus(char* user, bool onlineStatus)
 }
 
 //get the message queue of a user
-QueueStr database_get_msgQueue(char* user)
+QueueStr* database_get_msgQueue(char* user)
 {
 
 }

@@ -42,7 +42,7 @@ void database_add_challenger(char* user, char* challenger);
 void database_set_onlineStatus(char* user, bool onlineStatus);
 
 //get the message queue of a user
-QueueStr database_get_msgQueue(char* user);
+QueueStr* database_get_msgQueue(char* user);
 
 //get the next challenger
 char* database_get_nextChallenger(char* user);
