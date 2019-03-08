@@ -51,11 +51,10 @@ void GameOffline(){
 }
 
 void GameOnline(int argc, char *argv[]){
-    Register_menu();
-    sleep(3);
+    
     Login_menu();
-    sleep(3);
-
+    Register_menu();
+    
     if (argc < 3)
     {   
         printf("Usage: %s hostname port\n", argv[0]);
