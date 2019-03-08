@@ -1,4 +1,5 @@
 #include"codec.h"
+#include"queueStr.h"
 #include<gtk/gtk.h>
 #include<stdint.h>
 #include<arpa/inet.h>
@@ -275,7 +276,14 @@ int main(int argc, char *argv[]){
         database = fopen("database.txt","w");
     }
     
-    
+    QueueStr q;
+    queueStr_init(&q);
+    queueStr_enqueue(&q,"test","michael");
+    queueStr_enqueue(&q,"test2","michael");
+    char str_msg[MAX_MSG_LEN];
+    queueStr_printAll(&q);
+    queueStr_dequeue(&q,str_msg);
+    queueStr_free(&q);
 
 
     Program=argv[0];
