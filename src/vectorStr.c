@@ -35,25 +35,38 @@ void vectorStr_add(vectorStr *v, char *str)//add string to vector list
     v->count++;
 }
 
+
 void vectorStr_set(vectorStr *v, int index, char *str)//changes value of string at given index of vector
 {
     if (index >= v->count) {
         return;
     }
-
+    if(sizeof(v->data[index])<sizeof(str))
+        v->data[index]=realloc(v->data[index],sizeof(str));
     strcpy(v->data[index], str);
 }
 
-char* vectorStr_get(vectorStr *v, int index, char** str)//edits str to become string from vector at given index
+char* vectorStr_get(vectorStr *v, int index, char* str)//edits str to become string from vector at given index
 {
     if (index >= v->count) {
         return NULL;
     }
-    if(*str==NULL) 
-        *str=malloc(sizeof(v->data[index]));
 
-    strcpy(*str, v->data[index]);
-    return *(str);
+    strcpy(str, v->data[index]);
+    return str;
+}
+
+char* _vectorStr_get(vectorStr *v, int index, char** str)
+{
+    if (index >= v->count) {
+        return NULL;
+    }
+    if(*str==NULL)
+        *str=malloc(sizeof(v->data[index]));
+    else if(sizeof(*str)<sizeof(v->data[index]))
+        *str=realloc(*str,sizeof(v->data[index]));
+    vectorStr_get(v,index,*str);
+    return *str;
 }
 
 //deletes element at given index
@@ -63,10 +76,11 @@ void vectorStr_delete(vectorStr *v, int index)
         return;
     }
 
-    for (int i = index, j = index; i < v->count; i++,j++) {
-        vectorStr_set(v,j,v->data[i]);
+    int cnt=v->count;
+    for (int i = index, j = index+1; i < cnt-1; i++,j++) {
+        vectorStr_set(v,i,v->data[j]);
     }
-    free(v->data[v->count-1]);
+    free(v->data[cnt-1]);
     v->count--;
 }
 
@@ -85,7 +99,15 @@ void vectorStr_cat(vectorStr *v1, vectorStr *v2) //combines two vectors together
     char* tmp=NULL;
     for(int i=0;i<v2->count;i++)//adds every elements of v2 to end of v1
     {
-        tmp = vectorStr_get(v2,i, &tmp);
-        vectorStr_add(v1, tmp);
+        vectorStr_add(v1, _vectorStr_get(v2,i, &tmp));
     }
+    free(tmp);
+}
+
+void vectorStr_printAll(vectorStr *v)
+{
+    int cnt=v->count;
+    printf("start printing\n");
+    for(int i=0;i<cnt;i++)printf("%s  ",v->data[i]);
+    printf("\nend printing\n");
 }

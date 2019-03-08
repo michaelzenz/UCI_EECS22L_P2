@@ -52,61 +52,104 @@ void GameOffline(){
     }
 }
 
+void testVectorStr(vectorStr *v)
+{
+    vectorStr_init(v);
+    vectorStr_add(v,"test1");
+    vectorStr_add(v,"test21");
+    vectorStr_add(v,"test");
+
+    vectorStr_set(v,0,"test22");
+    vectorStr_set(v,0,"test");
+    vectorStr_delete(v,1);
+
+    vectorStr v2;
+    vectorStr_init(&v2);
+    vectorStr_add(&v2,"test222");
+    vectorStr_cat(v,&v2);
+    vectorStr_free(&v2);
+    return;
+}
+
+void testCodec()
+{
+    vectorStr friendList;
+    vectorStr_init(&friendList);
+    vectorStr_add(&friendList,"keenan");
+    vectorStr_add(&friendList,"aria");
+    vectorStr msgList,srcUserList;
+    vectorStr_init(&msgList);
+    vectorStr_init(&srcUserList);
+    vectorStr_add(&msgList,"hello");
+    vectorStr_add(&msgList,"hello");
+    vectorStr_add(&srcUserList,"keenan");
+    vectorStr_add(&srcUserList,"aria");
+
+    vectorStr_printAll(&friendList);
+    vectorStr_printAll(&msgList);
+    vectorStr_printAll(&srcUserList);
+
+    PackUnamePasswd pup={LOGIN,"michaelz","25619"};
+    PackAnswerLR palr={SUCCESS,2,friendList};
+    PackQuery pq={"michaelz","aria","hello","aria"};
+    PackAnswerQuery paq={2};
+    paq.onlineFlagList[0]=paq.onlineFlagList[1]=1;
+    strcpy(paq.challenger,"aria");
+    paq.messageList=msgList;
+    paq.srcUserList=srcUserList;
+    PackPlay pp={"michaelz",CHAT,"hello",48,40};
+
+    char str_pup[MAX_PUP_SIZE],str_palr[MAX_PALR_SIZE],str_pq[MAX_PQ_SIZE],str_paq[MAX_PAQ_SIZE],str_pp[MAX_PP_SIZE];
+    encodePackUnamePasswd(str_pup,&pup);
+    encodePackAnswerLR(str_palr,&palr);
+    encodePackQuery(str_pq,&pq);
+    encodePackAnswerQuery(str_paq,&paq);
+    encodePackPlay(str_pp,&pp);
+
+    printf("pup:%s\n",str_pup);
+    printf("palr:%s\n",str_palr);
+    printf("pq:%s\n",str_pq);
+    printf("paq:%s\n",str_paq);
+    printf("pp:%s\n",str_pp);
+
+    PackUnamePasswd dpup;
+    PackAnswerLR dpalr;
+    PackQuery dpq;
+    PackAnswerQuery dpaq;
+    PackPlay dpp;
+
+    dpup=decodeStrPUP(str_pup);
+    dpalr=decodeStrPALR(str_palr);
+    dpq=decodeStrPQ(str_pq);
+    dpaq=decodeStrPAQ(str_paq);
+    dpp=decodeStrPP(str_pp);
+    dpaq.friendNumber=2;
+
+    encodePackUnamePasswd(str_pup,&dpup);
+    encodePackAnswerLR(str_palr,&dpalr);
+    encodePackQuery(str_pq,&dpq);
+    encodePackAnswerQuery(str_paq,&dpaq);
+    encodePackPlay(str_pp,&dpp);
+
+    printf("\ntest decode\n");
+
+    printf("dpup:%s\n",str_pup);
+    printf("dpalr:%s\n",str_palr);
+    printf("dpq:%s\n",str_pq);
+    printf("dpaq:%s\n",str_paq);
+    printf("dpp:%s\n",str_pp);
+
+    return;
+}
+
 //a simple demo of online game(only login, and there is only one user michaelz)
-void GameOnline(int argc, char *argv[]){
-    //inserting test code here
-    vectorStr testVect;
-    vectorStr testVect2;
-    vectorStr_init(&testVect2);
-    vectorStr_init(&testVect);
-    char* testStr = "this is a test string";
-    vectorStr_add(&testVect, testStr);
-    char* getString = NULL;
+void GameOnline(int argc, char *argv[])
+{
 
-    //testing first vector
-    getString = vectorStr_get(&testVect, 0, &getString);
-    printf("this is what is contained in vector: %s\n", getString);
-    testStr = "2nd String";
-    vectorStr_add(&testVect, testStr);
-    getString = vectorStr_get(&testVect, 0, &getString);
-    printf("this is what is contained in vector[0]: %s\n", getString);
-    getString = vectorStr_get(&testVect, 1, &getString);
-    printf("this is what is contained in vector[1]: %s\n", getString);
-
-    //testing 2nd vector
-    testStr = "string in vector 2";
-    vectorStr_add(&testVect2, testStr);
-    testStr = "last string in vector 2";
-    vectorStr_add(&testVect2, testStr);
-    getString = vectorStr_get(&testVect2, 0, &getString);
-    printf("this is what is contained in vector2[0]: %s\n", getString);
-    getString = vectorStr_get(&testVect2, 1, &getString);
-    printf("this is what is contained in vector2[1]: %s\n", getString);
-
-    //testing Cat Function
-    vectorStr_cat(&testVect, &testVect2);
-    getString = vectorStr_get(&testVect, 0, &getString);
-    printf("this is what is contained in vector[0]: %s\n", getString);
-    getString = vectorStr_get(&testVect, 1, &getString);
-    printf("this is what is contained in vector[1]: %s\n", getString);
-    getString = vectorStr_get(&testVect, 2, &getString);
-    printf("this is what is contained in vector[2]: %s\n", getString);
-    getString = vectorStr_get(&testVect, 3, &getString);
-    printf("this is what is contained in vector[3]: %s\n", getString);
-
-    //testing free function
-    vectorStr_free(&testVect2);
-    getString = vectorStr_get(&testVect2, 0, &getString);
-    printf("this is what is contained in vector2[0]: %s\n", getString);
-    getString = vectorStr_get(&testVect2, 1, &getString);
-    printf("this is what is contained in vector2[1]: %s\n", getString);
-
-    //testing delete function
-    (vectorStr_delete(&testVect, 0));//delete first element of vector
-    getString = vectorStr_get(&testVect, 0, &getString);
-    printf("this is what is contained in vector[0]: %s\n", getString);
-    getString = vectorStr_get(&testVect, 1, &getString);
-    printf("this is what is contained in vector[1]: %s\n", getString);
+    vectorStr testV;
+    testVectorStr(&testV);
+    vectorStr_printAll(&testV);
+    testCodec();
 
     //end of test code insertion
 

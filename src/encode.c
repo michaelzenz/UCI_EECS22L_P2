@@ -49,7 +49,7 @@ void encodePackAnswerLR(char *jsonStr, PackAnswerLR *pack)
          strcat(str_FriendList,"\"]");
          break;
       }
-      strcat(str_FriendList,"\",\"");
+      strcat(str_FriendList,"\",");
    }
 
    strcat(jsonStr,str_successflag);
@@ -57,7 +57,7 @@ void encodePackAnswerLR(char *jsonStr, PackAnswerLR *pack)
    strcat(jsonStr,str_FriendNb);
    strcat(jsonStr,",");
    strcat(jsonStr,str_FriendList);
-   strcat(jsonStr,"\"}");
+   strcat(jsonStr,"}");
 }
 
 //Convert the PackAnswerLR into a json string
@@ -75,11 +75,11 @@ void encodePackQuery(char *jsonStr, PackQuery *pack)
    strcat(str_UserName,pack->UserName);
    strcat(str_UserName,"\"");
    strcat(str_NewFriend,pack->NewFriend);
-   strcat(str_UserName,"\"");
+   strcat(str_NewFriend,"\"");
    strcat(str_MSG,pack->Message);
-   strcat(str_UserName,"\"");
+   strcat(str_MSG,"\"");
    strcat(str_DstUserName,pack->dstUser);
-   strcat(str_UserName,"\"");
+   strcat(str_DstUserName,"\"");
 
    strcat(jsonStr,str_UserName);
    strcat(jsonStr,",");
@@ -95,13 +95,13 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
 {
    char str_OnlineFlagList[MAX_FRIEND_NB+10]="\"ol\":\"";
    char str_Challenger[MAX_USERNAME_LEN+12]="\"cger\":\"";
-   char str_messageList[MAX_MSG_LEN*MAX_FRIEND_NB+10]="\"msgs\":\"";
-   char str_srcUserList[MAX_USERNAME_LEN*MAX_FRIEND_NB+10]="\"srcs\":\"";
+   char str_messageList[MAX_MSG_LEN*MAX_FRIEND_NB+10]="\"msgs\":[";
+   char str_srcUserList[MAX_USERNAME_LEN*MAX_FRIEND_NB+10]="\"srcs\":[";
 
    memset(jsonStr,'\0',sizeof(jsonStr));
    jsonStr[0]='{';
 
-   strcat(str_OnlineFlagList,(char*)pack->challenger);
+   memcpy(str_OnlineFlagList+strlen(str_OnlineFlagList),pack->onlineFlagList,sizeof(char)*pack->friendNumber);
    strcat(str_OnlineFlagList,"\"");
 
    strcat(str_Challenger,pack->challenger);
@@ -113,15 +113,15 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    for(int i=0;i<newMsgNb;i++){
       strcat(str_messageList,"\"");
       strcat(str_srcUserList,"\"");
-      strcat(str_messageList,vectorStr_get(&pack->messageList,i,&tempMsg));
-      strcat(str_srcUserList,vectorStr_get(&pack->srcUserList,i,&tempUserName));
+      strcat(str_messageList,vectorStr_get(&pack->messageList,i,tempMsg));
+      strcat(str_srcUserList,vectorStr_get(&pack->srcUserList,i,tempUserName));
       if(i==newMsgNb-1){
          strcat(str_messageList,"\"]");
          strcat(str_srcUserList,"\"]");
          break;
       }
-      strcat(str_messageList,"\",\"");
-      strcat(str_srcUserList,"\",\"");
+      strcat(str_messageList,"\",");
+      strcat(str_srcUserList,"\",");
    }
 
 
@@ -133,5 +133,39 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    strcat(jsonStr,str_messageList);
    strcat(jsonStr,",");
    strcat(jsonStr,str_srcUserList);
+   strcat(jsonStr,"}");
+}
+
+//Convert the PackAnswerLR into a json string
+void encodePackPlay(char *jsonStr, PackPlay *pack)
+{
+   char str_UserName[MAX_USERNAME_LEN+10]="\"uname\":\"";
+   char str_Action[12]="\"act\":";
+   char str_MSG[MAX_MSG_LEN+10]="\"msg\":\"";
+   char str_start_pt[9]="\"spt\":";
+   char str_end_pt[9]="\"ept\":";
+
+   char str_temp[3]="";
+
+   memset(jsonStr,'\0',sizeof(jsonStr));
+   jsonStr[0]='{';
+
+   strcat(str_UserName,pack->UserName);
+   strcat(str_UserName,"\"");
+   strcat(str_Action,my_itoa(pack->Action,str_temp));
+   strcat(str_MSG,pack->message);
+   strcat(str_MSG,"\"");
+   strcat(str_start_pt,my_itoa(pack->start_pt,str_temp));
+   strcat(str_end_pt,my_itoa(pack->end_pt,str_temp));
+
+   strcat(jsonStr,str_UserName);
+   strcat(jsonStr,",");
+   strcat(jsonStr,str_Action);
+   strcat(jsonStr,",");
+   strcat(jsonStr,str_MSG);
+   strcat(jsonStr,",");
+   strcat(jsonStr,str_start_pt);
+   strcat(jsonStr,",");
+   strcat(jsonStr,str_end_pt);
    strcat(jsonStr,"}");
 }
