@@ -5,6 +5,7 @@
 #include"codec.h"
 #include"connection.h"
 
+
 #define MODEL 1
 
 //play on the current gameState by the current player
@@ -142,16 +143,23 @@ void testCodec()
 }
 
 //a simple demo of online game(only login, and there is only one user michaelz)
+<<<<<<< HEAD
 void GameOnline(int argc, char *argv[]){
-    
-
-    Login_menu();
     Register_menu();
-	//vectorStr testV;
-    //testVectorStr(&testV);
-    //vectorStr_printAll(&testV);
-    //testCodec();
+    sleep(3);
+    Login_menu();
+    sleep(3);
+=======
+void GameOnline(int argc, char *argv[])
+{
 
+    vectorStr testV;
+    testVectorStr(&testV);
+    vectorStr_printAll(&testV);
+    testCodec();
+
+    //end of test code insertion
+>>>>>>> master
 
     if (argc < 3)
     {   
@@ -169,20 +177,23 @@ void GameOnline(int argc, char *argv[]){
     printf("%s\n",str_up);//just for test decode
     up=decodeStrPUP(str_up);//just for test decode
     
+
+
+    PackAnswerLR alr={1,1};
+    vectorStr_init(&alr.FriendList);
+    vectorStr_add(&alr.FriendList,"keenan");
+
     char RecvBuf[BUFFERSIZE]; 
     sendToServer(str_up,RecvBuf);
-    printf("recive buff %s\n", RecvBuf);
-    printf("\ntry to login: michaelz, 25618\n");
-    strcpy(up.Password,"25618");
-    encodePackUnamePasswd(str_up,&up);
-    sendToServer(str_up,RecvBuf);
 
-    printf("\ntry to login: keenan, 25618\n");
-    strcpy(up.UserName,"keenan");
-    encodePackUnamePasswd(str_up,&up);
-    sendToServer(str_up,RecvBuf);
     int hit=1;
+<<<<<<< HEAD
+    while(1==1)sleep(1);
+=======
 
+    
+
+>>>>>>> master
 }
 
 //play the game
