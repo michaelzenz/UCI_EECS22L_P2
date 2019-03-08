@@ -14,8 +14,10 @@ int gui_player_CvC_menu(Player* player_arr);
 /*Global Variables */
 
 //Widgets for gtk to use
-GtkWidget *window=NULL;//the window
-GtkWidget *image=NULL;//the widget to load image
+
+
+GtkWidget *window=NULL;
+GtkWidget *image=NULL;
 GtkWidget *layout=NULL;//the layout to put on background and contain fixed widget
 GtkWidget *fixed=NULL;//the widget to contain table
 GtkWidget *chess_icon=NULL;//the icon to draw on the board
@@ -42,8 +44,12 @@ char *Background_path="res/GamePlayBackground.jpg";
 char *HvH_Menu_path="res/HvH_Menu.png";
 char *CvC_Menu_path="res/CvC_Menu.png";
 
+<<<<<<< HEAD
 //the Game Mode, go to constant.h for more info
 int GameMode=0;
+=======
+extern int GameMode;
+>>>>>>> GUIO
 
 //load .png and .jpg files to pixbuf
 GdkPixbuf *load_pixbuf_from_file (const char *filename)
@@ -112,12 +118,7 @@ void gui_init_offline(GameState *gameState,Player player_arr[2]){
         if(GameMode==GameMode_HvC)play=gui_player_HvC_menu(player_arr);
         else if(GameMode==GameMode_HvH)play=gui_player_HvH_menu(player_arr);
         else if(GameMode==GameMode_CvC)play=gui_player_CvC_menu(player_arr);
-        else if(GameMode==GameMode_ONLINE)
-        {
-            //gui_online_menu(player_arr);
-            //play=1;
-            //break;
-        }
+        else if(GameMode==GameMode_ONLINE)play=Login_menu();
 
     }while(play!=1);
 

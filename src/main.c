@@ -53,6 +53,10 @@ void GameOffline(){
 
 //a simple demo of online game(only login, and there is only one user michaelz)
 void GameOnline(int argc, char *argv[]){
+    Register_menu();
+    sleep(3);
+    Login_menu();
+    sleep(3);
 
     if (argc < 3)
     {   
@@ -83,7 +87,7 @@ void GameOnline(int argc, char *argv[]){
     encodePackUnamePasswd(str_up,&up);
     sendToServer(str_up,RecvBuf);
     int hit=1;
-
+    while(1==1)sleep(1);
 }
 
 //play the game
