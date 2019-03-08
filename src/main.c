@@ -7,7 +7,7 @@
 
 #define MODEL 1
 
-
+//play on the current gameState by the current player
 int play(GameState *gameState,Player *player,int model)
 {
     int quit;
@@ -17,6 +17,7 @@ int play(GameState *gameState,Player *player,int model)
     return quit;
 }
 
+//play the offline game
 void GameOffline(){
     Player player_arr[2];
     GameState gameState=env_init();
@@ -50,6 +51,7 @@ void GameOffline(){
     }
 }
 
+//a simple demo of online game(only login, and there is only one user michaelz)
 void GameOnline(int argc, char *argv[]){
     Register_menu();
     sleep(3);
@@ -65,15 +67,16 @@ void GameOnline(int argc, char *argv[]){
     
     printf("running game online\n");
     printf("\ntry to login: michaelz, 25619\n");
-    PackUnamePasswd up={"michaelz","25619"};
+    PackUnamePasswd up={LOGIN,"michaelz","25619"};
     char str_up[MAX_UP_SIZE];
     memset(str_up,'\0',sizeof(str_up));
     encodePackUnamePasswd(str_up,&up);
     printf("%s\n",str_up);//just for test decode
     up=decodeStrUP(str_up);//just for test decode
+    
     char RecvBuf[BUFFERSIZE]; 
     sendToServer(str_up,RecvBuf);
-
+    printf("recive buff %s\n", RecvBuf);
     printf("\ntry to login: michaelz, 25618\n");
     strcpy(up.Password,"25618");
     encodePackUnamePasswd(str_up,&up);
@@ -87,6 +90,7 @@ void GameOnline(int argc, char *argv[]){
     while(1==1)sleep(1);
 }
 
+//play the game
 void Game(int argc, char *argv[])
 {
     gui_init_window(argc,argv);
@@ -97,6 +101,7 @@ void Game(int argc, char *argv[])
     
 }
 
+//print the board
 void print_board(GameState *gameState)
 {
     for(int i=0;i<64;i++)
@@ -107,6 +112,7 @@ void print_board(GameState *gameState)
     printf("\n*****************\n");
 }
 
+//output the board to a file
 void fprint_board(GameState *gameState,FILE *fp)
 {
     for(int i=0;i<64;i++)
@@ -117,6 +123,7 @@ void fprint_board(GameState *gameState,FILE *fp)
     fprintf(fp,"\n*****************\n");
 }
 
+//do ai contesst between different models
 void AI_ContestWithGUI(int argc, char *argv[],int model1,int model2)
 {
     gui_init_window(argc,argv);
@@ -152,19 +159,10 @@ int main(int argc, char *argv[])
     printf("Even if you may not really want to\n");
     #endif
     srand(time(0));
-    //gui_init_window(argc,argv);
-    //test_gui_menu(argc,argv);//specially created for aria to test
-    // while(1)
-    Game(argc,argv);
+
+    Game(argc,argv);//play the game
     
-    
-    
-    //test_env();
-    //Test_AI(1);
-    //AI_Contest(1,2);
-    //test_gamePlay_window(argc,argv);
     //AI_ContestWithGUI(argc,argv,1,2);
-    //Test_AI_withGUI(argc,argv,1);
     
     return 0;
 }

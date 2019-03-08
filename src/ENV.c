@@ -4,9 +4,10 @@
 #define MAX(X,Y) (X)>(Y)?(X):(Y)
 #define XY2ID(X,Y) ((Y)*8+X)
 
-uchar human_promotion_flag=1;
-uchar HumanSelectedPromotion=QUEEN;
+uchar human_promotion_flag=1;//1 if it`s human doing promotion, 0 for simulation
+uchar HumanSelectedPromotion=QUEEN;//the selected promotion by human
 
+//update status flags in gameState
 void update_flags(GameState *gameState, int start_pt, int end_pt);
 
 int initial_board[64]={CASTLE_B,KNIGHT_B,BISHOP_B,QUEEN_B,KING_B,BISHOP_B,KNIGHT_B,CASTLE_B,
@@ -18,6 +19,7 @@ int initial_board[64]={CASTLE_B,KNIGHT_B,BISHOP_B,QUEEN_B,KING_B,BISHOP_B,KNIGHT
                         PAWN_W,PAWN_W,PAWN_W,PAWN_W,PAWN_W,PAWN_W,PAWN_W,PAWN_W,
                         CASTLE_W,KNIGHT_W,BISHOP_W,QUEEN_W,KING_W,BISHOP_W,KNIGHT_W,CASTLE_W};
 
+//return a new initialized GameState
 GameState env_init()
 {
     GameState gameState;
@@ -38,7 +40,7 @@ void env_free_container(GameState *gameState)
     gameState->moves_vector_cnt=0;
 }
 
-
+//play on the gameState by the player
 void env_play(GameState *gameState, Player *player, int start_pt, int end_pt)
 {
     int s_piece=gameState->board[start_pt];
@@ -257,6 +259,7 @@ uchar env_check_end(GameState *gameState, Player *player)
     return end;
 }
 
+//shallow copy the gameState, the move vector and stack will not be copied
 GameState env_copy_State(GameState *gameState)
 {
     GameState newState;
@@ -268,10 +271,7 @@ GameState env_copy_State(GameState *gameState)
     return newState;
 }
 
-
-
-
-
+//get all legal moves for different pieces, returns a vector
 vector env_get_legal_moves(GameState *gameState, Player *player, int start_pt)
 {
     
@@ -305,7 +305,7 @@ vector env_get_legal_moves(GameState *gameState, Player *player, int start_pt)
 
 //board[pos]*playerTurn<0 -> enemy
 //board[pos]*playerTurn>0 -> mime
-
+//get legal moves of different pieces
 vector env_get_legal_pawn(GameState *gameState, int start_pt)
 {
     vector legal_moves;
@@ -647,6 +647,8 @@ vector env_get_legal_knight(GameState *gameState, int start_pt)
     
     return legal_moves;
 }
+
+//update status flag in gameState
 void update_flags(GameState *gameState, int start_pt, int end_pt)
 {
     

@@ -21,6 +21,7 @@ void FatalError(		/* print error diagnostics and abort */
     exit(20);
 } /* end of FatalError */
 
+//sets up connection and send a message to server
 void sendToServer(char* msg,char*RecvBuf)
 {
     int n;
@@ -77,6 +78,7 @@ void ShutdownServer(		/* ask server to shutdown */
 #endif
 } /* end of ShutdownServer */
 
+//open socket and record the server address
 void init_connection2server(char *program,char *host, char *port)
 {
     Program=program;

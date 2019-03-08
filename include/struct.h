@@ -1,9 +1,14 @@
-#ifndef STRUCT_H
-#define STRUCT_H
+
 #include"vector.h"
 #include"constant.h"
 #include<assert.h>
 
+#ifndef STRUCT_H
+#define STRUCT_H
+
+typedef unsigned char uchar;
+
+//contains the infomation of a player
 typedef struct _Player
 {
     int id;
@@ -60,13 +65,9 @@ typedef struct _GameState
     Node *moves_stack;//the stack to record moves
 } GameState;
 
-typedef unsigned char uchar;
 
-typedef struct _PackUnamePasswd
-{
-    char UserName[30];
-    char Password[30];
-} PackUnamePasswd;
+
+
 
 
 

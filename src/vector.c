@@ -4,8 +4,9 @@
 
 #include "vector.h"
 
+//this vector only for int
 
-
+//init a vector
 void vector_init(vector *v)
 {
     v->data = NULL;
@@ -13,11 +14,13 @@ void vector_init(vector *v)
     v->count = 0;
 }
 
+//count how many elements in vector
 int vector_count(vector *v)
 {
     return v->count;
 }
 
+//add an element to vector
 void vector_add(vector *v, int p)
 {
     if (v->size == 0) {
@@ -34,15 +37,17 @@ void vector_add(vector *v, int p)
     v->count++;
 }
 
-void vector_set(vector *v, int index, int p)
+//set element at index to be new_val
+void vector_set(vector *v, int index, int new_val)
 {
     if (index >= v->count) {
         return;
     }
 
-    v->data[index] = p;
+    v->data[index] = new_val;
 }
 
+//get element at index
 int vector_get(vector *v, int index)
 {
     if (index >= v->count) {
@@ -52,6 +57,7 @@ int vector_get(vector *v, int index)
     return v->data[index];
 }
 
+//delete element at index
 void vector_delete(vector *v, int index)
 {
     if (index >= v->count) {
@@ -66,11 +72,13 @@ void vector_delete(vector *v, int index)
     v->count--;
 }
 
+//free the vector
 void vector_free(vector *v)
 {
     free(v->data);
 }
 
+//concatenate the elements in v2 to v1
 void vector_cat(vector *v1, vector *v2)
 {
     for(int i=0;i<v2->count;i++)
@@ -79,6 +87,7 @@ void vector_cat(vector *v1, vector *v2)
     }
 }
 
+//check if v contains element p
 unsigned char vector_contain(vector *v, int p)
 {
     int cnt=v->count;
