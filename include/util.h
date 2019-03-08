@@ -1,7 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
 #include<assert.h>
+#include<stdbool.h>
 
 #ifndef UTIL_H
 #define UTIL_H
