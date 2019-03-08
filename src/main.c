@@ -91,7 +91,31 @@ void ProcessRequest(		/* process a time request by a client */
     char RecvBuf[BUFFERSIZE];	/* message buffer for receiving a message */
     char SendBuf[BUFFERSIZE];	/* message buffer for sending a response */
 
-    n = read(DataSocketFD, RecvBuf, sizeof(RecvBuf)-1);//read 
+    int lbufferSize=BUFFERSIZE;
+    char *fullBuf=malloc(sizeof(char)*lbufferSize);
+    memset(fullBuf,'\0',lbufferSize);
+    int curLen=0;
+    
+    do{
+        n = read(DataSocketFD, RecvBuf, BUFFERSIZE-1);//read 
+        RecvBuf[n]='\0';
+        if(curLen+n+1>lbufferSize)
+        {
+            fullBuf=realloc(fullBuf,lbufferSize+BUFFERSIZE);
+            fullBuf[curLen]='\0';
+            lbufferSize+=BUFFERSIZE;
+        }
+        curLen+=n;
+        printf("pre:\n");
+        printf("%s\n",fullBuf);
+        printf("%s\n",RecvBuf);
+        strcat(fullBuf,RecvBuf);
+        printf("post:\n");
+        printf("%s\n",fullBuf);
+    }while(RecvBuf[n-1]!='}');
+    
+    
+
     if (n < 0) 
     {   
         FatalError("reading from data socket failed");
