@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/kchat-server",
-            "args": ["11000"],
+            "args": ["11005"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
