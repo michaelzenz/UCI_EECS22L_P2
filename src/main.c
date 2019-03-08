@@ -129,7 +129,19 @@ void ProcessRequest(		/* process a time request by a client */
     //Start decoding into a structure
     printf("beginning processing\n");
     PackUnamePasswd packUP=decodeStrPUP(RecvBuf);
-    //And sets the send buffer based on the content
+
+    //setting up the package to return packAnswerLR
+    PackAnswerLR palr;
+
+    //dummy friendlist info
+    //will fill in once we get more values
+    vectorStr friendList;
+    vectorStr_init(&friendList);
+    vectorStr_add(&friendList,"keenan");
+    vectorStr_add(&friendList,"aria");
+    palr.FriendList = friendList;
+    palr.FriendNb = 2;
+
 
     //bases check on atoi value 
     if(packUP.action == atoi("1"))//action 1 = registration, I dont like casting like this but oh well
@@ -140,7 +152,10 @@ void ProcessRequest(		/* process a time request by a client */
                 fprintf(database, "%s ",/*"name"*/packUP.UserName);
                 fprintf(database, "%s ",/*"password"*/packUP.Password);
                 fclose(database);
-                sprintf(SendBuf,"User: %s has just registered",packUP.UserName);
+        
+                palr.successflag = SUCCESS;//encodes seccess or registration
+
+                //sprintf(SendBuf,"User: %s has just registered",packUP.UserName);
     }
     else if(packUP.action == atoi("0"))//action 0 means login
     {
@@ -167,15 +182,18 @@ void ProcessRequest(		/* process a time request by a client */
         if(u){//username
            if(p){//password
                 printf("User: %s has just logged in\n\n",packUP.UserName);
-                sprintf(SendBuf,"User: %s has just logged in",packUP.UserName);
+                palr.successflag = SUCCESS;//encodes seccess in login
+                //sprintf(SendBuf,"User: %s has just logged in",packUP.UserName);
                 }
             else {
-                strcpy(SendBuf,"Invalid Password");
+                //strcpy(SendBuf,"Invalid Password");
+                palr.successflag = INVALID_PASSWD;//encodes failed password
                 printf("Invalid Password\n\n");
             }
         }
         else{
-        strcpy(SendBuf,"Unknown User");
+        //strcpy(SendBuf,"Unknown User");
+        palr.successflag = NO_SUCH_USER;//encodes failed user
         printf("Unknown User\n\n");
         }
     }
@@ -199,6 +217,10 @@ void ProcessRequest(		/* process a time request by a client */
         strcpy(SendBuf,"Unknown User");
     }
     #endif
+
+
+    //encoding the the packanswerLR to sendbug
+    encodePackAnswerLR(SendBuf, &palr);
 
     l = strlen(SendBuf);
 #ifdef PRINT_LOG
