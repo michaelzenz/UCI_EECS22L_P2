@@ -119,34 +119,39 @@ void ProcessRequest(		/* process a time request by a client */
     }
     else if(packUP.action == atoi("0"))//action 0 means login
     {
+        //current version only checks if the username and password are present in the file and not if the two are associated
         printf("attempting to log in %s %s\n",packUP.UserName, packUP.Password);
-        database = fopen("database.txt","a");
+        database = fopen("database.txt","r");
 
-        char data[500];
-        //fscanf(database, "%s",data);
-        fgets(data, 500, database);
-        printf("%s",data);
+        //fills the string data with the contents of the file and prints
+        char data[300] = "";
+        fgets(data, 300, database);
+        printf("text file reads as %s\ncomparing login information\n",data);
+        fclose(database);
+
+        //comparing if the name was anywhere in the data
         char* u;
         u = strstr(data,packUP.UserName);
-        printf("%s\n",u);
+        //printf("%s\n",u);
 
-        //char* p;
-        //p = strstr(data,packUP.Password);
+        //comparing if the password was anywhere in the data
+        char* p;
+        p = strstr(data,packUP.Password);
         //printf(data);
 
-        if(u){
-           if(true){
-                printf("User: %s has just logged in",packUP.UserName);
+        if(u){//username
+           if(p){//password
+                printf("User: %s has just logged in\n\n",packUP.UserName);
                 sprintf(SendBuf,"User: %s has just logged in",packUP.UserName);
                 }
             else {
                 strcpy(SendBuf,"Invalid Password");
-                printf("Invalid Password");
+                printf("Invalid Password\n\n");
             }
         }
         else{
         strcpy(SendBuf,"Unknown User");
-        printf("Unknown User");
+        printf("Unknown User\n\n");
         }
     }
 
