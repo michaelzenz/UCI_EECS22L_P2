@@ -103,7 +103,7 @@ void ProcessRequest(		/* process a time request by a client */
 //first attempt at actual package handling
     //Start decoding into a structure
     printf("beginning processing\n");
-    PackUnamePasswd packUP=decodeStrUP(RecvBuf);
+    PackUnamePasswd packUP=decodeStrPUP(RecvBuf);
     //And sets the send buffer based on the content
 
     //bases check on atoi value 
