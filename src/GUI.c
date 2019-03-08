@@ -105,12 +105,7 @@ void gui_init_offline(GameState *gameState,Player player_arr[2]){
         if(GameMode==GameMode_HvC)play=gui_player_HvC_menu(player_arr);
         else if(GameMode==GameMode_HvH)play=gui_player_HvH_menu(player_arr);
         else if(GameMode==GameMode_CvC)play=gui_player_CvC_menu(player_arr);
-        else if(GameMode==GameMode_ONLINE)
-        {
-            //gui_online_menu(player_arr);
-            //play=1;
-            //break;
-        }
+        else if(GameMode==GameMode_ONLINE)play=Login_menu();
 
     }while(play!=1);
 

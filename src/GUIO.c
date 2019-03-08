@@ -14,6 +14,8 @@ GdkPixbuf *Add_friends_pixbuf = NULL;
 char *Login_menu_path="res/Login.png";
 char *Register_menu_path="res/Register_Menu.png";
 
+int GameMode=0;
+
 gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 {
     int x, y;
@@ -29,16 +31,16 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     // {
     //     GameMode=GameMode_HvH;
     // }
-    // else if(x>630&&x<958&&y>346&&y<367)
-    // {
-    //     GameMode=GameMode_CvC;
-    // }
+    if(x>630&&x<958&&y>346&&y<367)
+    {
+        Register_menu();
+    }
     // else if(x>747&&x<837&&y>189&&y<214){
     //     GameMode=GameMode_ONLINE;
     // }
     // printf("GameMode:%d\n",GameMode);
 }
-int GameMode=0;
+
 int Login_menu()
 {
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
@@ -49,12 +51,44 @@ int Login_menu()
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
 
     
+    
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Login_menu_callback),NULL);
     gtk_widget_show_all(window);
     gdk_threads_leave();//after you finich calling gtk functions, call this
-    while(GameMode==4)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
+    //while(GameMode == 4)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
     gdk_threads_enter();//again, you know what I am gonna say
     g_signal_handler_disconnect(window,handlerID);
     gdk_threads_leave();
-    return ;
+    return GameMode;
+}
+
+
+gint Register_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
+{
+    int x, y;
+    GdkModifierType state;
+    gdk_window_get_pointer(widget->window,&x,&y,&state);
+    if(x>630&&x<958&&y>346&&y<367)
+    {
+        //put something to add user and pass to database
+    }
+}
+int Register_menu()
+{
+    gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
+    Register_pixbuf=load_pixbuf_from_file(Register_menu_path);
+    Register_pixbuf=gdk_pixbuf_scale_simple(Register_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);
+    
+    image = gtk_image_new_from_pixbuf(Register_pixbuf);
+    gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
+
+    
+    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Register_menu_callback),NULL);
+    gtk_widget_show_all(window);
+    gdk_threads_leave();//after you finich calling gtk functions, call this
+    //while(GameMode==4)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
+    gdk_threads_enter();//again, you know what I am gonna say
+    g_signal_handler_disconnect(window,handlerID);
+    gdk_threads_leave();
+    return GameMode;
 }

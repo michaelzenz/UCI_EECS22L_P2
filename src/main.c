@@ -51,7 +51,10 @@ void GameOffline(){
 }
 
 void GameOnline(int argc, char *argv[]){
+    Register_menu();
+    sleep(3);
     Login_menu();
+    sleep(3);
 
     if (argc < 3)
     {   
@@ -81,7 +84,7 @@ void GameOnline(int argc, char *argv[]){
     encodePackUnamePasswd(str_up,&up);
     sendToServer(str_up,RecvBuf);
     int hit=1;
-
+    while(1==1)sleep(1);
 }
 
 void Game(int argc, char *argv[])
