@@ -86,12 +86,12 @@ WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
 ENABLE_TESTING()
 
 add_custom_target(test-gui COMMAND
-    "./kchat-server" 
+    "./kchat-server"
     "11000"
     WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
 
 add_custom_target(test-comm COMMAND
-    "./kchat-server" 
+    "./kchat-server"
     "11000"
     WORKING_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
 

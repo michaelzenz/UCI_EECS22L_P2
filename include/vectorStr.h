@@ -1,3 +1,8 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #ifndef vectorSTR_H
 #define vectorSTR_H
 
@@ -11,9 +16,9 @@ void vectorStr_init(vectorStr*);
 int vectorStr_count(vectorStr*);
 void vectorStr_add(vectorStr *v, char *str);
 void vectorStr_set(vectorStr*, int, char*);
-char* vectorStr_get(vectorStr*, int, char **str);
-vectorStr* vectorStr_delete(vectorStr*, int);
+char* vectorStr_get(vectorStr*, int, char *str);
+void vectorStr_delete(vectorStr*, int);
 void vectorStr_free(vectorStr*);
 void vectorStr_cat(vectorStr *v1, vectorStr *v2);
-//unsigned char vectorStr_contain(vectorStr *v, int p);
+void vectorStr_printAll(vectorStr *v);
 #endif

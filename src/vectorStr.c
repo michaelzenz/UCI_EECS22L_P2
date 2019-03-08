@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
 
 #include "vectorStr.h"
 
@@ -35,45 +33,53 @@ void vectorStr_add(vectorStr *v, char *str)//add string to vector list
     v->count++;
 }
 
+
 void vectorStr_set(vectorStr *v, int index, char *str)//changes value of string at given index of vector
 {
     if (index >= v->count) {
         return;
     }
-
+    if(sizeof(v->data[index])<sizeof(str))
+        v->data[index]=realloc(v->data[index],sizeof(str));
     strcpy(v->data[index], str);
 }
 
-char* vectorStr_get(vectorStr *v, int index, char** str)//edits str to become string from vector at given index
+char* vectorStr_get(vectorStr *v, int index, char* str)//edits str to become string from vector at given index
 {
     if (index >= v->count) {
         return NULL;
     }
-    if(*str==NULL) 
-        *str=malloc(sizeof(v->data[index]));
 
-    strcpy(*str, v->data[index]);
-    return *(str);
+    strcpy(str, v->data[index]);
+    return str;
 }
 
-vectorStr* vectorStr_delete(vectorStr *v, int index)//deletes element at given index
+char* _vectorStr_get(vectorStr *v, int index, char** str)
 {
     if (index >= v->count) {
         return NULL;
     }
-    vectorStr *temp;//create a temp vector
-    vectorStr_init(temp);
+    if(*str==NULL)
+        *str=malloc(sizeof(v->data[index]));
+    else if(sizeof(*str)<sizeof(v->data[index]))
+        *str=realloc(*str,sizeof(v->data[index]));
+    vectorStr_get(v,index,*str);
+    return *str;
+}
 
-    for (int i = 0; i < v->count; i++) {//stops before last one due to indexing
-        if(i == index)
-        {
-            i++;//skip the index we are deleting
-        }
-        vectorStr_add(temp, v->data[i]);//copy every element from v into temp
-        //dont use copy use add function I wrote... strcpy(temp->data[i], v->data[i]);//copy string from next one into current
+//deletes element at given index
+void vectorStr_delete(vectorStr *v, int index)
+{
+    if (index >= v->count) {
+        return;
     }
-    vectorStr_free(v);
-    return temp;//returns new vector with deleted element gone.
+
+    int cnt=v->count;
+    for (int i = index, j = index+1; i < cnt-1; i++,j++) {
+        vectorStr_set(v,i,v->data[j]);
+    }
+    free(v->data[cnt-1]);
+    v->count--;
 }
 
 void vectorStr_free(vectorStr *v)//frees memory of vector
@@ -91,18 +97,15 @@ void vectorStr_cat(vectorStr *v1, vectorStr *v2) //combines two vectors together
     char* tmp=NULL;
     for(int i=0;i<v2->count;i++)//adds every elements of v2 to end of v1
     {
-        tmp = vectorStr_get(v2,i, &tmp);
-        vectorStr_add(v1, tmp);
+        vectorStr_add(v1, _vectorStr_get(v2,i, &tmp));
     }
+    free(tmp);
 }
 
-/*unsigned char vectorStr_contain(vectorStr *v, int str)//checks if element is contained in vector
+void vectorStr_printAll(vectorStr *v)
 {
     int cnt=v->count;
-    for(int i=0;i<cnt;i++)
-    {
-        if(vectorStr_get(v,i)==str)return 1;
-    }
-    return 0;
+    printf("start printing\n");
+    for(int i=0;i<cnt;i++)printf("%s  ",v->data[i]);
+    printf("\nend printing\n");
 }
-*/
