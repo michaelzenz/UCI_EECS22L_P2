@@ -1,3 +1,8 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #ifndef vectorSTR_H
 #define vectorSTR_H
 

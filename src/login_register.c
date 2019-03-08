@@ -1,5 +1,16 @@
 #include"login_register.h"
 
+extern const char *Program;//the name of program
+
+int ServiceID=-1;
+bool UserPackListenerShutdown=false;
+
+void UserPackTimeOutHandler()//the hanle function for timeout
+{
+    if(ServiceID<0)ServiceID=GetServiceID("UserPackListener");
+    PrintStatus(ServiceID,true);
+}
+
 PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
 {
     FILE * database;//setting up the pointer for the txt
@@ -7,8 +18,6 @@ PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
     if ((database = fopen("database.txt","a")) != NULL)
     {
         printf("database loaded");
-        /*fprintf(database, "So begins the database %s\n", "now");
-        fclose(database);*/
     }
     else
     {
@@ -86,4 +95,126 @@ PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
         }
     }
     return palr;
+}
+
+void UserPackListener(		/* process a time request by a client */
+	int DataSocketFD)
+{
+    int  l;
+
+    char SendBuf[BUFFERSIZE];	/* message buffer for sending a response */
+    
+    char *fullbuf=readFullBuffer(DataSocketFD);
+    PackUnamePasswd packUP=decodeStrPUP(fullbuf);
+    free(fullbuf);
+
+    PackAnswerLR palr=handleLoginRegister(packUP);
+
+    //encoding the the packanswerLR to sendbug
+    encodePackAnswerLR(SendBuf, &palr);
+
+    l = strlen(SendBuf);
+#ifdef PRINT_LOG
+    printf("%s: Sending response: %s.\n", Program, SendBuf);
+#endif
+
+    int LastSendLen;
+    //send back to client
+    LastSendLen = write(DataSocketFD, SendBuf, l);
+    if (LastSendLen < 0)FatalError("writing to data socket failed");
+} /* end of ProcessRequest */
+
+void UserPortLooper(		/* simple server main loop */
+	int ServSocketFD,		/* server socket to wait on */
+	int Timeout)			/* timeout in micro seconds */
+{
+    int DataSocketFD;	/* socket for a new client */
+    socklen_t ClientLen;
+    struct sockaddr_in
+	ClientAddress;	/* client address we connect with */
+    fd_set ActiveFDs;	/* socket file descriptors to select from */
+    fd_set ReadFDs;	/* socket file descriptors ready to read from */
+
+    int res, i;
+    struct timeval TimeVal;
+
+    FD_ZERO(&ActiveFDs);		/* set of active sockets */
+    FD_SET(ServSocketFD, &ActiveFDs);	/* server socket is active */
+    while(!UserPackListenerShutdown)
+    {
+	ReadFDs = ActiveFDs;
+    TimeVal.tv_sec  = Timeout / 1000000;
+	TimeVal.tv_usec = Timeout % 1000000;
+
+	/* block until input arrives on active sockets or until timeout */
+	res = select(FD_SETSIZE, &ReadFDs, NULL, NULL, &TimeVal);
+	if (res < 0)
+	{   FatalError("wait for input or timeout (select) failed");
+	}
+	if (res == 0)	/* timeout occurred */
+	{
+	    UserPackTimeOutHandler();
+	}
+	else		/* some FDs have data ready to read */
+	{   for(i=0; i<FD_SETSIZE; i++)
+	    {   if (FD_ISSET(i, &ReadFDs))
+		{   if (i == ServSocketFD)
+		    {	/* connection request on server socket */
+#ifdef DEBUG
+			printf("\n%s: Accepting new client...\n", Program);
+#endif
+			ClientLen = sizeof(ClientAddress);
+			DataSocketFD = accept(ServSocketFD,
+				(struct sockaddr*)&ClientAddress, &ClientLen);
+			if (DataSocketFD < 0)
+			{   FatalError("data socket creation (accept) failed");
+			}
+#ifdef DEBUG
+			printf("%s: New client connected from %s:%hu.\n",
+				Program,
+				inet_ntoa(ClientAddress.sin_addr),
+				ntohs(ClientAddress.sin_port));
+#endif
+			FD_SET(DataSocketFD, &ActiveFDs);
+		    }
+		    else
+		    {   /* active communication with a client */
+#ifdef DEBUG
+			printf("%s: Dealing with client on FD%d...\n",
+				Program, i);
+#endif
+			UserPackListener(i);
+#ifdef DEBUG
+			printf("%s: Closing client connection FD%d.\n\n",
+				Program, i);
+#endif
+			close(i);
+			FD_CLR(i, &ActiveFDs);
+		    }
+		}
+	    }
+	}
+    }
+} /* end of ServerMainLoop */
+
+void InitUserPackListener(int PortNo)
+{
+    int ServSocketFD;	/* socket file descriptor for service */
+    if(PortNo<11000||PortNo>=12000)FatalError("Invalid Port Number, must be between 11000 and 11999");
+    
+    #ifdef PRINT_LOG
+    printf("%s: Creating the User Pack listen socket...\n", Program);
+    #endif
+    ServSocketFD = MakeServerSocket(PortNo);//Make a socket
+
+    #ifdef PRINT_LOG
+    printf("%s: Providing UserPackListener service at port %d...\n", Program, PortNo);
+    #endif
+
+    UserPortLooper(ServSocketFD, 250000);//start the server main loop
+    
+    #ifdef PRINT_LOG
+    printf("\n%s: Shutting down UserPackListener service\n", Program);
+    #endif
+    close(ServSocketFD);
 }
