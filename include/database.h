@@ -1,9 +1,9 @@
-#include"struct.h"
 #include<string.h>
 #include"jsmn.h"
 #include<stdlib.h>
 #include"vectorStr.h"
 #include"map.h"
+#include"util.h"
 #define USER_NODE_SIZE 80
 
 #ifndef DATABASE_H
