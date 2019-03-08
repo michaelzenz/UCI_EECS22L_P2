@@ -111,12 +111,7 @@ char* readFullBuffer(int DataSocketFD)
             lbufferSize+=BUFFERSIZE;
         }
         curLen+=LastReadLen;
-        printf("pre:\n");
-        printf("%s\n",fullBuf);
-        printf("%s\n",RecvBuf);
         strcat(fullBuf,RecvBuf);
-        printf("post:\n");
-        printf("%s\n",fullBuf);
     }while(RecvBuf[LastReadLen-1]!='}');
     
 #ifdef PRINT_LOG

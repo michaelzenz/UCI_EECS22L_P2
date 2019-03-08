@@ -32,7 +32,7 @@ PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
 
 
     //bases check on atoi value 
-    if(packUP.action == atoi("1"))//action 1 = registration, I dont like casting like this but oh well
+    if(packUP.action)//action 1 = registration, I dont like casting like this but oh well
     {
                 printf("attempting to register %s/n",packUP.UserName);
                 database = fopen("database.txt","a");
@@ -45,7 +45,7 @@ PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
 
                 //sprintf(SendBuf,"User: %s has just registered",packUP.UserName);
     }
-    else if(packUP.action == atoi("0"))//action 0 means login
+    else//action 0 means login
     {
         //current version only checks if the username and password are present in the file and not if the two are associated
         printf("attempting to log in %s %s\n",packUP.UserName, packUP.Password);
@@ -85,6 +85,5 @@ PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
         printf("Unknown User\n\n");
         }
     }
-    fclose(database);
     return palr;
 }
