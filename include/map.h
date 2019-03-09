@@ -44,7 +44,7 @@ typedef struct {
 
 #define map_set(m, key, value)\
   ( (m)->tmp = (value),\
-    map_set_(&(m)->base, key, &(m)->tmp, sizeof((m)->tmp)) )
+    map_set_(&(m)->base, key, (m)->tmp, sizeof((m)->tmp)) )
 
 
 #define map_remove(m, key)\

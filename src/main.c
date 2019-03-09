@@ -5,14 +5,8 @@
 #include"database.h"
 
 extern const char *Program;//the name of program
-void testcode()
-{
-    database_intialize();
-    printf("...testing...\n");
-    database_add_user("keenan", "password", 11009, 1);
-    int port=database_get_port("keenan");
-    printf("new user port is: %d\n", port);
-}
+
+
 int main(int argc, char *argv[]){
     test_database();
     printf("\n/****************************/\n");

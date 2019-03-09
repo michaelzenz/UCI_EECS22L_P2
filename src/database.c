@@ -1,6 +1,21 @@
 #include"database.h"
 
-map_void_t DataBaseMap;
+
+
+typedef struct _User_Node
+{
+    char* password;
+	int port;
+    vectorStr friends;
+    QueueStr messages;
+    QueueStr challengers;
+    bool online_status;
+
+}User_Node;
+
+typedef map_t(User_Node*) DataBaseMap_t;
+
+DataBaseMap_t DataBaseMap;
 
 //intializes database
 void database_intialize()
@@ -28,7 +43,7 @@ void database_add_user(char* user_name, char* user_password, int port, bool user
 {
     User_Node *newNode = data_newNode(user_password, port, user_online_status);
     void *test=(void*)newNode;
-    map_set(&DataBaseMap, user_name, test);
+    map_set(&DataBaseMap, user_name, newNode);
 }
 
 //reset the password of a user
@@ -96,6 +111,7 @@ char* database_get_password(char* user)
     User_Node *node = map_get(&DataBaseMap, user);
     return node->password;
 }
+
 int database_get_port(char* user)
 {
     User_Node *node = (User_Node*)map_get(&DataBaseMap, user);
@@ -111,7 +127,7 @@ void test_database()
     map_iter_t iter=map_iter(&DataBaseMap);
 
     while((key=map_next(&DataBaseMap,&iter))){
-        void *test=map_get(&DataBaseMap,key);
+        //void *test=map_get(&DataBaseMap,key);
         User_Node *node=map_get(&DataBaseMap,key);
         int hit=1;
     }

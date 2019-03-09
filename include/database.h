@@ -9,16 +9,7 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-typedef struct _User_Node
-{
-    char* password;
-	int port;
-    vectorStr friends;
-    QueueStr messages;
-    QueueStr challengers;
-    bool online_status;
 
-}User_Node;
 
 //initialize database
 void database_intialize();
