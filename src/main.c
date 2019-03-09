@@ -145,8 +145,8 @@ void testCodec()
 void GameOnline(int argc, char *argv[]){
     
 
-    Login_menu();
-    Register_menu();
+   // Login_menu();
+   // Register_menu();
 	//vectorStr testV;
     //testVectorStr(&testV);
     //vectorStr_printAll(&testV);
@@ -159,7 +159,7 @@ void GameOnline(int argc, char *argv[]){
 	    exit(10);
     }
     init_connection2server(argv[0],argv[1],argv[2]);
-    
+   // Login_menu();
     printf("running game online\n");
     printf("\ntry to login: michaelz, 25619\n");
     PackUnamePasswd up={LOGIN,"michaelz","25619"};
@@ -171,16 +171,16 @@ void GameOnline(int argc, char *argv[]){
     
     char RecvBuf[BUFFERSIZE]; 
     sendToServer(str_up,RecvBuf);
-    printf("recive buff %s\n", RecvBuf);
-    printf("\ntry to login: michaelz, 25618\n");
-    strcpy(up.Password,"25618");
-    encodePackUnamePasswd(str_up,&up);
-    sendToServer(str_up,RecvBuf);
+    // printf("recive buff %s\n", RecvBuf);
+    // printf("\ntry to login: michaelz, 25618\n");
+    // strcpy(up.Password,"25618");
+    // encodePackUnamePasswd(str_up,&up);
+    // sendToServer(str_up,RecvBuf);
 
-    printf("\ntry to login: keenan, 25618\n");
-    strcpy(up.UserName,"keenan");
-    encodePackUnamePasswd(str_up,&up);
-    sendToServer(str_up,RecvBuf);
+    // printf("\ntry to login: keenan, 25618\n");
+    // strcpy(up.UserName,"keenan");
+    // encodePackUnamePasswd(str_up,&up);
+    // sendToServer(str_up,RecvBuf);
     int hit=1;
 
 }

@@ -49,10 +49,19 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
         printf("the Username is %s\n",gtk_entry_get_text(username));
         printf ("The password is %s\n",gtk_entry_get_text(password));
         PackUnamePasswd packUP;
+         
+        char test="heelllo";
         packUP.action=LOGIN;
-        strcpy(packUP.UserName,gtk_entry_get_text(username));
+        strcpy(packUP.UserName,test);
         strcpy(packUP.Password,gtk_entry_get_text(password)); 
+        printf("packUP user is %s",packUP.UserName);
+        printf("packUP pass is %s",packUP.Password);
         encodePackUnamePasswd(Sendstr,&packUP);
+        printf("packUP user is %s",Sendstr);
+        char RecvBuf[BUFFERSIZE];
+        sendToServer(Sendstr,RecvBuf);
+        printf("recive buff %s\n", RecvBuf);
+        printf("sendsrt is %s\n", Sendstr);
        //write(DataSocketFD,Sendstr, l);
     }
     else if(x>613&&x<747&&y>350&&y<380)
