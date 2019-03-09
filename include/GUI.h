@@ -7,6 +7,8 @@
 #include <gtk/gtk.h>
 #include <glib.h>
 #include <stdio.h>
+#include "codec.h"
+#include "connection.h"
 
 
 #ifndef GAMEGUI_H
