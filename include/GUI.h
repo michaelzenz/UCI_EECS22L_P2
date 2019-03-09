@@ -35,6 +35,14 @@
 #define ACTION_UNDO 2
 #define ACTION_QUIT 3
 
+//for online
+#define NOT_YET_LOGIN 0
+#define LOGIN_SUCCESS 1
+#define NOT_YET_REGISTER 2
+#define GO_TO_REGISTER 3
+#define REGISTER_SUCCESS 4
+//!for online
+
 //init a new window
 GdkPixbuf *load_pixbuf_from_file (const char *filename);
 

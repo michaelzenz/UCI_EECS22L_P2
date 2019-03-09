@@ -6,6 +6,7 @@ extern GtkWidget *layout;//the layout to put on background and contain fixed wid
 extern GtkWidget *fixed;//the widget to contain table
 extern GtkWidget *table;//the widget to contain icons
 extern GtkWidget *text_view; // widget to write text into log
+
 GtkWidget *username;
 GtkWidget *password, *verifyPassword;
 GtkWidget *tableU, *tableP, *tableVP;
@@ -18,9 +19,12 @@ GList *children, *iter;
 GdkPixbuf *Login_pixbuf = NULL;
 GdkPixbuf *Register_pixbuf = NULL;
 GdkPixbuf *Add_friends_pixbuf = NULL;
+
 char *Login_menu_path="res/Login.png";
 char *Register_menu_path="res/Register_Menu.png";
-extern int GameMode;
+
+uchar LoginFlag=NOT_YET_LOGIN;
+
 void empty_container(GtkWidget *container)
 {
     //testing the destroy stuff in a container
@@ -40,11 +44,9 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
    
     //gtk_text_buffer_set_text (buffer, "Your 1st GtkTextView widget!", -1);
 
-
-
-
      if(x>636&&x<724&&y>302&&y<333)
-    {   char Sendstr[BUFFERSIZE];
+    {   
+        char Sendstr[MAX_PUP_SIZE];
         printf("logingin\n");
         printf("the Username is %s\n",gtk_entry_get_text(username));
         printf ("The password is %s\n",gtk_entry_get_text(password));
@@ -53,12 +55,14 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
         strcpy(packUP.UserName,gtk_entry_get_text(username));
         strcpy(packUP.Password,gtk_entry_get_text(password)); 
         encodePackUnamePasswd(Sendstr,&packUP);
-       //write(DataSocketFD,Sendstr, l);
+        char *RecvBuf=sendToServer(Sendstr);
+        PackAnswerLR palr=decodeStrPALR(RecvBuf);
+        if(palr.successflag==LOGIN_SUCCESS)LoginFlag=LOGIN_SUCCESS;
     }
     else if(x>613&&x<747&&y>350&&y<380)
     {   
         printf("Register");
-        GameMode=5;
+        LoginFlag=GO_TO_REGISTER;
     }
     else if(x>124&&x<211&&y>452&&y<482)
     {
@@ -98,11 +102,11 @@ int Login_menu()
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Login_menu_callback),NULL);
     gtk_widget_show_all(window);
     gdk_threads_leave();//after you finich calling gtk functions, call this
-    while(GameMode==4)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
+    while(LoginFlag==NOT_YET_LOGIN)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
     gdk_threads_enter();//again, you know what I am gonna say
     g_signal_handler_disconnect(window,handlerID);
     gdk_threads_leave();
-    return GameMode;
+    return LoginFlag;
 }
 
 
@@ -149,9 +153,9 @@ int Register_menu()
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Register_menu_callback),NULL);
     gtk_widget_show_all(window);
     gdk_threads_leave();//after you finich calling gtk functions, call this
-    while(GameMode==5)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
+    while(LoginFlag==NOT_YET_REGISTER)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
     gdk_threads_enter();//again, you know what I am gonna say
     g_signal_handler_disconnect(window,handlerID);
     gdk_threads_leave();
-    return GameMode;
+    return LoginFlag;
 }
