@@ -1,7 +1,7 @@
 
 #include"ENV.h"
 #include<string.h>
-#include"struct.h"
+#include"util.h"
 #include"constant.h"
 #include"stack.h"
 #include <gtk/gtk.h>

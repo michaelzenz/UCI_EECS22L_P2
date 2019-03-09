@@ -112,6 +112,11 @@ PackQuery decodeStrPQ(char *jsonStr)
             strcpy(pack.dstUser,temp);
             i++;
         }
+        else if(jsoneq(jsonStr,&t[i],"port")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.portNb=atoi(temp);
+            i++;
+        }
     }
     return pack;
 }
@@ -160,6 +165,11 @@ PackAnswerQuery decodeStrPAQ(char *jsonStr)
 			}
 			i += t[i+1].size + 1;
         }
+        else if(jsoneq(jsonStr,&t[i],"qport")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.QueryPort=atoi(temp);
+            i++;
+        }
     }
     return pack;
 }
@@ -202,6 +212,12 @@ PackPlay decodeStrPP(char *jsonStr)
             pack.end_pt=atoi(temp);
             i++;
         }
+        else if(jsoneq(jsonStr,&t[i],"pro")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.promotion=atoi(temp);
+            i++;
+        }
+        
     }
     return pack;
 }

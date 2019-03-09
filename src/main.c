@@ -1,12 +1,13 @@
 #include"AI.h"
 #include"GUI.h"
-#include"struct.h"
+#include"util.h"
 #include"constant.h"
 #include"codec.h"
 #include"connection.h"
+#include"PlayBetween.h"
 
+extern const char *Program;//the name of program
 
-#define MODEL 1
 
 //play on the current gameState by the current player
 int play(GameState *gameState,Player *player,int model)
@@ -16,6 +17,15 @@ int play(GameState *gameState,Player *player,int model)
     if(player->identity==HUMAN) quit=gui_play(gameState,player);
     else quit=ai_play(gameState,player,model);
     return quit;
+}
+
+int onlinePlay(GameState *gameState, OnlinePlayer *player)
+{
+    // if(player->localUser)guio_play(gameState);
+    // else{
+    //     sleep(1);//wait for the opponent to make the move
+    //     return 0;
+    // }
 }
 
 //play the offline game
@@ -37,7 +47,7 @@ void GameOffline(){
             quit=play(&gameState,&player1,player1.difficulty);
         else 
             quit=play(&gameState,&player2,player2.difficulty);
-        stack_print_log(&(gameState.moves_stack));
+        print_stack_log(&(gameState.moves_stack));
         if(quit==CUR_PLAYER_LOSE||quit==CUR_PLAYER_WIN)
         {
             gui_refresh(&gameState,player_arr);
@@ -50,25 +60,7 @@ void GameOffline(){
         }
         else gui_refresh(&gameState,player_arr);
     }
-}
-
-void testVectorStr(vectorStr *v)
-{
-    vectorStr_init(v);
-    vectorStr_add(v,"test1");
-    vectorStr_add(v,"test21");
-    vectorStr_add(v,"test");
-
-    vectorStr_set(v,0,"test22");
-    vectorStr_set(v,0,"test");
-    vectorStr_delete(v,1);
-
-    vectorStr v2;
-    vectorStr_init(&v2);
-    vectorStr_add(&v2,"test222");
-    vectorStr_cat(v,&v2);
-    vectorStr_free(&v2);
-    return;
+    env_free_GameState(&gameState);
 }
 
 void testCodec()
@@ -91,13 +83,14 @@ void testCodec()
 
     PackUnamePasswd pup={LOGIN,"michaelz","25619"};
     PackAnswerLR palr={SUCCESS,2,friendList};
-    PackQuery pq={"michaelz","aria","hello","aria"};
+    PackQuery pq={"michaelz","aria","hello","aria",11000};
     PackAnswerQuery paq={2};
     paq.onlineFlagList[0]=paq.onlineFlagList[1]=1;
     strcpy(paq.challenger,"aria");
     paq.messageList=msgList;
     paq.srcUserList=srcUserList;
-    PackPlay pp={"michaelz",CHAT,"hello",48,40};
+    paq.QueryPort=11001;
+    PackPlay pp={"michaelz",CHAT,"hello",48,40,QUEEN};
 
     char str_pup[MAX_PUP_SIZE],str_palr[MAX_PALR_SIZE],str_pq[MAX_PQ_SIZE],str_paq[MAX_PAQ_SIZE],str_pp[MAX_PP_SIZE];
     encodePackUnamePasswd(str_pup,&pup);
@@ -146,12 +139,13 @@ void testCodec()
 void GameOnline(int argc, char *argv[])
 {
 
-    vectorStr testV;
-    testVectorStr(&testV);
-    vectorStr_printAll(&testV);
     testCodec();
 
+    GameState gameState=env_init();
+    OnlinePlayCallback onlineCallback={&gameState};
+
     //end of test code insertion
+    InitPlayBetweenListener(&onlineCallback);
 
     if (argc < 3)
     {   
@@ -159,28 +153,11 @@ void GameOnline(int argc, char *argv[])
 	    exit(10);
     }
     init_connection2server(argv[0],argv[1],argv[2]);
-    
-    printf("running game online\n");
-    printf("\ntry to login: michaelz, 25619\n");
-    PackUnamePasswd up={LOGIN,"michaelz","25619"};
-    char str_up[MAX_PUP_SIZE];
-    memset(str_up,'\0',sizeof(str_up));
-    encodePackUnamePasswd(str_up,&up);
-    printf("%s\n",str_up);//just for test decode
-    up=decodeStrPUP(str_up);//just for test decode
-    
 
 
-    PackAnswerLR alr={1,1};
-    vectorStr_init(&alr.FriendList);
-    vectorStr_add(&alr.FriendList,"keenan");
-
-    char RecvBuf[BUFFERSIZE]; 
-    sendToServer(str_up,RecvBuf);
 
     int hit=1;
-
-    
+    env_free_GameState(&gameState);
 
 }
 
@@ -251,8 +228,20 @@ int main(int argc, char *argv[])
     printf("You expect them to install the latest glib instead of some outdated version\n");
     printf("But after all we can`t do anything to stop you.\n");
     printf("Even if you may not really want to\n");
+    printf("\\********************\\\n");
     #endif
+
+    printf("\n\n\\********************\\\n");
+    printf("This program will start a local server when playing with other users\n");
+    printf("and will try to use a port between 11200 to 11999 of the current machine\n");
+    printf("to listen to the request from other users\n");
+    printf("thus please make sure there is at least one port between 11200 and 11999 is available\n");
+
     srand(time(0));
+
+    Program=argv[0];
+
+    //for(int i=)
 
     Game(argc,argv);//play the game
     

@@ -1,4 +1,4 @@
-#include"struct.h"
+#include"util.h"
 #include"constant.h"
 #include"ENV.h"
 #include<time.h> 

@@ -1,7 +1,8 @@
 #include"constant.h"
 #include"stack.h"
-#include"struct.h"
+#include"util.h"
 #include"string.h"
+
 
 #ifndef GAMEENV_H
 #define GAMEENV_H
@@ -11,14 +12,22 @@
 #define ADVANCED 3
 
 
+
 //initialize the GameState
 GameState env_init();
 
 //free up the memory of the container
 void env_free_container(GameState *gameState);
 
+//free the gameState
+void env_free_GameState(GameState *gameState);
+
 //the function to play chess on the board
 void env_play(GameState *gameState, Player *player, int start_pt, int end_pt);
+
+//play without player specified, if promotion is not between 1 and 5
+//by default it will be QUEEN
+void env_play2(GameState *gameState, int start_pt, int end_pt, int promotion);
 
 //check if is checkmate or king get captured
 uchar env_check_end(GameState *gameState, Player *player);

@@ -4,6 +4,8 @@
 #define MAX(X,Y) (X)>(Y)?(X):(Y)
 #define XY2ID(X,Y) ((Y)*8+X)
 
+
+
 uchar human_promotion_flag=1;//1 if it`s human doing promotion, 0 for simulation
 uchar HumanSelectedPromotion=QUEEN;//the selected promotion by human
 
@@ -38,6 +40,12 @@ void env_free_container(GameState *gameState)
     for(int i=0;i<gameState->moves_vector_cnt;i++)
         vector_free(&(gameState->container[i].legal_moves));
     gameState->moves_vector_cnt=0;
+}
+
+void env_free_GameState(GameState *gameState)
+{
+    env_free_container(gameState);
+    stack_free(&gameState->moves_stack);
 }
 
 //play on the gameState by the player
@@ -125,7 +133,78 @@ void env_play(GameState *gameState, Player *player, int start_pt, int end_pt)
     memset(str_move,'\0',sizeof(str_move));
     move2string(str_move,&move);
     stack_push(&(gameState->moves_stack),str_move);
+}
 
+//play on the gameState by the player
+void env_play2(GameState *gameState, int start_pt, int end_pt, int promotion)
+{
+    int s_piece=gameState->board[start_pt];
+    int e_piece=gameState->board[end_pt];
+
+    int sx=start_pt%8,sy=start_pt/8;
+    int ex=end_pt%8,ey=end_pt/8;
+    
+    int captured_pos=end_pt;
+    int SPECIAL_MOVE=NOSPECIAL;
+    //if(((s_piece*==6)||(s_piece*==-6))&&(pow((end_pt-start_pt),2)>1))
+    int colorID=MAX(gameState->playerTurn*-1,0);
+    int PrevMoveCastlingState=(gameState->castling_arr[colorID].Left<<1)|(gameState->castling_arr[colorID].Right);
+    update_flags(gameState, start_pt, end_pt);
+    gameState->board[start_pt]=0;
+    gameState->board[end_pt]=s_piece;
+    if((abs(s_piece)==KING)&&(start_pt%8==4))
+    {
+        if(end_pt==58)//one of the possible four endpoints of a castling bottom/left
+        {
+            gameState->board[56]=0;
+            gameState->board[59]=CASTLE_W;
+        }
+        else if(end_pt==62)//castling bottom/right
+        {
+            gameState->board[63]=0;
+            gameState->board[61]=CASTLE_W;
+        }
+        else if(end_pt==6)//castling top/left
+        {
+            gameState->board[7]=0;
+            gameState->board[5]=CASTLE_B;
+        }
+        else if(end_pt==2)//castling top/right
+        {
+            gameState->board[0]=0;
+            gameState->board[3]=CASTLE_B;
+        }
+        SPECIAL_MOVE=CASTLING;
+    }
+
+    char str_last_move[STR_NODE_SIZE];
+    Move last_move;
+    stack_peek(gameState->moves_stack, str_last_move);
+    last_move = string2move(str_last_move);
+    
+    if(abs(last_move.piece)== PAWN && (abs(last_move.start_pt - last_move.end_pt) == 16)
+        && (abs(s_piece) == PAWN) && abs(start_pt - last_move.end_pt)== 1)
+        {
+            gameState->board[last_move.end_pt] = BLANK;
+            e_piece=PAWN*gameState->playerTurn*-1;
+            captured_pos=last_move.end_pt;
+            SPECIAL_MOVE=ENPASSANT;
+        }
+    
+    if(abs(s_piece)==PAWN&&(7-2*ey)*gameState->playerTurn==7&&ex==sx)
+    {
+        int SelectedPromotion=QUEEN;
+        if(promotion>0&&promotion<6)SelectedPromotion=promotion;
+        
+        gameState->board[end_pt]=SelectedPromotion*gameState->playerTurn;
+        SPECIAL_MOVE=PROMOTION;
+    }
+    gameState->playerTurn*=-1;
+    Move move={s_piece,start_pt,end_pt,e_piece,captured_pos,SPECIAL_MOVE,PrevMoveCastlingState};
+    char str_move[STR_NODE_SIZE];
+    memset(str_move,'\0',sizeof(str_move));
+    move2string(str_move,&move);
+    stack_push(&(gameState->moves_stack),str_move);
 }
 
 //undo the last move

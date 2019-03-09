@@ -1,5 +1,5 @@
 
-#include"struct.h"
+#include"util.h"
 #include<string.h>
 #include"jsmn.h"
 #include<stdlib.h>
@@ -67,6 +67,7 @@ typedef struct _PackQuery
      char NewFriend[MAX_USERNAME_LEN];//if you add a new friend
      char Message[MAX_MSG_LEN];//you want to say something
      char dstUser[MAX_USERNAME_LEN];//to who
+     int portNb;
 } PackQuery;
 
 //For server answering client query for online status and new message or new challenges
@@ -77,6 +78,7 @@ typedef struct _PackAnswerQuery
     char challenger[MAX_USERNAME_LEN];//The list of friends that want to challenge current user
     vectorStr messageList;//the list of new messages
     vectorStr srcUserList;
+    int QueryPort;
 } PackAnswerQuery;
 
 //For client to chat and play between another client
@@ -87,6 +89,7 @@ typedef struct _PackPlay
      char message[MAX_MSG_LEN];
      int start_pt;
      int end_pt;
+     uchar promotion;
 } PackPlay;
 
 

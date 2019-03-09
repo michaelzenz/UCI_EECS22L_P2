@@ -2,6 +2,9 @@
 #include"vector.h"
 #include"constant.h"
 #include<assert.h>
+#include"stack.h"
+#include<regex.h>
+#include<stdbool.h>
 
 #ifndef STRUCT_H
 #define STRUCT_H
@@ -33,12 +36,6 @@ typedef struct _LegalMovesContainer
     vector legal_moves;
 }LegalMovesContainer;
 
-typedef struct _Node
-{
-    char log[STR_NODE_SIZE];
-    struct _Node *next;
-
-}Node;
 
 //the struct containing all info for a move
 typedef struct _Move{
@@ -68,7 +65,18 @@ typedef struct _GameState
 
 
 
+//convert move to string
+void move2string(char* str_move, Move *move);
+//convert and return a move from a string
+Move string2move(char* str_move);
 
+//output moves to a file
+void print_stack_log(Node** head_ref);
 
+/* print error diagnostics and abort */
+void FatalError(const char *ErrorMsg);
+
+//compare regex strings, return true if is equal
+bool matchRegex(const char* pattern, const char* userString);
 
 #endif

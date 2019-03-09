@@ -67,6 +67,7 @@ void encodePackQuery(char *jsonStr, PackQuery *pack)
    char str_NewFriend[MAX_USERNAME_LEN+12]="\"nfd\":\"";
    char str_MSG[MAX_MSG_LEN]="\"msg\":\"";
    char str_DstUserName[MAX_USERNAME_LEN+10]="\"dst\":\"";
+   char str_portNb[12];
    char str_temp[3]="";
 
    memset(jsonStr,'\0',sizeof(jsonStr));
@@ -80,6 +81,7 @@ void encodePackQuery(char *jsonStr, PackQuery *pack)
    strcat(str_MSG,"\"");
    strcat(str_DstUserName,pack->dstUser);
    strcat(str_DstUserName,"\"");
+   sprintf(str_portNb,"\"port\":%d",pack->portNb);
 
    strcat(jsonStr,str_UserName);
    strcat(jsonStr,",");
@@ -88,6 +90,8 @@ void encodePackQuery(char *jsonStr, PackQuery *pack)
    strcat(jsonStr,str_MSG);
    strcat(jsonStr,",");
    strcat(jsonStr,str_DstUserName);
+   strcat(jsonStr,",");
+   strcat(jsonStr,str_portNb);
    strcat(jsonStr,"}");
 }
 
@@ -97,6 +101,8 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    char str_Challenger[MAX_USERNAME_LEN+12]="\"cger\":\"";
    char str_messageList[MAX_MSG_LEN*MAX_FRIEND_NB+10]="\"msgs\":[";
    char str_srcUserList[MAX_USERNAME_LEN*MAX_FRIEND_NB+10]="\"srcs\":[";
+   char str_QueryPort[12];
+
 
    memset(jsonStr,'\0',sizeof(jsonStr));
    jsonStr[0]='{';
@@ -123,6 +129,8 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
       strcat(str_messageList,"\",");
       strcat(str_srcUserList,"\",");
    }
+   sprintf(str_QueryPort,"\"qport\":%d", pack->QueryPort);
+
 
 
 
@@ -133,6 +141,8 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    strcat(jsonStr,str_messageList);
    strcat(jsonStr,",");
    strcat(jsonStr,str_srcUserList);
+   strcat(jsonStr,",");
+   strcat(jsonStr,str_QueryPort);
    strcat(jsonStr,"}");
 }
 
@@ -144,6 +154,7 @@ void encodePackPlay(char *jsonStr, PackPlay *pack)
    char str_MSG[MAX_MSG_LEN+10]="\"msg\":\"";
    char str_start_pt[9]="\"spt\":";
    char str_end_pt[9]="\"ept\":";
+   char str_promotion[9]="\"pro\":";
 
    char str_temp[3]="";
 
@@ -157,6 +168,7 @@ void encodePackPlay(char *jsonStr, PackPlay *pack)
    strcat(str_MSG,"\"");
    strcat(str_start_pt,my_itoa(pack->start_pt,str_temp));
    strcat(str_end_pt,my_itoa(pack->end_pt,str_temp));
+   strcat(str_promotion,my_itoa(pack->promotion,str_temp));
 
    strcat(jsonStr,str_UserName);
    strcat(jsonStr,",");
@@ -167,5 +179,7 @@ void encodePackPlay(char *jsonStr, PackPlay *pack)
    strcat(jsonStr,str_start_pt);
    strcat(jsonStr,",");
    strcat(jsonStr,str_end_pt);
+   strcat(jsonStr,",");
+   strcat(jsonStr,str_promotion);
    strcat(jsonStr,"}");
 }
