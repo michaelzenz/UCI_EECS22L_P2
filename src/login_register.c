@@ -11,7 +11,7 @@ void UserPackTimeOutHandler()//the hanle function for timeout
     PrintStatus(ServiceID,true);
 }
 
-PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
+void OutputUserPack(PackUnamePasswd packUP)
 {
     FILE * database;//setting up the pointer for the txt
     /*global FILE * database; /*first attept at creating file for unames*/
@@ -94,6 +94,13 @@ PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
         printf("Unknown User\n\n");
         }
     }
+}
+
+PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
+{
+    //setting up the package to return packAnswerLR
+    PackAnswerLR palr;
+    //OutputUserPack(packUP);
     return palr;
 }
 
