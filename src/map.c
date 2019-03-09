@@ -36,7 +36,7 @@ static map_node_t *map_newnode(const char *key, void *value, int vsize) {
   memcpy(node + 1, key, ksize);
   node->hash = map_hash(key);
   node->value = ((char*) (node + 1)) + voffset;
-  memcpy(node->value, value, vsize);
+  node->value=value;
   return node;
 }
 

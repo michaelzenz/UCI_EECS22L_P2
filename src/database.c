@@ -13,9 +13,7 @@ typedef struct _User_Node
 
 }User_Node;
 
-typedef map_t(User_Node*) DataBaseMap_t;
-
-DataBaseMap_t DataBaseMap;
+map_void_t DataBaseMap;
 
 //intializes database
 void database_intialize()
@@ -131,5 +129,4 @@ void test_database()
         User_Node *node=map_get(&DataBaseMap,key);
         int hit=1;
     }
-    
 }
