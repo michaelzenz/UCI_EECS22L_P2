@@ -89,8 +89,9 @@ void PlayPackListener(int DataSocketFD)
 }
 
 void PlayBetweenLooper(		/* simple server main loop */
-	int Timeout)			/* timeout in micro seconds */
+	int *pTimeout)			/* timeout in micro seconds */
 {
+    int Timeout=*pTimeout;
     int DataSocketFD;	/* socket for a new client */
     socklen_t ClientLen;
     struct sockaddr_in
@@ -193,7 +194,7 @@ int InitPlayBetweenListener(OnlinePlayCallback *callback)
     RecvCallback=callback;
 
     int TimeOutMicroSec=250000;
-    PlayBetweenLooper(250000);//start the server main loop
+    //start the PlayBetweenLooper
     int ret=pthread_create(&PlayBetweenLooperID,NULL,(void*)PlayBetweenLooper,&TimeOutMicroSec);
 
     if(ret!=0){

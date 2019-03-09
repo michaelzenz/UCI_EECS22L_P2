@@ -41,32 +41,33 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     gdk_window_get_pointer(widget->window,&x,&y,&state);
     
     printf("x:%d, y:%d\n",x,y);
-   
-    //gtk_text_buffer_set_text (buffer, "Your 1st GtkTextView widget!", -1);
 
-
-
-
-     if(x>636&&x<724&&y>302&&y<333)
+    if(x>636&&x<724&&y>302&&y<333)
     {   
         char Sendstr[MAX_PUP_SIZE];
         printf("logingin\n");
-        printf("the Username is %s\n",gtk_entry_get_text(username));
-        printf ("The password is %s\n",gtk_entry_get_text(password));
+        char UserName[MAX_USERNAME_LEN];
+        char Passwd[MAX_PASSWD_LEN];
+        sprintf(UserName,"%s",gtk_entry_get_text(username));
+        sprintf(Passwd,"%s",gtk_entry_get_text(password));
         PackUnamePasswd packUP;
         packUP.action=LOGIN;
-        strcpy(packUP.UserName,gtk_entry_get_text(username));
-        strcpy(packUP.Password,gtk_entry_get_text(password)); 
+        strcpy(packUP.UserName,UserName);
+        strcpy(packUP.Password,Passwd); 
         encodePackUnamePasswd(Sendstr,&packUP);
+        
         char *RecvBuf=sendToServer(Sendstr);
         PackAnswerLR palr=decodeStrPALR(RecvBuf);
         if(palr.successflag==LOGIN_SUCCESS)LoginFlag=LOGIN_SUCCESS;
-	free(RecvBuf);
+        else if(palr.successflag==INVALID_PASSWD)LoginFlag=NOT_YET_LOGIN;
+        else if(palr.successflag==NO_SUCH_USER)LoginFlag=NOT_YET_REGISTER;
+	    free(RecvBuf);
+        printf("Trying to login\n");
     }
     else if(x>613&&x<747&&y>350&&y<380)
     {   
         printf("Register");
-        LoginFlag=GO_TO_REGISTER;
+        LoginFlag=NOT_YET_REGISTER;
     }
     else if(x>124&&x<211&&y>452&&y<482)
     {
@@ -162,4 +163,14 @@ int Register_menu()
     g_signal_handler_disconnect(window,handlerID);
     gdk_threads_leave();
     return LoginFlag;
+}
+
+void LoginOrRegister()
+{
+    while(LoginFlag==NOT_YET_LOGIN){
+        Login_menu();
+    }
+    while(LoginFlag==NOT_YET_REGISTER){
+        Register_menu();
+    }
 }

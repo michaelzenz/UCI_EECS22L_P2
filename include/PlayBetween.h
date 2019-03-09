@@ -21,4 +21,7 @@ typedef struct _OnlinePlayer
     bool localUser;
 }OnlinePlayer;
 
+//Init the local Play Between Listener
+int InitPlayBetweenListener(OnlinePlayCallback *callback);
+
 #endif

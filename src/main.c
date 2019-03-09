@@ -139,8 +139,7 @@ void testCodec()
 //a simple demo of online game(only login, and there is only one user michaelz)
 void GameOnline(int argc, char *argv[])
 {
-    Login_menu();
-    Register_menu();
+
     testCodec();
 
     GameState gameState=env_init();
@@ -157,7 +156,7 @@ void GameOnline(int argc, char *argv[])
     init_connection2server(argv[0],argv[1],argv[2]);
     
 
-
+    LoginOrRegister();
 
 
     int hit=1;
