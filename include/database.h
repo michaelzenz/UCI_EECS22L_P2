@@ -20,6 +20,9 @@ typedef struct _User_Node
 
 }User_Node;
 
+//initialize database
+void database_intialize();
+
 //add a user to the database
 void database_add_user( char* user_name, char* user_password, int port, bool user_online_status);
 
@@ -46,4 +49,13 @@ QueueStr* database_get_msgQueue(char* user);
 
 //get the next challenger
 char* database_get_nextChallenger(char* user);
+
+//get password
+char* database_get_password(char* user);
+
+//get port
+int database_get_port(char* user);
+
+void test_database();
+
 #endif

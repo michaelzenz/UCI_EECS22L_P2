@@ -2,10 +2,19 @@
 #include"server.h"
 #include"util.h"
 #include"login_register.h"
+#include"database.h"
 
 extern const char *Program;//the name of program
-
+void testcode()
+{
+    database_intialize();
+    printf("...testing...\n");
+    database_add_user("keenan", "password", 11009, 1);
+    int port=database_get_port("keenan");
+    printf("new user port is: %d\n", port);
+}
 int main(int argc, char *argv[]){
+    test_database();
     printf("\n/****************************/\n");
     printf("This program will use the given port number to listen to login and register request\n");
     printf("And then automatically choose a port between 11000 and 11200 to listen to client query\n");
