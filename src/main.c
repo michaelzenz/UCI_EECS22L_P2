@@ -159,6 +159,7 @@ void GameOnline(int argc, char *argv[])
 
 
 
+
     int hit=1;
     env_free_GameState(&gameState);
 
@@ -244,7 +245,6 @@ int main(int argc, char *argv[])
 
     Program=argv[0];
 
-    //for(int i=)
 
     Game(argc,argv);//play the game
     

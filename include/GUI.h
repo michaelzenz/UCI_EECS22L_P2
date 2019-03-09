@@ -10,7 +10,6 @@
 #include "codec.h"
 #include "connection.h"
 
-
 #ifndef GAMEGUI_H
 #define GAMEGUI_H
 

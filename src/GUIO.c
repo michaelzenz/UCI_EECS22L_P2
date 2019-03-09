@@ -44,6 +44,9 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
    
     //gtk_text_buffer_set_text (buffer, "Your 1st GtkTextView widget!", -1);
 
+
+
+
      if(x>636&&x<724&&y>302&&y<333)
     {   
         char Sendstr[MAX_PUP_SIZE];
@@ -58,6 +61,7 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
         char *RecvBuf=sendToServer(Sendstr);
         PackAnswerLR palr=decodeStrPALR(RecvBuf);
         if(palr.successflag==LOGIN_SUCCESS)LoginFlag=LOGIN_SUCCESS;
+	free(RecvBuf);
     }
     else if(x>613&&x<747&&y>350&&y<380)
     {   
