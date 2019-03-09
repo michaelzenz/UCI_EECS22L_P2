@@ -106,8 +106,10 @@ void UserPackListener(		/* process a time request by a client */
     
     char *fullbuf=readFullBuffer(DataSocketFD);
     PackUnamePasswd packUP=decodeStrPUP(fullbuf);
-    free(fullbuf);
+    
 
+    if(packUP.action==LOGIN)printf("%s\n",fullbuf);
+    free(fullbuf);
     PackAnswerLR palr=handleLoginRegister(packUP);
 
     //encoding the the packanswerLR to sendbug

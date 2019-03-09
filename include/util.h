@@ -3,6 +3,7 @@
 #include<unistd.h>
 #include<assert.h>
 #include<stdbool.h>
+#include<regex.h>
 
 #ifndef UTIL_H
 #define UTIL_H
@@ -13,5 +14,8 @@ typedef unsigned char uchar;
 
 /* print error diagnostics and abort */
 void FatalError(const char *ErrorMsg);
+
+//compare regex strings, return true if is equal
+bool matchRegex(const char* pattern, const char* userString);
 
 #endif
