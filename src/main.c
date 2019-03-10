@@ -52,7 +52,9 @@ void GameOffline(){
 
 void GameOnline(int argc, char *argv[]){
     Register_menu();
-    sleep(3);
+    sleep(1);
+    Chats_menu();
+    while(1==1)sleep(3);
     Login_menu();
     sleep(3);
 
