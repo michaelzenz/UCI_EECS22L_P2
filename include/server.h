@@ -11,6 +11,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include"util.h"
+#include<pthread.h>
 
 #ifndef SERVER_H
 #define SERVER_H
@@ -36,5 +37,17 @@ int MakeServerSocket(uint16_t PortNo);
 //WARNING: the char* that this function returns must be free
 //Otherwise there will be memory leak
 char* readFullBuffer(int DataSocketFD);
+
+/* Starts the UserPackListener Service */
+/* PortNo: the port number that this service will use */
+void InitUserPackListener(int PortNo, int qPort);
+
+//inits the Query Pack Listener
+//returns the port that this listener uses
+int InitQueryPackListener();
+
+//inits the service list so that the status window or terminal
+//can show the status of the services
+void InitServiceStatusViewer();
 
 #endif

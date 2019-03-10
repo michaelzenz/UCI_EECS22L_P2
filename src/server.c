@@ -12,7 +12,6 @@ char buffer[BUFFERSIZE];//the buffer to store message
 vectorStr services;
 vector RotateLineDirections;
 char StatusLine[STATUS_LINE_SIZE];
-bool ServicesListInit=false;
 char RotateLine[]={'-','\\','|','/'};//for showing a rotating line after still waiting...
 uchar RotateDirection=0;//the current rotate direction
 bool FirstTimeOut=false;//if the timeout handle function is called for the first time after the last processing request
@@ -20,25 +19,35 @@ bool FirstTimeOut=false;//if the timeout handle function is called for the first
 typedef void (*ClientHandler)(int DataSocketFD);
 typedef void (*TimeoutHandler)(void);
 
+pthread_mutex_t ShowServiceStatusMutex;
 
+void InitServiceStatusViewer()
+{
+    vectorStr_init(&services);
+    vector_init(&RotateLineDirections);
+
+    pthread_mutex_init(&ShowServiceStatusMutex, NULL);
+}
 
 int GetServiceID(char *service)
 {
-    if(!ServicesListInit){
-        vectorStr_init(&services);
-        vector_init(&RotateLineDirections);
-        ServicesListInit=true;
-    }
+    pthread_mutex_lock(&ShowServiceStatusMutex);
     vectorStr_add(&services,service);
     vector_add(&RotateLineDirections,0);
-    return vectorStr_count(&services)-1;
+    printf("Waiting for service:%s to start...\n",service);
+    int ServiceID=vectorStr_count(&services)-1;
+    pthread_mutex_unlock(&ShowServiceStatusMutex);
+    return ServiceID;
 }
 
 void PrintStatus(int ServiceID, bool ServiceIsRunning)
 {
+    pthread_mutex_lock(&ShowServiceStatusMutex);
     int RewindBackLines=vectorStr_count(&services)-ServiceID-1;
+    if(RewindBackLines!=0)RewindBackLines++;
     printf("\033[%dA",RewindBackLines);
     printf("\33[2K\r");
+    fflush(stdout);
     vectorStr_get(&services,ServiceID,StatusLine);
     if(ServiceIsRunning){
         sprintf(StatusLine,"%s is running ...%c", StatusLine, 
@@ -50,6 +59,7 @@ void PrintStatus(int ServiceID, bool ServiceIsRunning)
     printf("%s",StatusLine);
     fflush(stdout);
     printf("\033[%dB",RewindBackLines);
+    pthread_mutex_unlock(&ShowServiceStatusMutex);
 }
 
 int MakeServerSocket(		/* create a socket on this server */
@@ -71,7 +81,8 @@ int MakeServerSocket(		/* create a socket on this server */
     //Bind the socket
     if (bind(ServSocketFD, (struct sockaddr*)&ServSocketName,
 		sizeof(ServSocketName)) < 0)
-    {   FatalError("binding the server to a socket failed");
+    {   printf("binding the server to a socket at port: %d failed",PortNo);
+        return -1;
     }
     /* start listening to this socket */
     if (listen(ServSocketFD, 5) < 0)	/* max 5 clients in backlog */
@@ -115,7 +126,4 @@ char* readFullBuffer(int DataSocketFD)
 #endif
     return fullBuf;
 }
-
-
-
 

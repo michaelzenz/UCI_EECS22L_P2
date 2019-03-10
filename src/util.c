@@ -11,6 +11,7 @@ void FatalError(		/* print error diagnostics and abort */
     perror(ErrorMsg);
     fputs(Program, stderr);
     fputs(": Exiting!\n", stderr);
+    fflush(stderr);
     exit(20);
 } /* end of FatalError */
 

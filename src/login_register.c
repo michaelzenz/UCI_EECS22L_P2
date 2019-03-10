@@ -1,14 +1,19 @@
-#include"login_register.h"
+#include"server.h"
 
 extern const char *Program;//the name of program
 
-int ServiceID=-1;
+int UserPortServiceID=-1;
 bool UserPackListenerShutdown=false;
+int UserPortSocketFD; /* socket file descriptor for service */
 
-void UserPackTimeOutHandler()//the hanle function for timeout
+pthread_t UserPortLooperID;
+int QueryPort;
+
+void UserServTimeOutHandler()//the hanle function for timeout
 {
-    if(ServiceID<0)ServiceID=GetServiceID("UserPackListener");
-    PrintStatus(ServiceID,true);
+    if(UserPortServiceID<0)UserPortServiceID=GetServiceID("UserPackListener");
+    //PrintStatus(UserPortServiceID,true);
+    printf("UserPackListener Running\n");
 }
 
 void OutputUserPack(PackUnamePasswd packUP)
@@ -134,9 +139,9 @@ void UserPackListener(		/* process a time request by a client */
 } /* end of ProcessRequest */
 
 void UserPortLooper(		/* simple server main loop */
-	int ServSocketFD,		/* server socket to wait on */
-	int Timeout)			/* timeout in micro seconds */
+	int *pTimeout)			/* timeout in micro seconds */
 {
+    int Timeout=*pTimeout;
     int DataSocketFD;	/* socket for a new client */
     socklen_t ClientLen;
     struct sockaddr_in
@@ -148,7 +153,7 @@ void UserPortLooper(		/* simple server main loop */
     struct timeval TimeVal;
 
     FD_ZERO(&ActiveFDs);		/* set of active sockets */
-    FD_SET(ServSocketFD, &ActiveFDs);	/* server socket is active */
+    FD_SET(UserPortSocketFD, &ActiveFDs);	/* server socket is active */
     while(!UserPackListenerShutdown)
     {
 	ReadFDs = ActiveFDs;
@@ -162,18 +167,18 @@ void UserPortLooper(		/* simple server main loop */
 	}
 	if (res == 0)	/* timeout occurred */
 	{
-	    UserPackTimeOutHandler();
+	    UserServTimeOutHandler();
 	}
 	else		/* some FDs have data ready to read */
 	{   for(i=0; i<FD_SETSIZE; i++)
 	    {   if (FD_ISSET(i, &ReadFDs))
-		{   if (i == ServSocketFD)
+		{   if (i == UserPortSocketFD)
 		    {	/* connection request on server socket */
 #ifdef DEBUG
 			printf("\n%s: Accepting new client...\n", Program);
 #endif
 			ClientLen = sizeof(ClientAddress);
-			DataSocketFD = accept(ServSocketFD,
+			DataSocketFD = accept(UserPortSocketFD,
 				(struct sockaddr*)&ClientAddress, &ClientLen);
 			if (DataSocketFD < 0)
 			{   FatalError("data socket creation (accept) failed");
@@ -206,24 +211,41 @@ void UserPortLooper(		/* simple server main loop */
     }
 } /* end of ServerMainLoop */
 
-void InitUserPackListener(int PortNo)
+
+
+void InitUserPackListener(int PortNo, int qPort)
 {
-    int ServSocketFD;	/* socket file descriptor for service */
     if(PortNo<11000||PortNo>=12000)FatalError("Invalid Port Number, must be between 11000 and 11999");
     
+    QueryPort=qPort;
+
     #ifdef PRINT_LOG
     printf("%s: Creating the User Pack listen socket...\n", Program);
     #endif
-    ServSocketFD = MakeServerSocket(PortNo);//Make a socket
-
+    UserPortSocketFD = MakeServerSocket(PortNo);//Make a socket
+    if(UserPortSocketFD<0){
+        FatalError("Fail to start user pack listener");
+    }
     #ifdef PRINT_LOG
     printf("%s: Providing UserPackListener service at port %d...\n", Program, PortNo);
     #endif
 
-    UserPortLooper(ServSocketFD, 250000);//start the server main loop
-    
+    int TimeOutMicroSec=250000;
+
+    int ret=pthread_create(&UserPortLooperID,NULL,(void*)UserPortLooper,&TimeOutMicroSec);
+
+    if(ret!=0){
+        printf("Create Local Sever thread fail, exiting\n");
+        exit(1);
+    }
+}
+
+void ShutUserPackListener()
+{
     #ifdef PRINT_LOG
-    printf("\n%s: Shutting down UserPackListener service\n", Program);
+    printf("\n%s: Shutting down UserPortLooper service\n", Program);
     #endif
-    close(ServSocketFD);
+    UserPackListenerShutdown=true;
+    pthread_join(UserPortLooperID,NULL);
+    close(UserPortSocketFD);
 }

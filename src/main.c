@@ -1,17 +1,16 @@
 
 #include"server.h"
 #include"util.h"
-#include"login_register.h"
 #include"database.h"
 
 extern const char *Program;//the name of program
 
 
 int main(int argc, char *argv[]){
-    test_database();
+    //test_database();
     printf("\n/****************************/\n");
     printf("This program will use the given port number to listen to login and register request\n");
-    printf("And then automatically choose a port between 11000 and 11200 to listen to client query\n");
+    printf("And then automatically choose a port between 11001 and 11200 to listen to client query\n");
     printf("Thus please make sure there is an available port in this range\n");
     printf("/****************************/\n\n");
     Program=argv[0];
@@ -26,7 +25,14 @@ int main(int argc, char *argv[]){
 	    exit(10);
     }
 
-    InitUserPackListener(atoi(argv[1]));
+    InitServiceStatusViewer();
+    int QueryPort=InitQueryPackListener();
+    InitUserPackListener(atoi(argv[1]),QueryPort);
+
+    while(true){
+        //do sth if necessary
+        sleep(2);
+    }
     
     return 0;
 }
