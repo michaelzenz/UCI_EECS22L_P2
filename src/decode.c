@@ -70,6 +70,11 @@ PackAnswerLR decodeStrPALR(char *jsonStr)
             }
 			i += t[i+1].size + 1;
         }
+        else if(jsoneq(jsonStr,&t[i],"qport")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.QueryPort=atoi(temp);
+            i++;
+        }
     }
     return pack;
 }
@@ -160,11 +165,7 @@ PackAnswerQuery decodeStrPAQ(char *jsonStr)
 			}
 			i += t[i+1].size + 1;
         }
-        else if(jsoneq(jsonStr,&t[i],"qport")==0){
-            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
-            pack.QueryPort=atoi(temp);
-            i++;
-        }
+
     }
     return pack;
 }

@@ -12,6 +12,7 @@ char RotateLine[]={'-','\\','|','/'};//for showing a rotating line after still w
 uchar RotateDirection=0;//the current rotate direction
 
 int PlayBetweenSocketFD;
+int PlayBetweenServerPort;
 
 pthread_t PlayBetweenLooperID;
 OnlinePlayCallback *RecvCallback;
@@ -191,7 +192,7 @@ int InitPlayBetweenServer(OnlinePlayCallback *callback)
     }
 
     printf("%s: Providing PlayPackListener service at port %d...\n", Program, PortNb);
-
+    PlayBetweenServerPort=PortNb;
     callback->RecvCallback=PPcalllbackFunc;
     RecvCallback=callback;
 

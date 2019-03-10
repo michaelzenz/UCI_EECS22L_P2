@@ -31,7 +31,7 @@ void encodePackAnswerLR(char *jsonStr, PackAnswerLR *pack)
 {
    char str_successflag[10]="\"flag\":";
    char str_FriendList[MAX_FRIEND_NB*MAX_USERNAME_LEN+10]="\"flist\":[";
-
+   char str_QueryPort[12];
    char str_temp[3]="";
 
    memset(jsonStr,'\0',sizeof(jsonStr));
@@ -50,10 +50,13 @@ void encodePackAnswerLR(char *jsonStr, PackAnswerLR *pack)
       strcat(str_FriendList,"\",");
    }
    if(friendNb==0)strcat(str_FriendList,"]");
+   sprintf(str_QueryPort,"\"qport\":%d", pack->QueryPort);
 
    strcat(jsonStr,str_successflag);
    strcat(jsonStr,",");
    strcat(jsonStr,str_FriendList);
+   strcat(jsonStr,",");
+   strcat(jsonStr,str_QueryPort);
    strcat(jsonStr,"}");
 }
 
@@ -98,8 +101,6 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    char str_Challenger[MAX_USERNAME_LEN+12]="\"cger\":\"";
    char str_messageList[MAX_MSG_LEN*MAX_FRIEND_NB+10]="\"msgs\":[";
    char str_srcUserList[MAX_USERNAME_LEN*MAX_FRIEND_NB+10]="\"srcs\":[";
-   char str_QueryPort[12];
-
 
    memset(jsonStr,'\0',sizeof(jsonStr));
    jsonStr[0]='{';
@@ -126,10 +127,6 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
       strcat(str_messageList,"\",");
       strcat(str_srcUserList,"\",");
    }
-   sprintf(str_QueryPort,"\"qport\":%d", pack->QueryPort);
-
-
-
 
    strcat(jsonStr,str_OnlineFlagList);
    strcat(jsonStr,",");
@@ -138,8 +135,6 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    strcat(jsonStr,str_messageList);
    strcat(jsonStr,",");
    strcat(jsonStr,str_srcUserList);
-   strcat(jsonStr,",");
-   strcat(jsonStr,str_QueryPort);
    strcat(jsonStr,"}");
 }
 

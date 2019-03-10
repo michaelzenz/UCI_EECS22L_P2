@@ -6,8 +6,10 @@
 #include<regex.h>
 #include<stdbool.h>
 
-#ifndef STRUCT_H
-#define STRUCT_H
+#ifndef UTIL_H
+#define UTIL_H
+
+#define TEST_MSGING
 
 typedef unsigned char uchar;
 

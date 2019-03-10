@@ -29,6 +29,7 @@ uchar LoginFlag=NOT_YET_LOGIN;
 bool isUserExist=true;
 
 extern char *UserName;
+extern int QueryPort;
 
 void empty_container(GtkWidget *container)
 {
@@ -71,7 +72,10 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
         
         char *RecvBuf=sendToServer(Sendstr);
         PackAnswerLR palr=decodeStrPALR(RecvBuf);
-        if(palr.successflag==USER_LOGIN)LoginFlag=LOGIN_SUCCESS;
+        if(palr.successflag==USER_LOGIN){
+            LoginFlag=LOGIN_SUCCESS;
+            QueryPort=palr.QueryPort;
+        }
         else if(palr.successflag==INVALID_PASSWD)LoginFlag=NOT_YET_LOGIN;
         else if(palr.successflag==NO_SUCH_USER){
             isUserExist=false;

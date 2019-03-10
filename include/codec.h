@@ -59,6 +59,7 @@ typedef struct _PackAnswerLR
 {
     uchar successflag;//1 if PackUnamePasswd received successfully, 0 if exception occur
     vectorStr FriendList;//The Friends List of current user
+    int QueryPort;
 } PackAnswerLR;
 
 //For client to query about online status and new message or new challenges
@@ -79,7 +80,7 @@ typedef struct _PackAnswerQuery
     char challenger[MAX_USERNAME_LEN];//The list of friends that want to challenge current user
     vectorStr messageList;//the list of new messages
     vectorStr srcUserList;
-    int QueryPort;
+
 } PackAnswerQuery;
 
 //For client to chat and play between another client

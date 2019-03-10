@@ -44,4 +44,10 @@ int MakeServerSocket(uint16_t PortNo);
 //Otherwise there will be memory leak
 char* readFullBuffer(int DataSocketFD);
 
+//Send a msg to user
+void SendMsgToUser(char *dstUser, char* msg);
+
+//init the connection to the qport of the server
+void init_connection2qport();
+
 #endif

@@ -81,14 +81,13 @@ void testCodec()
     vectorStr_printAll(&srcUserList);
 
     PackUnamePasswd pup={LOGIN,"michaelz","25619"};
-    PackAnswerLR palr={USER_LOGIN,friendList};
+    PackAnswerLR palr={USER_LOGIN,friendList,11001};
     PackQuery pq={"michaelz","aria","hello","aria",11000};
     PackAnswerQuery paq={2};
     paq.onlineFlagList[0]=paq.onlineFlagList[1]=1;
     strcpy(paq.challenger,"aria");
     paq.messageList=msgList;
     paq.srcUserList=srcUserList;
-    paq.QueryPort=11001;
     PackPlay pp={"michaelz",CHAT,"hello",48,40,QUEEN};
 
     char str_pup[MAX_PUP_SIZE],str_palr[MAX_PALR_SIZE],str_pq[MAX_PQ_SIZE],str_paq[MAX_PAQ_SIZE],str_pp[MAX_PP_SIZE];
@@ -152,10 +151,15 @@ void GameOnline(int argc, char *argv[])
 	    exit(10);
     }
     init_connection2server(argv[0],argv[1],argv[2]);
-    
 
     LoginOrRegister();
+    init_connection2qport();
+
+    SendMsgToUser("aria","fuck you");
+
     Chats_menu();
+
+    
 
     int hit=1;
     env_free_GameState(&gameState);
