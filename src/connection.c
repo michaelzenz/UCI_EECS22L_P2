@@ -1,6 +1,7 @@
 #include"connection.h"
 
 extern const char *Program;
+extern char *UserName;
 
 struct sockaddr_in ServerAddress;	/* server address we connect with */
 
@@ -12,6 +13,8 @@ pthread_mutex_t mutex;
 bool MutexInitialized=false;
 
 bool StopQuery=false;
+
+extern 
 
 //WARNING: the char* that this function returns must be free
 //Otherwise there will be memory leak
@@ -140,6 +143,21 @@ void QueryTimeredTask(char *str_PQ)
         sleep(2);
     }
     free(str_PQ);
+}
+
+void SendMsgToUser(char *dstUser, char* msg)
+{
+    PackQuery pq;
+    strcpy(pq.UserName,UserName);
+    strcpy(pq.NewFriend,"");
+    strcpy(pq.Message,msg);
+    strcpy(pq.dstUser,dstUser);
+    pq.portNb=0;
+}
+
+void AddNewFriend(char *newFriend)
+{
+
 }
 
 void InitQueryTimeredTask(char *UserName, int portNb)

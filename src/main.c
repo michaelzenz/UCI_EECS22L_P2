@@ -153,23 +153,12 @@ void GameOnline(int argc, char *argv[])
     }
     init_connection2server(argv[0],argv[1],argv[2]);
     
-    printf("running game online\n");
-    printf("\ntry to login: michaelz, 25619\n");
-    PackUnamePasswd up={"michaelz","25619"};
-    char str_up[MAX_UP_SIZE];
-    memset(str_up,'\0',sizeof(str_up));
-    encodePackUnamePasswd(str_up,&up);
-    printf("%s\n",str_up);//just for test decode
-    up=decodeStrUP(str_up);//just for test decode
-    char RecvBuf[BUFFERSIZE]; 
-    sendToServer(str_up,RecvBuf);
 
     LoginOrRegister();
-
+    Chats_menu();
 
     int hit=1;
     env_free_GameState(&gameState);
-
 }
 
 //play the game
@@ -255,14 +244,7 @@ int main(int argc, char *argv[])
 
     Game(argc,argv);//play the game
     
-    
-    
-    //test_env();
-    //Test_AI(1);
-    //AI_Contest(1,2);
-    //test_gamePlay_window(argc,argv);
     //AI_ContestWithGUI(argc,argv,1,2);
-    //Test_AI_withGUI(argc,argv,1);
     
     return 0;
 }

@@ -1,13 +1,13 @@
 #include"util.h"
 
 const char *Program=NULL;//the name of program
+char *UserName=NULL;//the user name of the current user
 
 //the id in char array to show
 char *BoardIDX[8]={"A","B","C","D","E","F","G","H"};
 char *BoardIDY[8]={"1","2","3","4","5","6","7","8"};
 
-void FatalError(		/* print error diagnostics and abort */
-	const char *ErrorMsg)
+void FatalError(const char *ErrorMsg)
 {
     fputs(Program, stderr);
     fputs(": ", stderr);

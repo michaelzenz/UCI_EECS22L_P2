@@ -79,6 +79,8 @@ void gui_gameplay_window(GameState *gameState);
 //Try to login or register
 void LoginOrRegister();
 
+//Opens the chat menu
+void Chats_menu();
 /*********************/
 //!Online
 /*********************/

@@ -13,17 +13,22 @@ GtkWidget *tableU, *tableP, *tableVP;
 GtkWidget *scrolled_win;
 GtkWidget *friendsList;
 GtkTextBuffer *buffer=NULL;
+GList *children, *iter;
 
 //the pixbuf to load image and resize from a .jpg or .png file
 GdkPixbuf *Login_pixbuf = NULL;
 GdkPixbuf *Register_pixbuf = NULL;
 GdkPixbuf *Chats_pixbuf = NULL;
 GdkPixbuf *Add_friends_pixbuf = NULL;
+
 char *Login_menu_path="res/Login.png";
 char *Register_menu_path="res/Register_Menu.png";
 char *Chats_menu_path="res/background.png";
 
 uchar LoginFlag=NOT_YET_LOGIN;
+bool isUserExist=true;
+
+extern char *UserName;
 
 void empty_container(GtkWidget *container)
 {
@@ -49,37 +54,43 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     {   
         char Sendstr[MAX_PUP_SIZE];
         printf("logingin\n");
-        char UserName[MAX_USERNAME_LEN];
+        char Username[MAX_USERNAME_LEN];
+        
         char Passwd[MAX_PASSWD_LEN];
-        sprintf(UserName,"%s",gtk_entry_get_text(username));
+
+        sprintf(Username,"%s",gtk_entry_get_text(username));
         sprintf(Passwd,"%s",gtk_entry_get_text(password));
+        if(strlen(Username)==0||strlen(Passwd)==0)return 0;
         PackUnamePasswd packUP;
         packUP.action=LOGIN;
-        strcpy(packUP.UserName,UserName);
+        strcpy(packUP.UserName,Username);
         strcpy(packUP.Password,Passwd); 
         encodePackUnamePasswd(Sendstr,&packUP);
+        if(UserName==NULL)UserName=malloc(strlen(Username)+1);
+        strcpy(UserName,Username);//this is for the global one
         
         char *RecvBuf=sendToServer(Sendstr);
         PackAnswerLR palr=decodeStrPALR(RecvBuf);
-        if(palr.successflag==LOGIN_SUCCESS)LoginFlag=LOGIN_SUCCESS;
+        if(palr.successflag==USER_LOGIN)LoginFlag=LOGIN_SUCCESS;
         else if(palr.successflag==INVALID_PASSWD)LoginFlag=NOT_YET_LOGIN;
-        else if(palr.successflag==NO_SUCH_USER)LoginFlag=NOT_YET_REGISTER;
+        else if(palr.successflag==NO_SUCH_USER){
+            isUserExist=false;
+            LoginFlag=NOT_YET_REGISTER;
+        }
 	    free(RecvBuf);
         printf("Trying to login\n");
     }
     else if(x>613&&x<747&&y>350&&y<380)
     {
         printf("Register");
-        LoginFlag=NOT_YET_REGISTER;
+        if(!isUserExist)LoginFlag=NOT_YET_REGISTER;
     }
     else if(x>124&&x<211&&y>452&&y<482)
     {
         printf("BACK");
     }
-   
-   
 }
-int GameMode=0;
+
 int Login_menu()
 {
     
@@ -132,7 +143,7 @@ gint Register_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 int Register_menu()
 {
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
-    empty_container(layout); //empties the layout
+
     Register_pixbuf=load_pixbuf_from_file(Register_menu_path); //loads the background image from files
     Register_pixbuf=gdk_pixbuf_scale_simple(Register_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);//sets bg image to size of window
     tableU=gtk_table_new (10, 10, TRUE); //crates table for username text entry
@@ -166,6 +177,16 @@ int Register_menu()
     g_signal_handler_disconnect(window,handlerID); //disconnects the signals from clicking
     gdk_threads_leave();
     return LoginFlag;
+}
+
+void LoginOrRegister()
+{
+    while(LoginFlag==NOT_YET_LOGIN){
+        Login_menu();
+    }
+    while(LoginFlag==NOT_YET_REGISTER){
+        Register_menu();
+    }
 }
 
 gint Chats_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
@@ -209,7 +230,7 @@ void remove_book (GtkNotebook *notebook)
 void Chats_menu()
 {
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
-    empty_container(layout); //empties the layout
+
     Chats_pixbuf=load_pixbuf_from_file(Chats_menu_path);  //loads the background image from files
     Chats_pixbuf=gdk_pixbuf_scale_simple(Chats_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);  //sets bg image to size of window
     image = gtk_image_new_from_pixbuf(Chats_pixbuf);  //sets variable for bg image
@@ -218,7 +239,7 @@ void Chats_menu()
     gtk_list_set_selection_mode (GTK_LIST (friendsList), GTK_SELECTION_BROWSE); //sets style of list box
 
     //note book
-    GtkWidget     *windscroll;
+    GtkWidget *windscroll;
     GtkWidget *notebook;
     GtkWidget *frame;
     GtkWidget *button;
@@ -324,9 +345,11 @@ void Chats_menu()
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Chats_menu_callback),NULL);  //connect signals from clicking the window to active the callback
     gtk_widget_show_all(window);   //shows the window to the user
     gdk_threads_leave();//after you finich calling gtk functions, call this
-
+    while(true){
+        sleep(1);
+    }
+    
     gdk_threads_enter();//again, you know what I am gonna say
     g_signal_handler_disconnect(window,handlerID);
     gdk_threads_leave();
-    return 0;
 }
