@@ -21,7 +21,11 @@ GdkPixbuf *Chats_pixbuf = NULL;
 GdkPixbuf *Add_friends_pixbuf = NULL;
 char *Login_menu_path="res/Login.png";
 char *Register_menu_path="res/Register_Menu.png";
+<<<<<<< HEAD
 char *Chats_menu_path="res/background.png";
+=======
+int GameMode=0;
+>>>>>>> 5688cb4b7f5950fc51acdc50b6e29dd28a42e8c8
 
 void empty_container(GtkWidget *container)
 {
@@ -37,7 +41,7 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 {
     int x, y;
     GdkModifierType state;
-    gdk_window_get_pointer(widget->window,&x,&y,&state);
+     gdk_window_get_pointer(widget->window,&x,&y,&state);
     
     printf("x:%d, y:%d\n",x,y);
    
@@ -51,22 +55,24 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
         printf("logingin\n");
         printf("the Username is %s\n",gtk_entry_get_text(username));
         printf ("The password is %s\n",gtk_entry_get_text(password));
+        
     }
     else if(x>613&&x<747&&y>350&&y<380)
     {
         printf("Register");
+        GameMode=5;
     }
     else if(x>124&&x<211&&y>452&&y<482)
     {
         printf("BACK");
     }
    
-   
+   return GameMode;
 }
-int GameMode=0;
+
 int Login_menu()
 {
-    
+
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
     empty_container(layout);
     Login_pixbuf=load_pixbuf_from_file(Login_menu_path);
@@ -139,7 +145,7 @@ int Register_menu()
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Register_menu_callback),NULL); //connect signals from clicking the window to active the callback
     gtk_widget_show_all(window); //shows the window to the user
     gdk_threads_leave();//after you finich calling gtk functions, call this
-    //while(GameMode==4)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
+    while(GameMode==5)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
     gdk_threads_enter();//again, you know what I am gonna say
     g_signal_handler_disconnect(window,handlerID); //disconnects the signals from clicking
     gdk_threads_leave();
