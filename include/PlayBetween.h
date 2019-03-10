@@ -21,8 +21,12 @@ typedef struct _OnlinePlayer
     bool localUser;
 }OnlinePlayer;
 
+
 //Init the local Play Between Listener
 int InitPlayBetweenServer(OnlinePlayCallback *callback);
 void ShutPlayBetweenServer();
+
+char* sendToOppo(char* msg);
+void packmove(char* target, int start, int end, char* message);
 
 #endif

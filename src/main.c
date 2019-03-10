@@ -88,7 +88,7 @@ void testCodec()
     strcpy(paq.challenger,"aria");
     paq.messageList=msgList;
     paq.srcUserList=srcUserList;
-    PackPlay pp={"michaelz",CHAT,"hello",48,40,QUEEN};
+    PackPlay pp={"michaelz",CHAT,"hello",48,40};
 
     char str_pup[MAX_PUP_SIZE],str_palr[MAX_PALR_SIZE],str_pq[MAX_PQ_SIZE],str_paq[MAX_PAQ_SIZE],str_pp[MAX_PP_SIZE];
     encodePackUnamePasswd(str_pup,&pup);
@@ -133,7 +133,7 @@ void testCodec()
     return;
 }
 
-//a simple demo of online game(only login, and there is only one user michaelz)
+//a simple demo of online game(only login, register and a hardcoded chat feature)
 void GameOnline(int argc, char *argv[])
 {
 

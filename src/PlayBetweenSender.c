@@ -2,6 +2,7 @@
 
 extern const char *Program;
 
+extern char *UserName;//using extern username for the chess packets
 //here oppo is just a brief of opponent
 
 //for connection to server
@@ -76,4 +77,30 @@ void init_connection2oppo(char *program,char *host, char *port)
     OppoServerAddress.sin_family = AF_INET;
     OppoServerAddress.sin_port = htons(OppoServerPort);
     OppoServerAddress.sin_addr = *(struct in_addr*)OppoServer->h_addr_list[0];
+}
+
+void packmove(char* target, int start, int end, char* message)
+{
+//char str_pp[MAX_PP_SIZE];
+PackPlay pp;
+strcpy(pp.UserName,UserName);
+
+if (message != NULL)
+{
+    pp.Action = 1;
+    strcpy(pp.message,message);
+    pp.start_pt = 0;
+    pp.end_pt = 0;
+}
+else
+{
+    pp.Action = 2;
+    strcpy(pp.message,"");
+    pp.start_pt = start;
+    pp.end_pt = end;
+}
+
+pp.promotion = atoi("0");
+
+ encodePackPlay(target,&pp);
 }
