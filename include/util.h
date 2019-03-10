@@ -8,6 +8,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#define TEST_MSGING
+
 #define PRINT_LOG //if want to print log
 
 typedef unsigned char uchar;

@@ -7,7 +7,9 @@ bool UserPackListenerShutdown=false;
 int UserPortSocketFD; /* socket file descriptor for service */
 
 pthread_t UserPortLooperID;
-int QueryPort;
+extern int QueryPort;
+
+extern int TimeOutMicroSec;
 
 void UserServTimeOutHandler()//the hanle function for timeout
 {
@@ -42,7 +44,6 @@ void OutputUserPack(PackUnamePasswd packUP)
     vectorStr_add(&friendList,"keenan");
     vectorStr_add(&friendList,"aria");
     palr.FriendList = friendList;
-    palr.FriendNb = 2;
 
 
     //bases check on atoi value 
@@ -55,7 +56,7 @@ void OutputUserPack(PackUnamePasswd packUP)
                 fprintf(database, "%s ",/*"password"*/packUP.Password);
                 fclose(database);
         
-                palr.successflag = SUCCESS;//encodes seccess or registration
+                palr.successflag = USER_LOGIN;//encodes seccess or registration
 
                 //sprintf(SendBuf,"User: %s has just registered",packUP.UserName);
     }
@@ -84,7 +85,7 @@ void OutputUserPack(PackUnamePasswd packUP)
         if(u){//username
            if(p){//password
                 printf("User: %s has just logged in\n\n",packUP.UserName);
-                palr.successflag = SUCCESS;//encodes seccess in login
+                palr.successflag = USER_LOGIN;//encodes seccess in login
                 //sprintf(SendBuf,"User: %s has just logged in",packUP.UserName);
                 }
             else {
@@ -104,7 +105,23 @@ void OutputUserPack(PackUnamePasswd packUP)
 PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
 {
     //setting up the package to return packAnswerLR
-    PackAnswerLR palr;
+    vectorStr dummy;
+    vectorStr_init(&dummy);
+    PackAnswerLR palr={NO_SUCH_USER,dummy};
+    if(packUP.action==LOGIN){
+        if(!database_isUserExist(packUP.UserName))palr.successflag=NO_SUCH_USER;
+        else if(!strcmp(packUP.Password,database_get_password(packUP.UserName))){
+            database_set_onlineStatus(packUP.UserName,true);
+            palr.successflag=USER_LOGIN;
+            vectorStr friends=database_get_friends(packUP.UserName);
+            palr.FriendList=friends;
+            palr.QueryPort=QueryPort;
+        }
+        else palr.successflag=INVALID_PASSWD;
+    }
+    if(packUP.action==REGISTER){
+        database_add_user(packUP.UserName,packUP.Password,packUP.port,1);
+    }
     //OutputUserPack(packUP);
     return palr;
 }
@@ -138,10 +155,9 @@ void UserPackListener(		/* process a time request by a client */
     if (LastSendLen < 0)FatalError("writing to data socket failed");
 } /* end of ProcessRequest */
 
-void UserPortLooper(		/* simple server main loop */
-	int *pTimeout)			/* timeout in micro seconds */
+void UserPortLooper()
 {
-    int Timeout=*pTimeout;
+    int Timeout=TimeOutMicroSec;
     int DataSocketFD;	/* socket for a new client */
     socklen_t ClientLen;
     struct sockaddr_in
@@ -213,11 +229,10 @@ void UserPortLooper(		/* simple server main loop */
 
 
 
-void InitUserPackListener(int PortNo, int qPort)
+void InitUserPackListener(int PortNo)
 {
     if(PortNo<11000||PortNo>=12000)FatalError("Invalid Port Number, must be between 11000 and 11999");
     
-    QueryPort=qPort;
 
     #ifdef PRINT_LOG
     printf("%s: Creating the User Pack listen socket...\n", Program);
@@ -232,7 +247,7 @@ void InitUserPackListener(int PortNo, int qPort)
 
     int TimeOutMicroSec=250000;
 
-    int ret=pthread_create(&UserPortLooperID,NULL,(void*)UserPortLooper,&TimeOutMicroSec);
+    int ret=pthread_create(&UserPortLooperID,NULL,(void*)UserPortLooper,NULL);
 
     if(ret!=0){
         printf("Create Local Sever thread fail, exiting\n");

@@ -16,6 +16,8 @@ char RotateLine[]={'-','\\','|','/'};//for showing a rotating line after still w
 uchar RotateDirection=0;//the current rotate direction
 bool FirstTimeOut=false;//if the timeout handle function is called for the first time after the last processing request
 
+int TimeOutMicroSec=250000;//Modify this if you want
+
 typedef void (*ClientHandler)(int DataSocketFD);
 typedef void (*TimeoutHandler)(void);
 
@@ -81,7 +83,7 @@ int MakeServerSocket(		/* create a socket on this server */
     //Bind the socket
     if (bind(ServSocketFD, (struct sockaddr*)&ServSocketName,
 		sizeof(ServSocketName)) < 0)
-    {   printf("binding the server to a socket at port: %d failed",PortNo);
+    {   printf("binding the server to a socket at port: %d failed\n",PortNo);
         return -1;
     }
     /* start listening to this socket */

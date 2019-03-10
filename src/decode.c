@@ -37,6 +37,11 @@ PackUnamePasswd decodeStrPUP(char *jsonStr)
             strcpy(pack.Password,temp);
             i++;
         }
+        else if(jsoneq(jsonStr,&t[i],"port")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.action=atoi(temp);
+            i++;
+        }
     }
     return pack;
 }
@@ -61,11 +66,6 @@ PackAnswerLR decodeStrPALR(char *jsonStr)
             pack.successflag=atoi(temp);
             i++;
         }
-        else if(jsoneq(jsonStr,&t[i],"fnb")==0){
-            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start, jsonStr + t[i+1].start);
-            pack.FriendNb=atoi(temp);
-            i++;
-        }
         else if(jsoneq(jsonStr,&t[i],"flist")==0){
 			if (t[i+1].type != JSMN_ARRAY)continue; /* groups should be an array of strings */
 			for (int j = 0; j < t[i+1].size; j++) {
@@ -74,6 +74,11 @@ PackAnswerLR decodeStrPALR(char *jsonStr)
 			    vectorStr_add(&pack.FriendList,temp);
             }
 			i += t[i+1].size + 1;
+        }
+        else if(jsoneq(jsonStr,&t[i],"qport")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.QueryPort=atoi(temp);
+            i++;
         }
     }
     return pack;
@@ -110,6 +115,11 @@ PackQuery decodeStrPQ(char *jsonStr)
         else if(jsoneq(jsonStr,&t[i],"dst")==0){
             sprintf(temp, "%.*s", t[i+1].end-t[i+1].start, jsonStr + t[i+1].start);
             strcpy(pack.dstUser,temp);
+            i++;
+        }
+        else if(jsoneq(jsonStr,&t[i],"port")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.portNb=atoi(temp);
             i++;
         }
     }
@@ -160,6 +170,7 @@ PackAnswerQuery decodeStrPAQ(char *jsonStr)
 			}
 			i += t[i+1].size + 1;
         }
+
     }
     return pack;
 }
@@ -202,6 +213,12 @@ PackPlay decodeStrPP(char *jsonStr)
             pack.end_pt=atoi(temp);
             i++;
         }
+        else if(jsoneq(jsonStr,&t[i],"pro")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.promotion=atoi(temp);
+            i++;
+        }
+        
     }
     return pack;
 }

@@ -1,9 +1,9 @@
 
+#include"util.h"
 #include<string.h>
 #include"jsmn.h"
 #include<stdlib.h>
 #include"vectorStr.h"
-#include"util.h"
 
 #ifndef CODEC_H
 #define CODEC_H
@@ -26,9 +26,10 @@
 
 #define MAX_FRIEND_NB 2
 
-#define SUCCESS 0
+#define USER_LOGIN 0
 #define NO_SUCH_USER 1
 #define INVALID_PASSWD 2
+#define USER_REGISTER 3
 
 //for PackQuery
 #define MAX_PQ_SIZE (MAX_USERNAME_LEN+10+MAX_USERNAME_LEN+12+MAX_MSG_LEN+MAX_USERNAME_LEN+10)
@@ -51,14 +52,15 @@ typedef struct _PackUnamePasswd
     uchar action;
     char UserName[MAX_USERNAME_LEN];
     char Password[MAX_PASSWD_LEN];
+    int port;
 } PackUnamePasswd;
 
 //For server returning to client when they try to login or register
 typedef struct _PackAnswerLR
 {
     uchar successflag;//1 if PackUnamePasswd received successfully, 0 if exception occur
-    int FriendNb;//The number of friends current user has
     vectorStr FriendList;//The Friends List of current user
+    int QueryPort;
 } PackAnswerLR;
 
 //For client to query about online status and new message or new challenges
@@ -68,6 +70,7 @@ typedef struct _PackQuery
      char NewFriend[MAX_USERNAME_LEN];//if you add a new friend
      char Message[MAX_MSG_LEN];//you want to say something
      char dstUser[MAX_USERNAME_LEN];//to who
+     int portNb;
 } PackQuery;
 
 //For server answering client query for online status and new message or new challenges
@@ -78,6 +81,7 @@ typedef struct _PackAnswerQuery
     char challenger[MAX_USERNAME_LEN];//The list of friends that want to challenge current user
     vectorStr messageList;//the list of new messages
     vectorStr srcUserList;
+
 } PackAnswerQuery;
 
 //For client to chat and play between another client
@@ -88,6 +92,7 @@ typedef struct _PackPlay
      char message[MAX_MSG_LEN];
      int start_pt;
      int end_pt;
+     uchar promotion;
 } PackPlay;
 
 

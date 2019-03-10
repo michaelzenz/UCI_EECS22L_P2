@@ -21,11 +21,15 @@ typedef struct _QueueStr{
 //init queue
 QNodeStr queueStr_init(QueueStr *queue);
 //check if stack is empty
-uchar stack_isEmpty(QueueStr *queue);
+uchar queueStr_isEmpty(QueueStr *queue);
 //push a node into stack
 void queueStr_enqueue(QueueStr *queue, char *new_msg, char *srcUser);
 //pop a node from stack into a string
-void queueStr_dequeue(QueueStr *queue, char *ret_str);
+//WARNING: The node that this function returns must be free
+//otherwise there will be memory leak
+QNodeStr queueStr_dequeue(QueueStr *queue);
+//frees a node
+void queueStr_freeNode(QNodeStr *pNode);
 //Print Moves Log to MovesLog.txt
 void queueStr_printAll(QueueStr *queue);
 //free queue

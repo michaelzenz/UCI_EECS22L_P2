@@ -6,8 +6,9 @@
 extern const char *Program;//the name of program
 
 
+
 int main(int argc, char *argv[]){
-    //test_database();
+    test_database();
     printf("\n/****************************/\n");
     printf("This program will use the given port number to listen to login and register request\n");
     printf("And then automatically choose a port between 11001 and 11200 to listen to client query\n");
@@ -27,7 +28,12 @@ int main(int argc, char *argv[]){
 
     InitServiceStatusViewer();
     int QueryPort=InitQueryPackListener();
-    InitUserPackListener(atoi(argv[1]),QueryPort);
+    InitUserPackListener(atoi(argv[1]));
+
+    #ifdef TEST_MSGING
+    database_add_user("michaelz","25619",-1,false);
+    database_add_user("aria","no",-1,false);
+    #endif
 
     while(true){
         //do sth if necessary

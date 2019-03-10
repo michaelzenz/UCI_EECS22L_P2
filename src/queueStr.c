@@ -8,9 +8,9 @@ QNodeStr queueStr_init(QueueStr *queue)
     queue->size=0;
 }
 
-uchar stack_isEmpty(QueueStr *queue)
+uchar queueStr_isEmpty(QueueStr *queue)
 {
-    return queue->size<=0;
+    return queue->head==NULL;
 }
 
 void queueStr_enqueue(QueueStr *queue, char *new_msg, char *srcUser)
@@ -42,16 +42,31 @@ void queueStr_enqueue(QueueStr *queue, char *new_msg, char *srcUser)
     queue->size++;
 }
 
-void queueStr_dequeue(QueueStr *queue, char *ret_str)
+//pop a node from stack into a string
+//WARNING: The node that this function returns must be free
+//otherwise there will be memory leak
+QNodeStr queueStr_dequeue(QueueStr *queue)
 {
+    QNodeStr retNode={NULL,NULL,NULL};
+    
     if(queue->head==NULL)return;
     QNodeStr *head=queue->head;
-    strcpy(ret_str,head->msg);
+    retNode.msg=malloc(sizeof(char)*sizeof(head->msg));
+    retNode.srcUser=malloc(sizeof(char)*sizeof(head->srcUser));
+    strcpy(retNode.msg,head->msg);
+    strcpy(retNode.srcUser,head->srcUser);
     if(queue->head==queue->tail)queue->tail=queue->tail->next;
     queue->head=queue->head->next;
     free(head->msg);
     free(head->srcUser);
     free(head);
+    return retNode;
+}
+
+void queueStr_freeNode(QNodeStr *pNode)
+{
+    free(pNode->msg);
+    free(pNode->srcUser);
 }
 
 void queueStr_printAll(QueueStr *queue)

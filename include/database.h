@@ -44,6 +44,14 @@ char* database_get_nextChallenger(char* user);
 //get password
 char* database_get_password(char* user);
 
+bool database_get_onlineStatus(char* user);
+
+//returns true if user does not exist
+bool database_isUserExist(char* user);
+
+//get friends list
+vectorStr database_get_friends(char* user);
+
 //get port
 int database_get_port(char* user);
 

@@ -7,6 +7,9 @@ bool QueryListenerShutdown=false;
 int QueryPortSocketFD; /* socket file descriptor for service */
 
 pthread_t QueryPortLooperID;
+extern int TimeOutMicroSec;//Modify this if you want
+
+int QueryPort;
 
 void QueryServTimeOutHandler()//the hanle function for timeout
 {
@@ -19,6 +22,35 @@ PackAnswerQuery handleQuery(PackQuery pack)
 {
     //setting up the package to return packAnswerLR
     PackAnswerQuery paq;
+    if(database_isUserExist(pack.UserName)){
+        if(database_isUserExist(pack.dstUser)&&strlen(pack.Message)>0){
+            database_add_msg(pack.dstUser,pack.Message,pack.UserName);
+            database_set_port(pack.UserName,pack.portNb);
+        }
+        if(database_isUserExist(pack.NewFriend)){
+            database_add_friend(pack.UserName,pack.NewFriend);
+        }
+    }
+    vectorStr friends=database_get_friends(pack.UserName);
+    int friendNumber=vectorStr_count(&friends);
+    paq.friendNumber=friendNumber;
+    char temp[MAX_USERNAME_LEN];
+    for(int i=0;i<friendNumber;i++){
+        paq.onlineFlagList[i]=database_get_onlineStatus(vectorStr_get(&friends,i,temp));
+    }
+    QueueStr *pMSGqueue=database_get_msgQueue(pack.UserName);
+    vectorStr messageList,srcUserList;
+    vectorStr_init(&messageList);
+    vectorStr_init(&srcUserList);
+    while(!queueStr_isEmpty(pMSGqueue)){
+        QNodeStr node=queueStr_dequeue(pMSGqueue);
+        vectorStr_add(&messageList,node.msg);
+        vectorStr_add(&srcUserList,node.srcUser);
+        queueStr_freeNode(&node);
+    }
+    strcpy(paq.challenger,"");
+    paq.messageList=messageList;
+    paq.srcUserList=srcUserList;
     //OutputUserPack(packUP);
     return paq;
 }
@@ -50,10 +82,9 @@ void QueryPackListener(		/* process a time request by a client */
     if (LastSendLen < 0)FatalError("writing to data socket failed");
 } /* end of ProcessRequest */
 
-void QueryPortLooper(		/* simple server main loop */
-	int *pTimeout)			/* timeout in micro seconds */
+void QueryPortLooper()
 {
-    int Timeout=*pTimeout;
+    int Timeout=TimeOutMicroSec;
     int DataSocketFD;	/* socket for a new client */
     socklen_t ClientLen;
     struct sockaddr_in
@@ -136,10 +167,10 @@ int InitQueryPackListener()
     }
 
     printf("%s: Providing QueryPackListener service at port %d...\n", Program, PortNb);
+    QueryPort=PortNb;
 
-    int TimeOutMicroSec=250000;
 
-    int ret=pthread_create(&QueryPortLooperID,NULL,(void*)QueryPortLooper,&TimeOutMicroSec);
+    int ret=pthread_create(&QueryPortLooperID,NULL,(void*)QueryPortLooper,NULL);
     
     if(ret!=0){
         printf("Create Query Pack Listener thread fail, exiting\n");

@@ -12,6 +12,7 @@
 #include<stdlib.h>
 #include"util.h"
 #include<pthread.h>
+#include"database.h"
 
 #ifndef SERVER_H
 #define SERVER_H
@@ -40,7 +41,7 @@ char* readFullBuffer(int DataSocketFD);
 
 /* Starts the UserPackListener Service */
 /* PortNo: the port number that this service will use */
-void InitUserPackListener(int PortNo, int qPort);
+void InitUserPackListener(int PortNo);
 
 //inits the Query Pack Listener
 //returns the port that this listener uses

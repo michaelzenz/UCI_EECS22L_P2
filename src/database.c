@@ -10,7 +10,6 @@ typedef struct _User_Node
     QueueStr messages;
     QueueStr challengers;
     bool online_status;
-
 }User_Node;
 
 map_void_t DataBaseMap;
@@ -99,7 +98,9 @@ char* database_get_nextChallenger(char* user)
 {
     User_Node *node = map_get(&DataBaseMap, user);
     char* challenger;
-    queueStr_dequeue(&(node->challengers), challenger);
+    QNodeStr qnode=queueStr_dequeue(&(node->challengers));
+    challenger=malloc(sizeof(qnode.srcUser));
+    strcpy(challenger,qnode.srcUser);
     return challenger;
 }
 
@@ -114,6 +115,24 @@ int database_get_port(char* user)
 {
     User_Node *node = (User_Node*)map_get(&DataBaseMap, user);
     return node->port;
+}
+
+bool database_isUserExist(char* user)
+{
+    User_Node *node=map_get(&DataBaseMap,user);
+    return node!=NULL;
+}
+
+vectorStr database_get_friends(char* user)
+{
+    User_Node *node = (User_Node*)map_get(&DataBaseMap, user);
+    return node->friends;
+}
+
+bool database_get_onlineStatus(char* user)
+{
+    User_Node *node = (User_Node*)map_get(&DataBaseMap, user);
+    return node->online_status;
 }
 
 void test_database()
