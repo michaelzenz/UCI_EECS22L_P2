@@ -142,8 +142,6 @@ void QueryTimeredTask(char *str_PQ)
     free(str_PQ);
 }
 
-
-
 void InitQueryTimeredTask(char *UserName, int portNb)
 {
     if(!MutexInitialized){

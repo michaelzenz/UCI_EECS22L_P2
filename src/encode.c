@@ -30,7 +30,6 @@ void encodePackUnamePasswd(char *jsonStr, PackUnamePasswd *pack)
 void encodePackAnswerLR(char *jsonStr, PackAnswerLR *pack)
 {
    char str_successflag[10]="\"flag\":";
-   char str_FriendNb[10]="\"fnb\":";
    char str_FriendList[MAX_FRIEND_NB*MAX_USERNAME_LEN+10]="\"flist\":[";
 
    char str_temp[3]="";
@@ -38,9 +37,8 @@ void encodePackAnswerLR(char *jsonStr, PackAnswerLR *pack)
    memset(jsonStr,'\0',sizeof(jsonStr));
    jsonStr[0]='{';
    strcat(str_successflag,my_itoa(pack->successflag,str_temp));
-   strcat(str_FriendNb,my_itoa(pack->FriendNb,str_temp));
 
-   int friendNb=pack->FriendNb;
+   int friendNb=vectorStr_count(&pack->FriendList);
    char friendName[MAX_USERNAME_LEN]="";
    for(int i=0;i<friendNb;i++){
       strcat(str_FriendList,"\"");
@@ -51,10 +49,9 @@ void encodePackAnswerLR(char *jsonStr, PackAnswerLR *pack)
       }
       strcat(str_FriendList,"\",");
    }
+   if(friendNb==0)strcat(str_FriendList,"]");
 
    strcat(jsonStr,str_successflag);
-   strcat(jsonStr,",");
-   strcat(jsonStr,str_FriendNb);
    strcat(jsonStr,",");
    strcat(jsonStr,str_FriendList);
    strcat(jsonStr,"}");

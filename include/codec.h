@@ -58,7 +58,6 @@ typedef struct _PackUnamePasswd
 typedef struct _PackAnswerLR
 {
     uchar successflag;//1 if PackUnamePasswd received successfully, 0 if exception occur
-    int FriendNb;//The number of friends current user has
     vectorStr FriendList;//The Friends List of current user
 } PackAnswerLR;
 

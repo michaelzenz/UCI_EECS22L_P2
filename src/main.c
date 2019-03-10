@@ -68,8 +68,6 @@ void testCodec()
 {
     vectorStr friendList;
     vectorStr_init(&friendList);
-    vectorStr_add(&friendList,"keenan");
-    vectorStr_add(&friendList,"aria");
     vectorStr msgList,srcUserList;
     vectorStr_init(&msgList);
     vectorStr_init(&srcUserList);
@@ -83,7 +81,7 @@ void testCodec()
     vectorStr_printAll(&srcUserList);
 
     PackUnamePasswd pup={LOGIN,"michaelz","25619"};
-    PackAnswerLR palr={USER_LOGIN,2,friendList};
+    PackAnswerLR palr={USER_LOGIN,friendList};
     PackQuery pq={"michaelz","aria","hello","aria",11000};
     PackAnswerQuery paq={2};
     paq.onlineFlagList[0]=paq.onlineFlagList[1]=1;
@@ -146,7 +144,7 @@ void GameOnline(int argc, char *argv[])
     OnlinePlayCallback onlineCallback={&gameState};
 
     //end of test code insertion
-    InitPlayBetweenListener(&onlineCallback);
+    int portNb=InitPlayBetweenServer(&onlineCallback);
 
     if (argc < 3)
     {   

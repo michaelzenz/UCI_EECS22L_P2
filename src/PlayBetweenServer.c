@@ -13,7 +13,10 @@ uchar RotateDirection=0;//the current rotate direction
 
 int PlayBetweenSocketFD;
 
+pthread_t PlayBetweenLooperID;
 OnlinePlayCallback *RecvCallback;
+
+int TimeOutMicroSec=250000;
 
 void PlayBetweenTimeOutHandler()//the hanle function for timeout
 {
@@ -88,10 +91,9 @@ void PlayPackListener(int DataSocketFD)
     if (LastSendLen < 0)FatalError("writing to data socket failed");
 }
 
-void PlayBetweenLooper(		/* simple server main loop */
-	int *pTimeout)			/* timeout in micro seconds */
+void PlayBetweenLooper()
 {
-    int Timeout=*pTimeout;
+    int Timeout=TimeOutMicroSec;
     int DataSocketFD;	/* socket for a new client */
     socklen_t ClientLen;
     struct sockaddr_in
@@ -173,16 +175,16 @@ PPrecvCallback PPcalllbackFunc(PackPlay pack)
         env_undo(RecvCallback->pGameState);
 }
 
-pthread_t PlayBetweenLooperID;
+
 
 //callback: this function will be called when a PackPlay is received
-int InitPlayBetweenListener(OnlinePlayCallback *callback)
+int InitPlayBetweenServer(OnlinePlayCallback *callback)
 {
     #ifdef PRINT_LOG
     printf("%s: Creating the User Pack listen socket...\n", Program);
     #endif
-    int PortNb=11000;
-    for(;PortNb<11200;PortNb++)
+    int PortNb=11200;
+    for(;PortNb<12000;PortNb++)
     {
         PlayBetweenSocketFD = MakeServerSocket(PortNb);//Make a socket
         if(PlayBetweenSocketFD>=0)break;
@@ -193,9 +195,9 @@ int InitPlayBetweenListener(OnlinePlayCallback *callback)
     callback->RecvCallback=PPcalllbackFunc;
     RecvCallback=callback;
 
-    int TimeOutMicroSec=250000;
+    
     //start the PlayBetweenLooper
-    int ret=pthread_create(&PlayBetweenLooperID,NULL,(void*)PlayBetweenLooper,&TimeOutMicroSec);
+    int ret=pthread_create(&PlayBetweenLooperID,NULL,(void*)PlayBetweenLooper,NULL);
 
     if(ret!=0){
         printf("Create Local Sever thread fail, exiting\n");
@@ -205,7 +207,7 @@ int InitPlayBetweenListener(OnlinePlayCallback *callback)
     return PortNb;
 }
 
-void ShutPlayBetweenListener()
+void ShutPlayBetweenServer()
 {
     #ifdef PRINT_LOG
     printf("\n%s: Shutting down UserPackListener service\n", Program);
