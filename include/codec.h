@@ -4,14 +4,9 @@
 #include"jsmn.h"
 #include<stdlib.h>
 #include"vectorStr.h"
-#include"math.h"
-
-
 
 #ifndef CODEC_H
 #define CODEC_H
-
-
 
 #define MAX_JSON_OBJ_LEN 50
 #define MAX_JSMN_TOKEN_NB 128
@@ -92,6 +87,8 @@ typedef struct _PackAnswerQuery
     int friendNumber;//this will not be pack into the encoded string, but is necessary for encoding
     uchar onlineFlagList[MAX_FRIEND_NB];//The online status of the friend list of current user
     char challenger[MAX_USERNAME_LEN];//The list of friends that want to challenge current user
+    char challengerHost[20];
+    int challengerPort;
     vectorStr messageList;//the list of new messages
     vectorStr srcUserList;
 } PackAnswerQuery;

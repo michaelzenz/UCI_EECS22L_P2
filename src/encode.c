@@ -11,8 +11,8 @@ void encodePackUnamePasswd(char *jsonStr, PackUnamePasswd *pack)
    memset(jsonStr,'\0',sizeof(jsonStr));
    jsonStr[0]='{';
    sprintf(str_action,"\"act\":%d",pack->action);
-   sprintf(str_UserName,"\"uname\":%s",pack->UserName);
-   sprintf(str_Password,"\"passwd\":%s",pack->Password);
+   sprintf(str_UserName,"\"uname\":\"%s\"",pack->UserName);
+   sprintf(str_Password,"\"passwd\":\"%s\"",pack->Password);
    sprintf(str_port,"\"port\":%d",pack->port);
 
    strcat(jsonStr,str_action);
@@ -72,7 +72,6 @@ void encodePackQuery(char *jsonStr, PackQuery *pack)
    memset(jsonStr,'\0',sizeof(jsonStr));
    jsonStr[0]='{';
 
-
    sprintf(str_UserName,"\"uname\":\"%s\"",pack->UserName);
    sprintf(str_DstUserName,"\"dst\":\"%s\"",pack->dstUser);
    sprintf(str_MSG,"\"msg\":\"%s\"",pack->Message);
@@ -95,6 +94,8 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
 {
    char str_OnlineFlagList[MAX_FRIEND_NB+10]="\"ol\":\"";
    char str_Challenger[MAX_USERNAME_LEN+12];
+   char str_ChallengerHost[30];
+   char str_ChallengerPort[12];
    char str_messageList[MAX_MSG_LEN*MAX_FRIEND_NB+10]="\"msgs\":[";
    char str_srcUserList[MAX_USERNAME_LEN*MAX_FRIEND_NB+10]="\"srcs\":[";
 
@@ -104,7 +105,9 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    memcpy(str_OnlineFlagList+strlen(str_OnlineFlagList),pack->onlineFlagList,sizeof(char)*pack->friendNumber);
    strcat(str_OnlineFlagList,"\"");
 
-   sprintf(str_Challenger,"\"cger\":%s",pack->challenger);
+   sprintf(str_Challenger,"\"cger\":\"%s\"",pack->challenger);
+   sprintf(str_ChallengerHost,"\"chost\":\"%s\"",pack->challengerHost);
+   sprintf(str_ChallengerPort,"\"cport\":%d",pack->challengerPort);
 
    int newMsgNb=vectorStr_count(&pack->messageList);
    char temp[max(MAX_MSG_LEN,MAX_USERNAME_LEN)];
@@ -151,9 +154,9 @@ void encodePackPlay(char *jsonStr, PackPlay *pack)
    memset(jsonStr,'\0',sizeof(jsonStr));
    jsonStr[0]='{';
 
-   sprintf(str_UserName,"\"uname\":%s",pack->UserName);
+   sprintf(str_UserName,"\"uname\":\"%s\"",pack->UserName);
    sprintf(str_Action,"\"act\":%d",pack->Action);
-   sprintf(str_MSG,"\"msg\":%s",pack->message);
+   sprintf(str_MSG,"\"msg\":\"%s\"",pack->message);
    sprintf(str_start_pt,"\"spt\":%d",pack->start_pt);
    sprintf(str_end_pt,"\"ept\":%d",pack->end_pt);
    sprintf(str_promotion,"\"pro\":%d",pack->promotion);
