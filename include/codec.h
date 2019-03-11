@@ -87,8 +87,8 @@ typedef struct _PackAnswerQuery
     int friendNumber;//this will not be pack into the encoded string, but is necessary for encoding
     uchar onlineFlagList[MAX_FRIEND_NB];//The online status of the friend list of current user
     char challenger[MAX_USERNAME_LEN];//The list of friends that want to challenge current user
-    char challengerHost[20];
-    int challengerPort;
+    char opponentHost[20];
+    int opponentPort;
     vectorStr messageList;//the list of new messages
     vectorStr srcUserList;
 } PackAnswerQuery;

@@ -42,20 +42,20 @@ int GetServiceID(char *service)
     return ServiceID;
 }
 
-void PrintStatus(int ServiceID, bool ServiceIsRunning)
+void PrintStatus(Service service)
 {
     pthread_mutex_lock(&ShowServiceStatusMutex);
-    int RewindBackLines=vectorStr_count(&services)-ServiceID-1;
+    int RewindBackLines=vectorStr_count(&services)-service.ServiceID-1;
     if(RewindBackLines!=0)RewindBackLines++;
     printf("\033[%dA",RewindBackLines);
     printf("\33[2K\r");
     fflush(stdout);
-    vectorStr_get(&services,ServiceID,StatusLine);
-    if(ServiceIsRunning){
+    vectorStr_get(&services,service.ServiceID,StatusLine);
+    if(service.isServiceRunning){
         sprintf(StatusLine,"%s is running ...%c", StatusLine, 
-            RotateLine[vector_get(&RotateLineDirections,ServiceID)]);
-        vector_set(&RotateLineDirections,ServiceID,
-            (vector_get(&RotateLineDirections,ServiceID)+1)%4);
+            RotateLine[vector_get(&RotateLineDirections,service.ServiceID)]);
+        vector_set(&RotateLineDirections,service.ServiceID,
+            (vector_get(&RotateLineDirections,service.ServiceID)+1)%4);
     }
     else sprintf(StatusLine,"%s stops",StatusLine);
     printf("%s",StatusLine);
@@ -63,6 +63,7 @@ void PrintStatus(int ServiceID, bool ServiceIsRunning)
     printf("\033[%dB",RewindBackLines);
     pthread_mutex_unlock(&ShowServiceStatusMutex);
 }
+
 
 int MakeServerSocket(		/* create a socket on this server */
 	uint16_t PortNo)

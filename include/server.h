@@ -20,6 +20,12 @@
 #define BUFFERSIZE 256
 #define MAX_SERVICE_NAME_LEN 20
 
+typedef struct _Service{
+    char ServiceName[30];
+    int ServiceID;
+    bool isServiceRunning;
+}Service;
+
 //Register the given service in the Service List that a 
 //Status or terminal is going to show
 //service: service name
@@ -28,7 +34,7 @@ int GetServiceID(char *service);
 //print the status of the given service
 //ServiceID: The id that attain from GetServiceID
 //ServiceIsRunning: true if the service is now running
-void PrintStatus(int ServiceID, bool ServiceIsRunning);
+void PrintStatus(Service service);
 
 /* create a socket on this server */
 //PortNo: port number

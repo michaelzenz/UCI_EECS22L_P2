@@ -2,7 +2,7 @@
 
 extern const char *Program;//the name of program
 
-int UserPortServiceID=-1;
+Service ServiceUserPackListener={"UserPackListener", -1, false};
 bool UserPackListenerShutdown=false;
 int UserPortSocketFD; /* socket file descriptor for service */
 
@@ -11,11 +11,18 @@ extern int QueryPort;
 
 extern int TimeOutMicroSec;
 
+bool isUserServStatusPrinting=false;
+
 void UserServTimeOutHandler()//the hanle function for timeout
 {
-    if(UserPortServiceID<0)UserPortServiceID=GetServiceID("UserPackListener");
-    //PrintStatus(UserPortServiceID,true);
+    if(ServiceUserPackListener.ServiceID<0)
+    {
+        ServiceUserPackListener.ServiceID=GetServiceID(ServiceUserPackListener.ServiceName);
+        ServiceUserPackListener.isServiceRunning=true;
+    }
+    //PrintStatus(ServiceUserPackListener);
     printf("UserPackListener Running\n");
+    isUserServStatusPrinting=false;
 }
 
 void OutputUserPack(PackUnamePasswd packUP)
@@ -102,7 +109,7 @@ void OutputUserPack(PackUnamePasswd packUP)
     }
 }
 
-PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
+PackAnswerLR handleLoginRegister(PackUnamePasswd packUP, char *host)
 {
     //setting up the package to return packAnswerLR
     vectorStr dummy;
@@ -112,6 +119,7 @@ PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
         if(!database_isUserExist(packUP.UserName))palr.successflag=NO_SUCH_USER;
         else if(!strcmp(packUP.Password,database_get_password(packUP.UserName))){
             database_set_onlineStatus(packUP.UserName,true);
+            database_set_host(packUP.UserName,host);
             palr.successflag=USER_LOGIN;
             vectorStr friends=database_get_friends(packUP.UserName);
             palr.FriendList=friends;
@@ -127,7 +135,7 @@ PackAnswerLR handleLoginRegister(PackUnamePasswd packUP)
 }
 
 void UserPackListener(		/* process a time request by a client */
-	int DataSocketFD)
+	int DataSocketFD, char *host)
 {
     int  l;
 
@@ -139,7 +147,7 @@ void UserPackListener(		/* process a time request by a client */
 
     if(packUP.action==LOGIN)printf("%s\n",fullbuf);
     free(fullbuf);
-    PackAnswerLR palr=handleLoginRegister(packUP);
+    PackAnswerLR palr=handleLoginRegister(packUP, host);
 
     //encoding the the packanswerLR to sendbug
     encodePackAnswerLR(SendBuf, &palr);
@@ -183,7 +191,12 @@ void UserPortLooper()
 	}
 	if (res == 0)	/* timeout occurred */
 	{
-	    UserServTimeOutHandler();
+        if(!isUserServStatusPrinting){
+            isUserServStatusPrinting=true;
+            // pthread_t new_printer;
+            // pthread_create(&new_printer,NULL,(void*)UserServTimeOutHandler,NULL);
+            UserServTimeOutHandler();
+        }
 	}
 	else		/* some FDs have data ready to read */
 	{   for(i=0; i<FD_SETSIZE; i++)
@@ -213,7 +226,7 @@ void UserPortLooper()
 			printf("%s: Dealing with client on FD%d...\n",
 				Program, i);
 #endif
-			UserPackListener(i);
+			UserPackListener(i,inet_ntoa(ClientAddress.sin_addr));
 #ifdef DEBUG
 			printf("%s: Closing client connection FD%d.\n\n",
 				Program, i);

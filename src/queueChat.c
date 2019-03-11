@@ -95,7 +95,7 @@ void queueChat_freeChallengerNode(QNodeChallenger *pNode)
 //otherwise there will be memory leak
 QNodeMsg queueChat_dequeueMsg(QueueChat *queue)
 {
-    if(queue->head==NULL){
+    if(queue->size==0){
         QNodeMsg dummy={NULL,NULL,NULL};
         return dummy;
     }
@@ -112,7 +112,7 @@ QNodeMsg queueChat_dequeueMsg(QueueChat *queue)
 
 QNodeChallenger queueChat_dequeueChallenger(QueueChat *queue)
 {
-    if(queue->head==NULL){
+    if(queue->size==0){
         QNodeChallenger dummy={NULL,NULL,-1,NULL};
         return dummy;
     }

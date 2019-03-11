@@ -20,6 +20,8 @@ void database_add_user( char* user_name, char* user_password, int port, bool use
 //reset the password of a user
 void database_set_passwd(char* user, char* passwd);
 
+void database_set_host(char* user, char* host);
+
 //reset the port that a user uses to listen to other users
 void database_set_port(char* user, int port);
 

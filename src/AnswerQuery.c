@@ -2,7 +2,7 @@
 
 extern const char *Program;//the name of program
 
-int QueryServiceID=-1;
+Service ServiceQueryListener={"QueryListener", -1, false};
 bool QueryListenerShutdown=false;
 int QueryPortSocketFD; /* socket file descriptor for service */
 
@@ -11,56 +11,93 @@ extern int TimeOutMicroSec;//Modify this if you want
 
 int QueryPort;
 
+bool isQueryServStatusPrinting=false;
+
 void QueryServTimeOutHandler()//the hanle function for timeout
 {
-    if(QueryServiceID<0)QueryServiceID=GetServiceID("QueryPackListener");
-    //PrintStatus(QueryServiceID,true);
+    if(ServiceQueryListener.ServiceID<0)
+    {
+        ServiceQueryListener.ServiceID=GetServiceID(ServiceQueryListener.ServiceName);
+        ServiceQueryListener.isServiceRunning=true;
+    }
+    //PrintStatus(ServiceQueryListener);
+    isQueryServStatusPrinting=false;
     printf("QueryPackListener Running\n");
 }
 
-
-
-PackAnswerQuery handleQuery(PackQuery pack)
+PackAnswerQuery handleQuery(PackQuery pack,char *host)
 {
     //setting up the package to return packAnswerLR
-    if(pack.action!=QUERY_CHECK_UPDATE)
-        printf("new msg %s from %s\n",pack.Message,pack.UserName);
+    
     PackAnswerQuery paq;
     if(database_isUserExist(pack.UserName)){
+        if(pack.action!=QUERY_CHECK_UPDATE)
+        {
+
+        }
+        database_set_host(pack.UserName,host);
+        database_set_port(pack.UserName,pack.portNb);
         if(database_isUserExist(pack.dstUser)&&strlen(pack.Message)>0){
             database_add_msg(pack.dstUser,pack.Message,pack.UserName);
-            database_set_port(pack.UserName,pack.portNb);
+            
         }
         if(pack.action==QUERY_ADD_FRIEND&&database_isUserExist(pack.dstUser)){
             database_add_friend(pack.UserName,pack.dstUser);
         }
+        if(pack.action==QUERY_CHALLENGE&&database_get_onlineStatus(pack.dstUser)){
+            database_add_challenger(pack.dstUser,pack.UserName);
+            strcpy(paq.challenger,pack.UserName);
+            strcpy(paq.opponentHost,database_get_host(pack.dstUser));
+            paq.opponentPort=database_get_port(pack.dstUser);
+        }
+        else{
+            //for chllenger
+            QNodeChallenger node=database_get_nextChallenger(pack.UserName);
+            if(node.challenger!=NULL){
+                strcpy(paq.challenger,node.challenger);
+                strcpy(paq.opponentHost,database_get_host(node.challenger));
+                paq.opponentPort=database_get_port(node.challenger);
+            }
+            else
+            {
+                strcpy(paq.challenger,"");
+                strcpy(paq.opponentHost,"");
+                paq.opponentPort=-1;
+            }
+        }
+
+
+
+        //for online status
+        vectorStr friends=database_get_friends(pack.UserName);
+        int friendNumber=vectorStr_count(&friends);
+        paq.friendNumber=friendNumber;
+        char temp[MAX_USERNAME_LEN];
+        for(int i=0;i<friendNumber;i++){
+            paq.onlineFlagList[i]=database_get_onlineStatus(vectorStr_get(&friends,i,temp));
+        }
+        //for msg and srcUser
+        QueueChat *pMSGqueue=database_get_msgQueue(pack.UserName);
+        vectorStr messageList,srcUserList;
+        vectorStr_init(&messageList);
+        vectorStr_init(&srcUserList);
+        while(!queueChat_isEmpty(pMSGqueue)){
+            QNodeMsg node=queueChat_dequeueMsg(pMSGqueue);
+            vectorStr_add(&messageList,node.msg);
+            vectorStr_add(&srcUserList,node.srcUser);
+            queueChat_freeMsgNode(&node);
+        }
+        paq.messageList=messageList;
+        paq.srcUserList=srcUserList;
     }
-    vectorStr friends=database_get_friends(pack.UserName);
-    int friendNumber=vectorStr_count(&friends);
-    paq.friendNumber=friendNumber;
-    char temp[MAX_USERNAME_LEN];
-    for(int i=0;i<friendNumber;i++){
-        paq.onlineFlagList[i]=database_get_onlineStatus(vectorStr_get(&friends,i,temp));
-    }
-    QueueChat *pMSGqueue=database_get_msgQueue(pack.UserName);
-    vectorStr messageList,srcUserList;
-    vectorStr_init(&messageList);
-    vectorStr_init(&srcUserList);
-    while(!queueChat_isEmpty(pMSGqueue)){
-        QNodeMsg node=queueChat_dequeueMsg(pMSGqueue);
-        vectorStr_add(&messageList,node.msg);
-        vectorStr_add(&srcUserList,node.srcUser);
-        queueChat_freeMsgNode(&node);
-    }
-    strcpy(paq.challenger,"");
-    paq.messageList=messageList;
-    paq.srcUserList=srcUserList;
+
+
     //OutputUserPack(packUP);
     return paq;
 }
 
 void QueryPackListener(		/* process a time request by a client */
-	int DataSocketFD)
+	int DataSocketFD, char *host)
 {
     int  l;
 
@@ -70,10 +107,11 @@ void QueryPackListener(		/* process a time request by a client */
     PackQuery pack=decodeStrPQ(fullbuf);
     
     free(fullbuf);
-    PackAnswerQuery paq=handleQuery(pack);
+    PackAnswerQuery paq=handleQuery(pack,host);
 
     //encoding the the packanswerLR to sendbug
     encodePackAnswerQuery(SendBuf, &paq);
+    printf("Sending back:%s to query\n",SendBuf);
 
     l = strlen(SendBuf);
 #ifdef PRINT_LOG
@@ -114,7 +152,12 @@ void QueryPortLooper()
 	}
 	if (res == 0)	/* timeout occurred */
 	{
-	    QueryServTimeOutHandler();
+        if(!isQueryServStatusPrinting){
+            isQueryServStatusPrinting=true;
+            // pthread_t new_printer;
+            // pthread_create(&new_printer,NULL,(void*)QueryServTimeOutHandler,NULL);
+            QueryServTimeOutHandler();
+        }
 	}
 	else		/* some FDs have data ready to read */
 	{   for(i=0; i<FD_SETSIZE; i++)
@@ -144,7 +187,7 @@ void QueryPortLooper()
 			printf("%s: Dealing with client on FD%d...\n",
 				Program, i);
 #endif
-			QueryPackListener(i);
+			QueryPackListener(i,inet_ntoa(ClientAddress.sin_addr));
 #ifdef DEBUG
 			printf("%s: Closing client connection FD%d.\n\n",
 				Program, i);
