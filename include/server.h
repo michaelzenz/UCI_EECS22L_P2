@@ -1,5 +1,5 @@
 #include"codec.h"
-#include"queueStr.h"
+#include"queueChat.h"
 #include<gtk/gtk.h>
 #include"vector.h"
 #include<stdint.h>

@@ -18,6 +18,8 @@ void QueryServTimeOutHandler()//the hanle function for timeout
     printf("QueryPackListener Running\n");
 }
 
+
+
 PackAnswerQuery handleQuery(PackQuery pack)
 {
     //setting up the package to return packAnswerLR
@@ -27,8 +29,8 @@ PackAnswerQuery handleQuery(PackQuery pack)
             database_add_msg(pack.dstUser,pack.Message,pack.UserName);
             database_set_port(pack.UserName,pack.portNb);
         }
-        if(database_isUserExist(pack.NewFriend)){
-            database_add_friend(pack.UserName,pack.NewFriend);
+        if(pack.action==QUERY_ADD_FRIEND&&database_isUserExist(pack.dstUser)){
+            database_add_friend(pack.UserName,pack.dstUser);
         }
     }
     vectorStr friends=database_get_friends(pack.UserName);
@@ -38,15 +40,15 @@ PackAnswerQuery handleQuery(PackQuery pack)
     for(int i=0;i<friendNumber;i++){
         paq.onlineFlagList[i]=database_get_onlineStatus(vectorStr_get(&friends,i,temp));
     }
-    QueueStr *pMSGqueue=database_get_msgQueue(pack.UserName);
+    QueueChat *pMSGqueue=database_get_msgQueue(pack.UserName);
     vectorStr messageList,srcUserList;
     vectorStr_init(&messageList);
     vectorStr_init(&srcUserList);
-    while(!queueStr_isEmpty(pMSGqueue)){
-        QNodeStr node=queueStr_dequeue(pMSGqueue);
+    while(!queueChat_isEmpty(pMSGqueue)){
+        QNodeMsg node=queueChat_dequeueMsg(pMSGqueue);
         vectorStr_add(&messageList,node.msg);
         vectorStr_add(&srcUserList,node.srcUser);
-        queueStr_freeNode(&node);
+        queueChat_freeMsgNode(&node);
     }
     strcpy(paq.challenger,"");
     paq.messageList=messageList;

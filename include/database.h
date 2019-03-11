@@ -4,7 +4,7 @@
 #include"vectorStr.h"
 #include"map.h"
 #include"util.h"
-#include"queueStr.h"
+#include"queueChat.h"
 
 #ifndef DATABASE_H
 #define DATABASE_H
@@ -36,13 +36,15 @@ void database_add_challenger(char* user, char* challenger);
 void database_set_onlineStatus(char* user, bool onlineStatus);
 
 //get the message queue of a user
-QueueStr* database_get_msgQueue(char* user);
+QueueChat* database_get_msgQueue(char* user);
 
 //get the next challenger
-char* database_get_nextChallenger(char* user);
+QNodeChallenger database_get_nextChallenger(char* user);
 
 //get password
 char* database_get_password(char* user);
+
+char* database_get_host(char* user);
 
 bool database_get_onlineStatus(char* user);
 

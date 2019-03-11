@@ -36,6 +36,11 @@
 
 #define MAX_MSG_LEN 100
 
+#define QUERY_CHAT 0
+#define QUERY_CHALLENGE 1
+#define QUERY_ADD_FRIEND 2
+#define QUERY_CHECK_UPDATE 3
+
 //for PackAnswerQuery
 #define MAX_PAQ_SIZE (MAX_FRIEND_NB+10+MAX_USERNAME_LEN+12+MAX_MSG_LEN*MAX_FRIEND_NB+10+MAX_USERNAME_LEN*MAX_FRIEND_NB+10)
 
@@ -64,13 +69,16 @@ typedef struct _PackAnswerLR
 } PackAnswerLR;
 
 //For client to query about online status and new message or new challenges
+//you can only do chat or challenge at one time
 typedef struct _PackQuery
 {
-     char UserName[MAX_USERNAME_LEN];//who you are
-     char NewFriend[MAX_USERNAME_LEN];//if you add a new friend
-     char Message[MAX_MSG_LEN];//you want to say something
-     char dstUser[MAX_USERNAME_LEN];//to who
-     int portNb;
+    char UserName[MAX_USERNAME_LEN];//who you are
+    //the user that will be challenged, chat or add to friends
+    //depends on the action
+    char dstUser[MAX_USERNAME_LEN];
+    char Message[MAX_MSG_LEN];//if you want to say something
+    uchar action;
+    int portNb;
 } PackQuery;
 
 //For server answering client query for online status and new message or new challenges
@@ -81,7 +89,6 @@ typedef struct _PackAnswerQuery
     char challenger[MAX_USERNAME_LEN];//The list of friends that want to challenge current user
     vectorStr messageList;//the list of new messages
     vectorStr srcUserList;
-
 } PackAnswerQuery;
 
 //For client to chat and play between another client
