@@ -222,8 +222,6 @@ gint Chats_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     GdkModifierType state;
     gdk_window_get_pointer(widget->window,&x,&y,&state);
     printf("x:%d, y:%d\n",x,y);
-
-
 }
 
 /* This function rotates the position of the tabs */

@@ -72,7 +72,7 @@ char* sendToServer(char* msg)
         pthread_mutex_init(&mutex,NULL);
         MutexInitialized=true;
     }
-    pthread_mutex_lock(&mutex);
+    //pthread_mutex_lock(&mutex);
 
     int n;
     int SocketFD;
@@ -109,7 +109,7 @@ char* sendToServer(char* msg)
 
     // free(fullRecvBuf);
     close(SocketFD);
-    pthread_mutex_unlock(&mutex);
+    //pthread_mutex_unlock(&mutex);
 
     return fullRecvBuf;
 }
@@ -124,7 +124,7 @@ char* sendToServerQport(char* msg)
         pthread_mutex_init(&mutex,NULL);
         MutexInitialized=true;
     }
-    pthread_mutex_lock(&mutex);
+    //pthread_mutex_lock(&mutex);
 
     int n;
     int SocketFD;
@@ -161,7 +161,7 @@ char* sendToServerQport(char* msg)
 
     // free(fullRecvBuf);
     close(SocketFD);
-    pthread_mutex_unlock(&mutex);
+    //pthread_mutex_unlock(&mutex);
 
     return fullRecvBuf;
 }

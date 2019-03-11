@@ -4,9 +4,14 @@
 #include"jsmn.h"
 #include<stdlib.h>
 #include"vectorStr.h"
+#include"math.h"
+
+
 
 #ifndef CODEC_H
 #define CODEC_H
+
+
 
 #define MAX_JSON_OBJ_LEN 50
 #define MAX_JSMN_TOKEN_NB 128
