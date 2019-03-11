@@ -378,9 +378,7 @@ void Chats_menu()
     GtkWidget *label;
     char bufferf[32];
     char bufferl[32];
-
     
-
     for (int i=0; i < 5; i++) {
         sprintf(bufferf, "Prepend Frame %d", i+1);
         sprintf(bufferl, "PPage %d", i+1);
@@ -398,9 +396,6 @@ void Chats_menu()
         gtk_notebook_prepend_page (GTK_NOTEBOOK(notebook), NotebookFrame, label);
     }
 
-    
-
-    
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Chats_menu_callback),NULL);  //connect signals from clicking the window to active the callback
     gtk_widget_show_all(window);   //shows the window to the user
     gdk_threads_leave();//after you finich calling gtk functions, call this

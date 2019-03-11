@@ -199,7 +199,6 @@ int InitPlayBetweenServer(OnlinePlayCallback *callback)
     PlayBetweenServerPort=PortNb;
     callback->RecvCallback=PPcalllbackFunc;
     RecvCallback=callback;
-
     
     //start the PlayBetweenLooper
     int ret=pthread_create(&PlayBetweenLooperID,NULL,(void*)PlayBetweenLooper,NULL);
