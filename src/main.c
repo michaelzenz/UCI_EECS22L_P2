@@ -7,6 +7,8 @@
 #include"PlayBetween.h"
 
 extern const char *Program;//the name of program
+extern char *UserName;
+extern OnlinePlayer localPlayer, remotePlayer;
 
 #define MODEL 1
 
@@ -20,13 +22,13 @@ int play(GameState *gameState,Player *player,int model)
     return quit;
 }
 
-int onlinePlay(GameState *gameState, OnlinePlayer *player)
+int onlinePlay(GameState *gameState)
 {
-    // if(player->localUser)guio_play(gameState);
-    // else{
-    //     sleep(1);//wait for the opponent to make the move
-    //     return 0;
-    // }
+    if(gameState->playerTurn==localPlayer.color)guio_play(gameState);
+    else{
+        sleep(1);//wait for the opponent to make the move
+        return 0;
+    }
 }
 
 //play the offline game
@@ -88,7 +90,7 @@ void testCodec()
     strcpy(paq.challenger,"aria");
     paq.messageList=msgList;
     paq.srcUserList=srcUserList;
-    PackPlay pp={"michaelz",CHAT,"hello",48,40,QUEEN};
+    PackPlay pp={"michaelz",PLAYBETWEEN_PLAY,"hello",48,40,QUEEN};
 
     char str_pup[MAX_PUP_SIZE],str_palr[MAX_PALR_SIZE],str_pq[MAX_PQ_SIZE],str_paq[MAX_PAQ_SIZE],str_pp[MAX_PP_SIZE];
     encodePackUnamePasswd(str_pup,&pup);
@@ -152,14 +154,36 @@ void GameOnline(int argc, char *argv[])
     }
     init_connection2server(argv[0],argv[1],argv[2]);
 
+    
+
     LoginOrRegister();
     init_connection2qport();
 
     SendMsgToUser("aria","fuck");
     InitQueryTimeredTask();
+
     Chats_menu();
 
-    
+    strcpy(localPlayer.UserName,UserName);
+
+    guio_gameplay_window(&gameState);
+
+    int quit=0;
+    while(quit==0){
+        quit=onlinePlay(&gameState);
+        print_stack_log(&(gameState.moves_stack));
+        if(quit==CUR_PLAYER_LOSE||quit==CUR_PLAYER_WIN)
+        {
+            guio_refresh(&gameState);
+            gui_checkmate_window(&gameState,quit);
+            return;
+        }
+        else if(quit==QUIT)
+        {
+            return;
+        }
+        else guio_refresh(&gameState);
+    }
 
     int hit=1;
     env_free_GameState(&gameState);

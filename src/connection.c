@@ -1,4 +1,5 @@
 #include"connection.h"
+#include"PlayBetween.h"
 
 extern const char *Program;
 char *UserName;
@@ -21,9 +22,13 @@ bool MutexInitialized=false;
 bool StopQuery=false;
 
 extern int PlayBetweenServerPort;
+extern OnlinePlayer localPlayer, remotePlayer;
+bool isPlayingWithOpponent=false;
 
 //WARNING: the char* that this function returns must be free
 //Otherwise there will be memory leak
+//WARNING2: this function only reads a full json string
+//other that json string must not be longer that BUFFERSIZE
 char* readFullBuffer(int DataSocketFD)
 {
     int LastReadLen;
@@ -33,10 +38,10 @@ char* readFullBuffer(int DataSocketFD)
     char *fullBuf=malloc(sizeof(char)*lbufferSize);
     memset(fullBuf,'\0',lbufferSize);
     int curLen=0;
-    
+    bool firstRead=true;
     do{
         LastReadLen = read(DataSocketFD, RecvBuf, BUFFERSIZE-1);//read 
-        if (LastReadLen < 0) 
+        if (LastReadLen < 0)
         {   
             FatalError("reading from data socket failed");
         }
@@ -49,6 +54,10 @@ char* readFullBuffer(int DataSocketFD)
         }
         curLen+=LastReadLen;
         strcat(fullBuf,RecvBuf);
+        if(firstRead){
+            if(RecvBuf[0]!='{')break;
+            firstRead=false;
+        }
     }while(RecvBuf[LastReadLen-1]!='}');
     
 #ifdef PRINT_LOG
@@ -208,19 +217,40 @@ void init_connection2qport()
     ServerAddressQport.sin_addr = *(struct in_addr*)ServerQport->h_addr_list[0];
 }
 
+void handlePAQ(PackAnswerQuery paq)
+{
+    if(strlen(paq.challenger)>0){
+        init_connection2oppo(paq.opponentHost,paq.opponentPort);
+        if(!strcmp(UserName,paq.challenger)){
+            remotePlayer.color=WHITE;
+            localPlayer.color=BLACK;
+        }
+        else{
+            strcpy(remotePlayer.UserName,paq.challenger);
+            remotePlayer.color=BLACK;
+            localPlayer.color=WHITE;
+        }
+        isPlayingWithOpponent=true;
+    }
+
+    int NewMsgCnt=vectorStr_count(&paq.messageList);
+    char temp1[MAX_MSG_LEN],temp2[MAX_USERNAME_LEN];
+    for(int i=0;i<NewMsgCnt;i++){
+        printf("you got a new message:%s from %s\n",
+            vectorStr_get(&paq.messageList,i,temp1),
+            vectorStr_get(&paq.srcUserList,i,temp2));
+    }
+}
+
 void QueryTimeredTask(char *str_PQ)
 {
     while(!StopQuery){
         char *RecvBuf;
         RecvBuf=sendToServerQport(str_PQ);
         PackAnswerQuery paq=decodeStrPAQ(RecvBuf);
-        int NewMsgCnt=vectorStr_count(&paq.messageList);
-        char temp1[MAX_MSG_LEN],temp2[MAX_USERNAME_LEN];
-        for(int i=0;i<NewMsgCnt;i++){
-            printf("you got a new message:%s from %s\n",
-                vectorStr_get(&paq.messageList,i,temp1),
-                vectorStr_get(&paq.srcUserList,i,temp2));
-        }
+        
+        handlePAQ(paq);
+        
         free(RecvBuf);
         sleep(2);
     }
@@ -243,17 +273,31 @@ void SendMsgToUser(char *dstUser, char* msg)
     encodePackQuery(str_pq,&pq);
     char *fullBuf=sendToServerQport(str_pq);
     PackAnswerQuery paq=decodeStrPAQ(fullBuf);
-    #ifdef TEST_MSGING
-    int newMsgNb=vectorStr_count(&paq.messageList);
-    for(int i=0;i<newMsgNb;i++)
-    {
-        char msg[MAX_MSG_LEN];
-        char srcUser[MAX_USERNAME_LEN];
-        vectorStr_get(&paq.messageList,i,msg);
-        vectorStr_get(&paq.srcUserList,i,srcUser);
-        printf("you got a msg from %s: %s\n",srcUser,msg);
-    }
+
+    handlePAQ(paq);
+
+    free(fullBuf);
+}
+
+void ChallengeUser(char *dstUser)
+{
+    #ifdef PRINT_LOG
+    printf("sending msg to %s\n",dstUser);
     #endif
+    printf("sending msg to %s\n",dstUser);
+    PackQuery pq;
+    strcpy(pq.UserName,UserName);
+    strcpy(pq.dstUser,dstUser);
+    strcpy(pq.Message,"");
+    pq.action=QUERY_CHALLENGE;
+    pq.portNb=PlayBetweenServerPort;
+    char str_pq[MAX_PQ_SIZE];
+    encodePackQuery(str_pq,&pq);
+    char *fullBuf=sendToServerQport(str_pq);
+    PackAnswerQuery paq=decodeStrPAQ(fullBuf);
+
+    handlePAQ(paq);
+
     free(fullBuf);
 }
 

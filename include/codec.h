@@ -47,9 +47,9 @@
 //for PackPlay
 #define MAX_PP_SIZE (MAX_MSG_LEN+50)
 
-#define CHAT 1
-#define PLAY 2
-#define UNDO 3
+#define PLAYBETWEEN_CHAT 1
+#define PLAYBETWEEN_PLAY 2
+#define PLAYBETWEEN_UNDO 3
 
 //the pack that contains username and password
 typedef struct _PackUnamePasswd
@@ -87,8 +87,8 @@ typedef struct _PackAnswerQuery
     int friendNumber;//this will not be pack into the encoded string, but is necessary for encoding
     uchar onlineFlagList[MAX_FRIEND_NB];//The online status of the friend list of current user
     char challenger[MAX_USERNAME_LEN];//The list of friends that want to challenge current user
-    char challengerHost[20];
-    int challengerPort;
+    char opponentHost[20];
+    int opponentPort;
     vectorStr messageList;//the list of new messages
     vectorStr srcUserList;
 } PackAnswerQuery;

@@ -106,8 +106,8 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    strcat(str_OnlineFlagList,"\"");
 
    sprintf(str_Challenger,"\"cger\":\"%s\"",pack->challenger);
-   sprintf(str_ChallengerHost,"\"chost\":\"%s\"",pack->challengerHost);
-   sprintf(str_ChallengerPort,"\"cport\":%d",pack->challengerPort);
+   sprintf(str_ChallengerHost,"\"chost\":\"%s\"",pack->opponentHost);
+   sprintf(str_ChallengerPort,"\"cport\":%d",pack->opponentPort);
 
    int newMsgNb=vectorStr_count(&pack->messageList);
    char temp[max(MAX_MSG_LEN,MAX_USERNAME_LEN)];
@@ -116,7 +116,7 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    for(int i=0;i<newMsgNb;i++){
       vectorStr_get(&pack->messageList,i,temp);
       sprintf(tempMsg,"\"%s\"",temp);
-      vectorStr_get(&pack->messageList,i,temp);
+      vectorStr_get(&pack->srcUserList,i,temp);
       sprintf(tempUserName,"\"%s\"",temp);
       strcat(str_messageList,tempMsg);
       strcat(str_srcUserList,tempUserName);

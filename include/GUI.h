@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "codec.h"
 #include "connection.h"
+#include "PlayBetween.h"
 
 #ifndef GAMEGUI_H
 #define GAMEGUI_H
@@ -43,6 +44,8 @@
 
 #define CHAT_SCROLL_WIDTH 725
 
+#define CHAT_LIST_HEIGHT 450
+
 #define FRIEND_LIST_LEFT 750
 #define FRIEND_LIST_TOP 40
 #define FRIEND_LIST_WIDTH 200
@@ -52,10 +55,10 @@
 #define NOTEBOOK_FIXED_LEFT 10
 #define NOTEBOOK_FIXED_TOP 10
 
-#define MSG_ENTRY_FIXED_WIDTH 490
-#define MSG_ENTRY_FIXED_HEIGHT 60
-#define MSG_ENTRY_FIXED_LEFT 10
-#define MSG_ENTRY_FIXED_TOP 360
+#define MSG_TEXTVIEW_FIXED_WIDTH 490
+#define MSG_TEXTVIEW_FIXED_HEIGHT 60
+#define MSG_TEXTVIEW_FIXED_LEFT 10
+#define MSG_TEXTVIEW_FIXED_TOP 360
 
 #define CHAT_BUTTON_WIDTH 150
 #define CHAT_BUTTON_HEIGHT 20
@@ -63,12 +66,16 @@
 #define SEND_BUTTON_TOP 360
 #define RMPAGE_BUTTON_TOP 390
 
-#define CHALLENGE_BUTTON_WIDTH 390
-#define CHALLENGE_BUTTON_HEIGHT 390
-#define CHALLENGE_BUTTON_LEFT 390
-#define CHALLENGE_BUTTON_TOP 390
+#define CHALLENGE_BUTTON_WIDTH 120
+#define CHALLENGE_BUTTON_HEIGHT 30
+#define CHALLENGE_BUTTON_LEFT 790
+#define CHALLENGE_BUTTON_TOP (FRIEND_LIST_TOP+CHAT_LIST_HEIGHT)
 
-#define CHAT_LIST_HEIGHT 450
+#define ONLINE_BOARD_UP (WINDOW_HEIGHT/2-BOARD_HEIGHT/2)
+#define ONLINE_BOARD_LEFT (WINDOW_WIDTH/2-BOARD_WIDTH/2)
+#define ONLINE_BOARD_DOWN (WINDOW_HEIGHT/2+BOARD_HEIGHT/2)
+#define ONLINE_BOARD_RIGHT (WINDOW_WIDTH/2+BOARD_WIDTH/2)
+
 //!for online
 
 //init a new window
@@ -110,6 +117,12 @@ void LoginOrRegister();
 
 //Opens the chat menu
 void Chats_menu();
+
+void guio_gameplay_window(GameState *gameState);
+
+void guio_refresh(GameState *gameState);
+
+int guio_play(GameState *gameState);
 /*********************/
 //!Online
 /*********************/

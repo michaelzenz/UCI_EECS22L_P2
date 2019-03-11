@@ -565,7 +565,6 @@ int gui_play(GameState *gameState,Player *player)
     check_ActionMade=0;
     env_free_container(gameState);
     return check ;
-
 }
 
 //here you will use the gameState to refresh the board

@@ -1,6 +1,6 @@
 #include"PlayBetween.h"
 
-#define PLAY_PACK_RECEIVED "Play Pack Received Successfully"
+
 
 extern const char *Program;
 
@@ -18,6 +18,8 @@ pthread_t PlayBetweenLooperID;
 OnlinePlayCallback *RecvCallback;
 
 int TimeOutMicroSec=250000;
+
+extern bool isPlayingWithOpponent;
 
 void PlayBetweenTimeOutHandler()//the hanle function for timeout
 {
@@ -74,8 +76,6 @@ void PlayPackListener(int DataSocketFD)
     else{
         PackPlay packPlay=decodeStrPP(fullbuf);
         RecvCallback->RecvCallback(packPlay);
-
-
     }
 
     
@@ -168,15 +168,16 @@ void PlayBetweenLooper()
     }
 } /* end of ServerMainLoop */
 
-PPrecvCallback PPcalllbackFunc(PackPlay pack)
+void PPcalllbackFunc(PackPlay pack)
 {
-    if(pack.Action==CHAT){
+    if(!isPlayingWithOpponent)return;
+    if(pack.Action==PLAYBETWEEN_CHAT){
         
     }
-    else if(pack.Action==PLAY){
+    else if(pack.Action==PLAYBETWEEN_PLAY){
         env_play2(RecvCallback->pGameState,pack.start_pt,pack.end_pt,0);
     }
-    else if(pack.Action==UNDO)
+    else if(pack.Action==PLAYBETWEEN_UNDO)
         env_undo(RecvCallback->pGameState);
 }
 

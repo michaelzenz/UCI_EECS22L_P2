@@ -16,6 +16,8 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+
+
 //the buffer size to send
 #define BUFFERSIZE 256
 #define MAX_SERVICE_NAME_LEN 20
@@ -46,6 +48,8 @@ char* readFullBuffer(int DataSocketFD);
 
 //Send a msg to user
 void SendMsgToUser(char *dstUser, char* msg);
+
+void ChallengeUser(char *dstUser);
 
 //init the connection to the qport of the server
 void init_connection2qport();
