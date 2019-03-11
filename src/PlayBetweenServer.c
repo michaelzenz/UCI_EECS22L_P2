@@ -60,6 +60,8 @@ int MakeServerSocket(		/* create a socket on this server */
     return ServSocketFD;
 } /* end of MakeServerSocket */
 
+
+
 void PlayPackListener(int DataSocketFD)
 {
     firstTimeOut=false;
@@ -72,6 +74,8 @@ void PlayPackListener(int DataSocketFD)
     else{
         PackPlay packPlay=decodeStrPP(fullbuf);
         RecvCallback->RecvCallback(packPlay);
+
+
     }
 
     
@@ -167,7 +171,7 @@ void PlayBetweenLooper()
 PPrecvCallback PPcalllbackFunc(PackPlay pack)
 {
     if(pack.Action==CHAT){
-
+        
     }
     else if(pack.Action==PLAY){
         env_play2(RecvCallback->pGameState,pack.start_pt,pack.end_pt,0);

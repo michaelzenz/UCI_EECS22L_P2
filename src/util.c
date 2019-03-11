@@ -1,8 +1,6 @@
 #include"util.h"
 
 const char *Program=NULL;//the name of program
-char *UserName=NULL;//the user name of the current user
-int QueryPort=-1;
 
 //the id in char array to show
 char *BoardIDX[8]={"A","B","C","D","E","F","G","H"};

@@ -1,5 +1,8 @@
 #include"GUI.h"
 
+extern int PlayBetweenServerPort;
+extern vectorStr FriendsList;
+
 extern GtkWidget *window;
 extern GtkWidget *image;
 extern GtkWidget *layout;//the layout to put on background and contain fixed widget
@@ -14,6 +17,21 @@ GtkWidget *scrolled_win;
 GtkWidget *friendsList;
 GtkTextBuffer *buffer=NULL;
 GList *children, *iter;
+
+//for chat menu
+const gchar *list_item_data_key="list_item_data";
+GtkWidget *friendlistitem;
+GtkWidget *friendlistscroll;
+GtkWidget *NoteBookFixed;
+GtkWidget *ChatMenuScroll;
+GtkWidget *notebook;
+GtkWidget *NotebookFrame;
+GtkWidget *MsgEnty;
+GtkWidget *SendButton;
+GtkWidget *RMpageButton;
+
+bool ChatMenuInitialized=false;
+//!for chat menu
 
 //the pixbuf to load image and resize from a .jpg or .png file
 GdkPixbuf *Login_pixbuf = NULL;
@@ -30,6 +48,9 @@ bool isUserExist=true;
 
 extern char *UserName;
 extern int QueryPort;
+
+//add friend to friend list 
+void guio_addfriend(char *UserName);
 
 void empty_container(GtkWidget *container)
 {
@@ -67,6 +88,7 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
         strcpy(packUP.UserName,Username);
         strcpy(packUP.Password,Passwd); 
         encodePackUnamePasswd(Sendstr,&packUP);
+        printf("%s\n",Sendstr);
         if(UserName==NULL)UserName=malloc(strlen(Username)+1);
         strcpy(UserName,Username);//this is for the global one
         
@@ -75,6 +97,7 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
         if(palr.successflag==USER_LOGIN){
             LoginFlag=LOGIN_SUCCESS;
             QueryPort=palr.QueryPort;
+            FriendsList=palr.FriendList;
         }
         else if(palr.successflag==INVALID_PASSWD)LoginFlag=NOT_YET_LOGIN;
         else if(palr.successflag==NO_SUCH_USER){
@@ -198,6 +221,9 @@ gint Chats_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     int x, y;
     GdkModifierType state;
     gdk_window_get_pointer(widget->window,&x,&y,&state);
+    printf("x:%d, y:%d\n",x,y);
+
+
 }
 
 /* This function rotates the position of the tabs */
@@ -224,128 +250,159 @@ void tabsborder_book (GtkButton *button, GtkNotebook *notebook)
 void remove_book (GtkNotebook *notebook)
 {
     gint page;
-    
     page = gtk_notebook_current_page(notebook);
+
     gtk_notebook_remove_page (notebook, page);
     /* Need to refresh the widget -- 
      This forces the widget to redraw itself. */
     gtk_widget_draw(GTK_WIDGET(notebook), NULL);
 }
+
+void guio_CHAT_send_msg()
+{
+    char msg[MAX_MSG_LEN];
+    sprintf(msg,"%s",gtk_entry_get_text(MsgEnty));
+
+    GList *dlist;
+    dlist=GTK_LIST(friendsList)->selection;
+    
+    if (!dlist) {
+        printf("Please Choose a friend to send msg");
+        return;
+    }
+    GtkObject       *list_item;
+    gchar           *item_data_string;
+    while (dlist) {
+        
+        
+        list_item=GTK_OBJECT(dlist->data);
+        item_data_string=gtk_object_get_data(list_item,
+                                             list_item_data_key);
+        //g_print("%s ", item_data_string);
+        
+        dlist=dlist->next;
+    }
+
+    SendMsgToUser(item_data_string,msg);
+}
+
+void guio_addfriend(char *UserName)
+{
+    friendlistitem = gtk_list_item_new_with_label (UserName);
+    gtk_container_add (GTK_CONTAINER (friendsList), friendlistitem);
+    
+    gtk_object_set_data(GTK_OBJECT(friendlistitem),
+                            list_item_data_key,
+                            UserName);
+    
+}
+
+//this function adds msg to current notebook page
+//you can get 
+void guio_add_msg_NbPage(char *msg)
+{
+
+}
+
+void InitChatMenu()
+{
+    gdk_threads_enter();
+    friendsList = gtk_list_new (); //creates list box
+    gtk_list_set_selection_mode (GTK_LIST (friendsList), GTK_SELECTION_BROWSE); //sets style of list box
+
+    friendlistscroll = gtk_scrolled_window_new (NULL,NULL);
+    gtk_container_border_width (GTK_CONTAINER (friendlistscroll), 10);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (friendlistscroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+    gtk_widget_set_usize(GTK_SCROLLED_WINDOW (friendlistscroll), FRIEND_LIST_WIDTH, CHAT_LIST_HEIGHT);
+    gtk_scrolled_window_add_with_viewport (GTK_CONTAINER (friendlistscroll), friendsList);
+
+    ChatMenuScroll = gtk_scrolled_window_new (NULL,NULL);
+    gtk_container_border_width (GTK_CONTAINER (ChatMenuScroll), 10);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (ChatMenuScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+    gtk_widget_set_usize(GTK_SCROLLED_WINDOW (ChatMenuScroll), CHAT_SCROLL_WIDTH, CHAT_LIST_HEIGHT);
+
+    notebook = gtk_notebook_new ();
+    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
+    gtk_widget_set_size_request (notebook, NOTEBOOK_FIXED_WIDTH, NOTEBOOK_FIXED_HEIGHT);
+    NoteBookFixed=gtk_fixed_new();
+    gtk_fixed_put(GTK_FIXED(NoteBookFixed), notebook, NOTEBOOK_FIXED_LEFT, NOTEBOOK_FIXED_TOP);
+
+    MsgEnty=gtk_entry_new();
+    gtk_widget_set_size_request (MsgEnty, MSG_ENTRY_FIXED_WIDTH, MSG_ENTRY_FIXED_HEIGHT);
+    gtk_fixed_put(GTK_FIXED(NoteBookFixed), MsgEnty, MSG_ENTRY_FIXED_LEFT, MSG_ENTRY_FIXED_TOP);
+
+    gtk_scrolled_window_add_with_viewport (GTK_CONTAINER (ChatMenuScroll), NoteBookFixed);
+
+    SendButton = gtk_button_new_with_label ("send");
+    gtk_widget_set_size_request (SendButton, CHAT_BUTTON_WIDTH, CHAT_BUTTON_HEIGHT);
+    gtk_signal_connect_object (GTK_OBJECT (SendButton), "clicked",
+                            (GtkSignalFunc) guio_CHAT_send_msg,
+                            NULL);
+
+    RMpageButton = gtk_button_new_with_label ("remove page");
+    gtk_widget_set_size_request (RMpageButton, CHAT_BUTTON_WIDTH, CHAT_BUTTON_HEIGHT);
+
+    gtk_signal_connect_object (GTK_OBJECT (RMpageButton), "clicked",
+                            (GtkSignalFunc) remove_book,
+                            notebook);
+
+    gtk_fixed_put(GTK_FIXED(NoteBookFixed), SendButton, CHAT_BUTTON_LEFT, SEND_BUTTON_TOP);
+    gtk_fixed_put(GTK_FIXED(NoteBookFixed), RMpageButton, CHAT_BUTTON_LEFT, RMPAGE_BUTTON_TOP);
+    gdk_threads_leave();
+}
+
 void Chats_menu()
 {
+    
+    if(!ChatMenuInitialized){
+        InitChatMenu();
+        ChatMenuInitialized=true;
+    }
+
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
+
+    int friendNb=vectorStr_count(&FriendsList);
+    char temp[MAX_USERNAME_LEN];
+    for(int i=0;i<friendNb;i++){
+        guio_addfriend(vectorStr_get(&FriendsList,i,temp));
+    }
 
     Chats_pixbuf=load_pixbuf_from_file(Chats_menu_path);  //loads the background image from files
     Chats_pixbuf=gdk_pixbuf_scale_simple(Chats_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);  //sets bg image to size of window
     image = gtk_image_new_from_pixbuf(Chats_pixbuf);  //sets variable for bg image
-    
-    friendsList = gtk_list_new (); //creates list box
-    gtk_list_set_selection_mode (GTK_LIST (friendsList), GTK_SELECTION_BROWSE); //sets style of list box
+    gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);  //add bg image to layout
+    gtk_layout_put(GTK_LAYOUT(layout), friendlistscroll, FRIEND_LIST_LEFT, FRIEND_LIST_TOP);
+    gtk_layout_put(GTK_LAYOUT(layout), ChatMenuScroll, 20, 40);
+
 
     //note book
-    GtkWidget *windscroll;
-    GtkWidget *notebook;
-    GtkWidget *frame;
-    GtkWidget *button;
-    GtkWidget *checkbutton;
+
     GtkWidget *label;
-    GtkWidget *notetable;
     char bufferf[32];
     char bufferl[32];
-    gint    xMax = 725;
-    gint    yMax = 400;
-    windscroll = gtk_scrolled_window_new (NULL,NULL);
-    gtk_container_border_width (GTK_CONTAINER (windscroll), 10);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (windscroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-    gtk_widget_set_usize(GTK_SCROLLED_WINDOW (windscroll), xMax, yMax);
 
-    notetable = gtk_table_new(2,6,TRUE);
-    gtk_scrolled_window_add_with_viewport (GTK_CONTAINER (windscroll), notetable);
-    gtk_layout_put(GTK_LAYOUT(layout), windscroll, 20, 40);
-
-    notebook = gtk_notebook_new ();
-    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
-    gtk_table_attach_defaults(GTK_TABLE(notetable), notebook, 0,6,0,1);
-    gtk_widget_show(notebook);
     
-
-    for (int i=0; i < 5; i++) {
-        sprintf(bufferf, "Append Frame %d", i+1);
-        sprintf(bufferl, "Page %d", i+1);
-        
-        frame = gtk_frame_new (bufferf);
-        gtk_container_border_width (GTK_CONTAINER (frame), 10);
-        gtk_widget_set_usize (frame, 100, 75);
-        gtk_widget_show (frame);
-        
-        label = gtk_label_new (bufferf);
-        gtk_container_add (GTK_CONTAINER (frame), label);
-        gtk_widget_show (label);
-        
-        label = gtk_label_new (bufferl);
-        gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
-    }
-
-    checkbutton = gtk_check_button_new_with_label ("Check me please!");
-    gtk_widget_set_usize(checkbutton, 100, 75);
-    gtk_widget_show (checkbutton); 
-    gtk_notebook_insert_page (GTK_NOTEBOOK (notebook), checkbutton, label, 2);
 
     for (int i=0; i < 5; i++) {
         sprintf(bufferf, "Prepend Frame %d", i+1);
         sprintf(bufferl, "PPage %d", i+1);
         
-        frame = gtk_frame_new (bufferf);
-        gtk_container_border_width (GTK_CONTAINER (frame), 10);
-        gtk_widget_set_usize (frame, 100, 75);
-        gtk_widget_show (frame);
+        NotebookFrame = gtk_frame_new (bufferf);
+        gtk_container_border_width (GTK_CONTAINER (NotebookFrame), 10);
+        gtk_widget_set_usize (NotebookFrame, 100, 260);
+        gtk_widget_show (NotebookFrame);
         
         label = gtk_label_new (bufferf);
-        gtk_container_add (GTK_CONTAINER (frame), label);
+        gtk_container_add (GTK_CONTAINER (NotebookFrame), label);
         gtk_widget_show (label);
         
         label = gtk_label_new (bufferl);
-        gtk_notebook_prepend_page (GTK_NOTEBOOK(notebook), frame, label);
+        gtk_notebook_prepend_page (GTK_NOTEBOOK(notebook), NotebookFrame, label);
     }
 
-    button = gtk_button_new_with_label ("remove page");
-    gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
-                               (GtkSignalFunc) remove_book,
-                              notebook);
-    gtk_table_attach_defaults(GTK_TABLE(notetable), button, 1,2,1,2);
-
-    //gtk_container_add (GTK_CONTAINER (layout), notetable);
-    //end notebook
-
-    //testin adding items to list
-    GtkWidget     *item;
-    GtkWidget     *scroll;
-    gint    xmax = 200;
-    gint    ymax = 400;
-    scroll = gtk_scrolled_window_new (NULL,NULL);
-    gtk_container_border_width (GTK_CONTAINER (scroll), 10);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-    gtk_widget_set_usize(GTK_SCROLLED_WINDOW (scroll), xmax, ymax);
-    gtk_scrolled_window_add_with_viewport (GTK_CONTAINER (scroll), friendsList);
-    gtk_layout_put(GTK_LAYOUT(layout), scroll, 750, 40);
+    
 
     
-    item = gtk_list_item_new_with_label ("Armando Rodriguez");
-    gtk_container_add (GTK_CONTAINER (friendsList), item);
-    item = gtk_list_item_new_with_label ("Kennan Lau");
-    gtk_container_add (GTK_CONTAINER (friendsList), item);
-    item = gtk_list_item_new_with_label ("Michael Zeng");
-    gtk_container_add (GTK_CONTAINER (friendsList), item);
-    item = gtk_list_item_new_with_label ("ARIA");
-    gtk_container_add (GTK_CONTAINER (friendsList), item);
-    item = gtk_list_item_new_with_label ("Marchall Payatt");
-    gtk_container_add (GTK_CONTAINER (friendsList), item);
-
-    
-    //gtk_layout_put(GTK_LAYOUT(layout), friendsList, 800, 40);  //add to layout
-    //end test !this works!
-
-    gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);  //add bg image to layout
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Chats_menu_callback),NULL);  //connect signals from clicking the window to active the callback
     gtk_widget_show_all(window);   //shows the window to the user
     gdk_threads_leave();//after you finich calling gtk functions, call this

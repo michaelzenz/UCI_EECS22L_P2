@@ -6,7 +6,7 @@ void encodePackUnamePasswd(char *jsonStr, PackUnamePasswd *pack)
    char str_action[8]="\"act\":";
    char str_UserName[MAX_USERNAME_LEN+10]="\"uname\":\"";//which means that the length of user name must not exceed 30
    char str_Password[MAX_PASSWD_LEN+10]="\"passwd\":\"";//which means that the length of password must not exceed 30
-
+   char str_port[9];
    char str_temp[2]="";
 
    memset(jsonStr,'\0',sizeof(jsonStr));
@@ -14,12 +14,15 @@ void encodePackUnamePasswd(char *jsonStr, PackUnamePasswd *pack)
    strcat(str_action,my_itoa(pack->action,str_temp));
    strcat(str_UserName,pack->UserName);
    strcat(str_Password,pack->Password);
+   sprintf(str_port,"\"port\":%d",pack->port);
    strcat(jsonStr,str_action);
    strcat(jsonStr,",");
    strcat(jsonStr,str_UserName);
    strcat(jsonStr,"\",");
    strcat(jsonStr,str_Password);
-   strcat(jsonStr,"\"}");
+   strcat(jsonStr,"\",");
+   strcat(jsonStr,str_port);
+   strcat(jsonStr,"}");
    //Now, we have the json string {"uname":"$(UserName)","passwd":"$(PassWord)"}
    //where $(UserName) means the UserName of the user (a string)
    //and $(PassWord) means the Password of the user (a string)
@@ -64,9 +67,9 @@ void encodePackAnswerLR(char *jsonStr, PackAnswerLR *pack)
 void encodePackQuery(char *jsonStr, PackQuery *pack)
 {
    char str_UserName[MAX_USERNAME_LEN+10]="\"uname\":\"";
-   char str_NewFriend[MAX_USERNAME_LEN+12]="\"nfd\":\"";
-   char str_MSG[MAX_MSG_LEN]="\"msg\":\"";
    char str_DstUserName[MAX_USERNAME_LEN+10]="\"dst\":\"";
+   char str_MSG[MAX_MSG_LEN]="\"msg\":\"";
+   char str_Action[10];
    char str_portNb[12];
    char str_temp[3]="";
 
@@ -75,21 +78,20 @@ void encodePackQuery(char *jsonStr, PackQuery *pack)
 
    strcat(str_UserName,pack->UserName);
    strcat(str_UserName,"\"");
-   strcat(str_NewFriend,pack->NewFriend);
-   strcat(str_NewFriend,"\"");
-   strcat(str_MSG,pack->Message);
-   strcat(str_MSG,"\"");
    strcat(str_DstUserName,pack->dstUser);
    strcat(str_DstUserName,"\"");
+   strcat(str_MSG,pack->Message);
+   strcat(str_MSG,"\"");
+   sprintf(str_Action,"\"act\":%d",pack->action);
    sprintf(str_portNb,"\"port\":%d",pack->portNb);
 
    strcat(jsonStr,str_UserName);
    strcat(jsonStr,",");
-   strcat(jsonStr,str_NewFriend);
+   strcat(jsonStr,str_DstUserName);
    strcat(jsonStr,",");
    strcat(jsonStr,str_MSG);
    strcat(jsonStr,",");
-   strcat(jsonStr,str_DstUserName);
+   strcat(jsonStr,str_Action);
    strcat(jsonStr,",");
    strcat(jsonStr,str_portNb);
    strcat(jsonStr,"}");
@@ -99,6 +101,7 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
 {
    char str_OnlineFlagList[MAX_FRIEND_NB+10]="\"ol\":\"";
    char str_Challenger[MAX_USERNAME_LEN+12]="\"cger\":\"";
+
    char str_messageList[MAX_MSG_LEN*MAX_FRIEND_NB+10]="\"msgs\":[";
    char str_srcUserList[MAX_USERNAME_LEN*MAX_FRIEND_NB+10]="\"srcs\":[";
 

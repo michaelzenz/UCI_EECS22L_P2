@@ -55,9 +55,8 @@ char* sendToOppo(char* msg)
 }
 
 //open socket and record the server address
-void init_connection2oppo(char *program,char *host, char *port)
+void init_connection2oppo(char *host, char *port)
 {
-    Program=program;
 #ifdef PRINT_LOG
     printf("%s: Starting...\n", Program);
 #endif

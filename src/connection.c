@@ -1,8 +1,9 @@
 #include"connection.h"
 
 extern const char *Program;
-extern char *UserName;
-extern int QueryPort;
+char *UserName;
+int QueryPort;
+vectorStr FriendsList;
 
 struct sockaddr_in ServerAddress;	/* server address we connect with */
 int ServerPort;
@@ -228,9 +229,9 @@ void SendMsgToUser(char *dstUser, char* msg)
     printf("sending msg to %s\n",dstUser);
     PackQuery pq;
     strcpy(pq.UserName,UserName);
-    strcpy(pq.NewFriend,"");
-    strcpy(pq.Message,msg);
     strcpy(pq.dstUser,dstUser);
+    strcpy(pq.Message,msg);
+    pq.action=QUERY_CHAT;
     pq.portNb=PlayBetweenServerPort;
     char str_pq[MAX_PQ_SIZE];
     encodePackQuery(str_pq,&pq);
@@ -261,7 +262,7 @@ void InitQueryTimeredTask(char *UserName, int portNb)
         pthread_mutex_init(&mutex,NULL);
         MutexInitialized=true;
     }
-    PackQuery pack={"","","","",portNb};
+    PackQuery pack={"","","",QUERY_CHECK_UPDATE,portNb};
     strcpy(pack.UserName,UserName);
     char *str_PQ=malloc(sizeof(char)*MAX_PQ_SIZE);
     encodePackQuery(str_PQ,&pack);

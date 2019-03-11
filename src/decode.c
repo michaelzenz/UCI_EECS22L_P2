@@ -37,6 +37,11 @@ PackUnamePasswd decodeStrPUP(char *jsonStr)
             strcpy(pack.Password,temp);
             i++;
         }
+        else if(jsoneq(jsonStr,&t[i],"port")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.action=atoi(temp);
+            i++;
+        }
     }
     return pack;
 }
@@ -97,9 +102,9 @@ PackQuery decodeStrPQ(char *jsonStr)
             strcpy(pack.UserName,temp);
             i++;
         }
-        else if(jsoneq(jsonStr,&t[i],"nfd")==0){
+        else if(jsoneq(jsonStr,&t[i],"dst")==0){
             sprintf(temp, "%.*s", t[i+1].end-t[i+1].start, jsonStr + t[i+1].start);
-            strcpy(pack.NewFriend,temp);
+            strcpy(pack.dstUser,temp);
             i++;
         }
         else if(jsoneq(jsonStr,&t[i],"msg")==0){
@@ -107,9 +112,9 @@ PackQuery decodeStrPQ(char *jsonStr)
             strcpy(pack.Message,temp);
             i++;
         }
-        else if(jsoneq(jsonStr,&t[i],"dst")==0){
-            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start, jsonStr + t[i+1].start);
-            strcpy(pack.dstUser,temp);
+        else if(jsoneq(jsonStr,&t[i],"act")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.portNb=atoi(temp);
             i++;
         }
         else if(jsoneq(jsonStr,&t[i],"port")==0){

@@ -82,7 +82,7 @@ void testCodec()
 
     PackUnamePasswd pup={LOGIN,"michaelz","25619"};
     PackAnswerLR palr={USER_LOGIN,friendList,11001};
-    PackQuery pq={"michaelz","aria","hello","aria",11000};
+    PackQuery pq={"michaelz","aria","hello",QUERY_CHAT,11000};
     PackAnswerQuery paq={2};
     paq.onlineFlagList[0]=paq.onlineFlagList[1]=1;
     strcpy(paq.challenger,"aria");
@@ -155,8 +155,7 @@ void GameOnline(int argc, char *argv[])
     LoginOrRegister();
     init_connection2qport();
 
-    SendMsgToUser("aria","fuck you");
-
+    SendMsgToUser("aria","fuck");
     Chats_menu();
 
     
