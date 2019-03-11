@@ -212,9 +212,15 @@ void QueryTimeredTask(char *str_PQ)
 {
     while(!StopQuery){
         char *RecvBuf;
-        RecvBuf=sendToServer(str_PQ);
+        RecvBuf=sendToServerQport(str_PQ);
         PackAnswerQuery paq=decodeStrPAQ(RecvBuf);
-
+        int NewMsgCnt=vectorStr_count(&paq.messageList);
+        char temp1[MAX_MSG_LEN],temp2[MAX_USERNAME_LEN];
+        for(int i=0;i<NewMsgCnt;i++){
+            printf("you got a new message:%s from %s\n",
+                vectorStr_get(&paq.messageList,i,temp1),
+                vectorStr_get(&paq.srcUserList,i,temp2));
+        }
         free(RecvBuf);
         sleep(2);
     }
@@ -256,13 +262,14 @@ void AddNewFriend(char *newFriend)
 
 }
 
-void InitQueryTimeredTask(char *UserName, int portNb)
+void InitQueryTimeredTask()
 {
+    printf("Start Regular Query Check\n");
     if(!MutexInitialized){
         pthread_mutex_init(&mutex,NULL);
         MutexInitialized=true;
     }
-    PackQuery pack={"","","",QUERY_CHECK_UPDATE,portNb};
+    PackQuery pack={"","","",QUERY_CHECK_UPDATE,PlayBetweenServerPort};
     strcpy(pack.UserName,UserName);
     char *str_PQ=malloc(sizeof(char)*MAX_PQ_SIZE);
     encodePackQuery(str_PQ,&pack);

@@ -156,6 +156,7 @@ void GameOnline(int argc, char *argv[])
     init_connection2qport();
 
     SendMsgToUser("aria","fuck");
+    InitQueryTimeredTask();
     Chats_menu();
 
     

@@ -50,4 +50,6 @@ void SendMsgToUser(char *dstUser, char* msg);
 //init the connection to the qport of the server
 void init_connection2qport();
 
+void InitQueryTimeredTask();
+
 #endif
