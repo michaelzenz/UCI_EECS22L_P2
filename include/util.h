@@ -12,6 +12,11 @@
 
 #define PRINT_LOG //if want to print log
 
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+
 typedef unsigned char uchar;
 
 /* print error diagnostics and abort */
