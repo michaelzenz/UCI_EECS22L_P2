@@ -26,6 +26,7 @@
 
 #define MAX_FRIEND_NB 2
 
+//success flags
 #define USER_LOGIN 0
 #define NO_SUCH_USER 1
 #define INVALID_PASSWD 2
@@ -36,6 +37,7 @@
 
 #define MAX_MSG_LEN 100
 
+//query actions
 #define QUERY_CHAT 0
 #define QUERY_CHALLENGE 1
 #define QUERY_ADD_FRIEND 2
@@ -54,18 +56,18 @@
 //the pack that contains username and password
 typedef struct _PackUnamePasswd
 {
-    uchar action;
+    uchar action;//login or register
     char UserName[MAX_USERNAME_LEN];
     char Password[MAX_PASSWD_LEN];
-    int port;
+    int port;//the port that this user uses to listen to other users
 } PackUnamePasswd;
 
 //For server returning to client when they try to login or register
 typedef struct _PackAnswerLR
 {
-    uchar successflag;//1 if PackUnamePasswd received successfully, 0 if exception occur
+    uchar successflag;//please see success flags in for PackAnswerLR part
     vectorStr FriendList;//The Friends List of current user
-    int QueryPort;
+    int QueryPort;//The port of the server that allows user to do query
 } PackAnswerLR;
 
 //For client to query about online status and new message or new challenges
@@ -77,7 +79,7 @@ typedef struct _PackQuery
     //depends on the action
     char dstUser[MAX_USERNAME_LEN];
     char Message[MAX_MSG_LEN];//if you want to say something
-    uchar action;
+    uchar action;//please see query actions part above
     int portNb;
 } PackQuery;
 
@@ -87,21 +89,21 @@ typedef struct _PackAnswerQuery
     int friendNumber;//this will not be pack into the encoded string, but is necessary for encoding
     uchar onlineFlagList[MAX_FRIEND_NB];//The online status of the friend list of current user
     char challenger[MAX_USERNAME_LEN];//The list of friends that want to challenge current user
-    char opponentHost[20];
-    int opponentPort;
+    char opponentHost[20];//the opponent`s host
+    int opponentPort;//the opponent`s port
     vectorStr messageList;//the list of new messages
-    vectorStr srcUserList;
+    vectorStr srcUserList;//from who
 } PackAnswerQuery;
 
 //For client to chat and play between another client
 typedef struct _PackPlay
 {
-     char UserName[MAX_USERNAME_LEN];
+     char UserName[MAX_USERNAME_LEN];//the User that made this action
      uchar Action; //a hard code flag, where 1 is chat, 2 is play, 3 is undo
-     char message[MAX_MSG_LEN];
+     char message[MAX_MSG_LEN];//msg to current opponent
      int start_pt;
      int end_pt;
-     uchar promotion;
+     uchar promotion;//the promotion that the user selects
 } PackPlay;
 
 
