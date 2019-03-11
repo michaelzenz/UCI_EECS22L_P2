@@ -152,6 +152,16 @@ PackAnswerQuery decodeStrPAQ(char *jsonStr)
             strcpy(pack.challenger,temp);
             i++;
         }
+        else if(jsoneq(jsonStr,&t[i],"chost")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start, jsonStr + t[i+1].start);
+            strcpy(pack.challengerHost,temp);
+            i++;
+        }
+        else if(jsoneq(jsonStr,&t[i],"cport")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.challengerPort=atoi(temp);
+            i++;
+        }
         else if(jsoneq(jsonStr,&t[i],"msgs")==0){
 			if (t[i+1].type != JSMN_ARRAY)continue; /* groups should be an array of strings */
 			for (int j = 0; j < t[i+1].size; j++) {

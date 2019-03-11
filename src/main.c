@@ -27,16 +27,17 @@ int main(int argc, char *argv[]){
     }
 
     database_intialize();
-
-    InitServiceStatusViewer();
-    int QueryPort=InitQueryPackListener();
-    InitUserPackListener(atoi(argv[1]));
-    
     #ifdef TEST_MSGING
     database_add_user("michaelz","25619",-1,false);
     database_add_user("aria","no",-1,false);
     database_add_friend("michaelz","aria");
     #endif
+
+    InitServiceStatusViewer();
+    int QueryPort=InitQueryPackListener();
+    InitUserPackListener(atoi(argv[1]));
+
+
 
     while(true){
         //do sth if necessary
