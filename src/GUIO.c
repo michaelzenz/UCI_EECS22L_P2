@@ -41,7 +41,7 @@ GdkPixbuf *Add_friends_pixbuf = NULL;
 
 char *Login_menu_path="res/Login.png";
 char *Register_menu_path="res/Register_Menu.png";
-char *Chats_menu_path="res/background.png";
+char *Chats_menu_path="res/Chat_Menu.png";
 
 uchar LoginFlag=NOT_YET_LOGIN;
 bool isUserExist=true;
@@ -161,9 +161,52 @@ gint Register_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     int x, y;
     GdkModifierType state;
     gdk_window_get_pointer(widget->window,&x,&y,&state);
+    GtkWidget *label;
     if(x>630&&x<958&&y>346&&y<367)
     {
-        //put something to add user and pass to database
+        char Sendstr[MAX_PUP_SIZE];
+        printf("Registering\n");
+        char Username[MAX_USERNAME_LEN];
+      	char Passwd[MAX_PASSWD_LEN];
+	char verifyPasswd[MAX_PASSWD_LEN];
+        sprintf(Username,"%s",gtk_entry_get_text(username));
+        sprintf(Passwd,"%s",gtk_entry_get_text(password));
+	sprintf(verifyPasswd,"%s",gtk_entry_get_text(verifyPassword));
+	int passcmp=strcmp(verifyPasswd,Passwd);
+	if(passcmp!=0)
+	{
+	    label=gtk_label_new("PASSWORDS WON'T MATCH, PLEASE TRY AGAIN");
+	    gtk_container_add(GTK_CONTAINER(layout),label);
+	    gtk_widget_show_all(layout);
+	
+
+	}
+        if(strlen(Username)==0||strlen(Passwd)==0)return 0;
+        PackUnamePasswd packUP;
+        packUP.action=REGISTER;
+        strcpy(packUP.UserName,Username);
+        strcpy(packUP.Password,Passwd); 
+        encodePackUnamePasswd(Sendstr,&packUP);
+        printf("%s\n",Sendstr);
+        if(UserName==NULL)UserName=malloc(strlen(Username)+1);
+        strcpy(UserName,Username);//this is for the global one
+        
+        char *RecvBuf=sendToServer(Sendstr);
+        PackAnswerLR palr=decodeStrPALR(RecvBuf);
+        if(palr.successflag==USER_REGISTER){
+           LoginFlag=NOT_YET_LOGIN;
+	   printf("you have been successfully registerd");
+           // QueryPort=palr.QueryPort;
+         //  FriendsList=palr.FriendList;
+        }
+       /* else if(palr.successflag==INVALID_PASSWD)LoginFlag=NOT_YET_LOGIN;
+        else if(palr.successflag==NO_SUCH_USER){
+            isUserExist=false;
+            LoginFlag=NOT_YET_REGISTER;
+        }*/
+	    free(RecvBuf);
+        printf("Trying to Register\n");
+   //put something to add user and pass to database
     }
 }
 
@@ -183,9 +226,9 @@ int Register_menu()
     gtk_table_attach (GTK_TABLE (tableU), username, 0, 2, 0, 4,
         GTK_EXPAND, GTK_SHRINK, 380, 168);  //add text entry to table
     gtk_table_attach (GTK_TABLE (tableP), password, 0, 2, 0, 4,
-        GTK_EXPAND, GTK_SHRINK, 380, 219);  //add text entry to table
+        GTK_EXPAND, GTK_SHRINK, 380, 215);  //add text entry to table
     gtk_table_attach (GTK_TABLE (tableVP), verifyPassword, 0, 2, 0, 4,
-        GTK_EXPAND, GTK_SHRINK, 380, 270);  //add text entry to table
+        GTK_EXPAND, GTK_SHRINK, 380, 260);  //add text entry to table
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);  //add bg image to layout
     gtk_container_add (GTK_CONTAINER (layout), tableU);  //add table to layout
     gtk_container_add (GTK_CONTAINER (layout), tableP);  //add table to layout
