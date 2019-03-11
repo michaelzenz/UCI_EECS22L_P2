@@ -12,7 +12,7 @@ void queueChat_init(QueueChat *queue)
 
 uchar queueChat_isEmpty(QueueChat *queue)
 {
-    return queue->head==NULL;
+    return queue->size==0;
 }
 
 QNodeMsg* _newMsgNode(char *new_msg, char *srcUser)
@@ -106,6 +106,7 @@ QNodeMsg queueChat_dequeueMsg(QueueChat *queue)
     if(queue->head==queue->tail)queue->tail=((QNodeMsg*)(queue->tail))->next;
     queue->head=((QNodeMsg*)(queue->head))->next;
     free(temp);
+    queue->size--;
     return retNode;
 }
 
@@ -122,6 +123,7 @@ QNodeChallenger queueChat_dequeueChallenger(QueueChat *queue)
     if(queue->head==queue->tail)queue->tail=((QNodeChallenger*)(queue->tail))->next;
     queue->head=((QNodeChallenger*)(queue->head))->next;
     free(temp);
+    queue->size--;
     return retNode;
 }
 

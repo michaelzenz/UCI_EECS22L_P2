@@ -23,6 +23,8 @@ void QueryServTimeOutHandler()//the hanle function for timeout
 PackAnswerQuery handleQuery(PackQuery pack)
 {
     //setting up the package to return packAnswerLR
+    if(pack.action!=QUERY_CHECK_UPDATE)
+        printf("new msg %s from %s\n",pack.Message,pack.UserName);
     PackAnswerQuery paq;
     if(database_isUserExist(pack.UserName)){
         if(database_isUserExist(pack.dstUser)&&strlen(pack.Message)>0){

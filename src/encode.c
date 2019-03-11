@@ -130,7 +130,10 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
       strcat(str_messageList,"\",");
       strcat(str_srcUserList,"\",");
    }
-
+   if(newMsgNb==0){
+      strcat(str_messageList,"]");
+      strcat(str_srcUserList,"]");
+   }
    strcat(jsonStr,str_OnlineFlagList);
    strcat(jsonStr,",");
    strcat(jsonStr,str_Challenger);
