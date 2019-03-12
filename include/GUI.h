@@ -10,6 +10,7 @@
 #include "codec.h"
 #include "connection.h"
 #include "PlayBetween.h"
+#include"msgChat.h"
 
 #ifndef GAMEGUI_H
 #define GAMEGUI_H
@@ -36,11 +37,17 @@
 #define ACTION_QUIT 3
 
 //for online
+
+#define U_P_VP_LEFT 380 //the left of username, passwd and vpasswd
+#define USERNAME_TOP 168
+#define PASSWD_TOP 219
+#define VERIFY_PASSWD_TOP 270
+
+//LoginFlags
 #define NOT_YET_LOGIN 0
 #define LOGIN_SUCCESS 1
 #define NOT_YET_REGISTER 2
-#define GO_TO_REGISTER 3
-#define REGISTER_SUCCESS 4
+#define REGISTER_SUCCESS 3
 
 #define CHAT_SCROLL_WIDTH 725
 
@@ -54,6 +61,9 @@
 #define NOTEBOOK_FIXED_HEIGHT 340
 #define NOTEBOOK_FIXED_LEFT 10
 #define NOTEBOOK_FIXED_TOP 10
+
+#define CHAT_PAGE_WIDTH 100
+#define CHAT_PAGE_HEIGHT 260
 
 #define MSG_TEXTVIEW_FIXED_WIDTH 490
 #define MSG_TEXTVIEW_FIXED_HEIGHT 60

@@ -9,6 +9,7 @@
 extern const char *Program;//the name of program
 extern char *UserName;
 extern OnlinePlayer localPlayer, remotePlayer;
+extern vectorStr FriendsList;
 
 #define MODEL 1
 
@@ -139,7 +140,7 @@ void testCodec()
 void GameOnline(int argc, char *argv[])
 {
 
-    testCodec();
+    // testCodec();
 
     GameState gameState=env_init();
     OnlinePlayCallback onlineCallback={&gameState};
@@ -154,9 +155,15 @@ void GameOnline(int argc, char *argv[])
     }
     init_connection2server(argv[0],argv[1],argv[2]);
 
-    
-
     LoginOrRegister();
+
+    msgChat_init();
+    int friendNb=vectorStr_count(&FriendsList);
+    char temp[MAX_USERNAME_LEN];
+    for(int i=0;i<friendNb;i++){
+        msgChat_addUser(vectorStr_get(&FriendsList,i,temp),true);
+    }
+
     init_connection2qport();
 
     SendMsgToUser("aria","fuck");

@@ -1,5 +1,6 @@
 #include"connection.h"
 #include"PlayBetween.h"
+#include"msgChat.h"
 
 extern const char *Program;
 char *UserName;
@@ -234,11 +235,15 @@ void handlePAQ(PackAnswerQuery paq)
     }
 
     int NewMsgCnt=vectorStr_count(&paq.messageList);
-    char temp1[MAX_MSG_LEN],temp2[MAX_USERNAME_LEN];
+    char msg[MAX_MSG_LEN],user[MAX_USERNAME_LEN];
     for(int i=0;i<NewMsgCnt;i++){
         printf("you got a new message:%s from %s\n",
-            vectorStr_get(&paq.messageList,i,temp1),
-            vectorStr_get(&paq.srcUserList,i,temp2));
+            vectorStr_get(&paq.messageList,i,msg),
+            vectorStr_get(&paq.srcUserList,i,user));
+        if(!msgChat_get_isUserExist(user)){
+            msgChat_addUser(user,false);
+        }
+        msgChat_add_msg(user,msg);
     }
 }
 

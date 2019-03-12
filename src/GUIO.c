@@ -11,24 +11,30 @@ extern GtkWidget *fixed;//the widget to contain table
 extern GtkWidget *table;//the widget to contain icons
 extern GtkWidget *text_view; // widget to write text into log
 
-GtkWidget *username;
-GtkWidget *password, *verifyPassword;
-GtkWidget *tableU, *tableP, *tableVP;
+GtkWidget *usernameEntry;
+GtkWidget *passwordEntry, *verifyPasswordEntry;
 GtkWidget *scrolled_win;
-GtkWidget *friendsList;
+
 GtkTextBuffer *buffer=NULL;
 GList *children, *iter;
+
+bool isLoginRegisterInitialized=false;
 
 extern bool isPlayingWithOpponent;
 
 //for chat menu
 const gchar *list_item_data_key="list_item_data";
 GtkWidget *friendlistitem;
-GtkWidget *friendlistscroll;
+GtkWidget *guioFriendList;
+GtkWidget *guioFriendListScroll;
+GtkWidget *guioUnknownList;
+GtkWidget *guioUnknownListScroll;
+int guioFriendListPageNum=-1, guioUnknownListPageNum=-1;
+
+GtkWidget *FriendListNotebook;
 GtkWidget *NoteBookFixed;
 GtkWidget *ChatMenuScroll;
 GtkWidget *notebook;
-GtkWidget *NotebookFrame;
 GtkWidget *MsgTextView;
 GtkWidget *SendButton;
 GtkWidget *RMpageButton;
@@ -89,50 +95,63 @@ void guio_ErrorMsg(char *msg)
     gtk_widget_destroy (dialog);
 }
 
+void initLoginRegister(){
+    Login_pixbuf=load_pixbuf_from_file(Login_menu_path);
+    Login_pixbuf=gdk_pixbuf_scale_simple(Login_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);
+    Register_pixbuf=load_pixbuf_from_file(Register_menu_path); //loads the background image from files
+    Register_pixbuf=gdk_pixbuf_scale_simple(Register_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);//sets bg image to size of window
+
+    usernameEntry = gtk_entry_new();
+    passwordEntry= gtk_entry_new();
+    verifyPasswordEntry= gtk_entry_new();  // creates a text entry for verify password
+    gtk_entry_set_visibility(GTK_ENTRY(passwordEntry), FALSE);
+    gtk_entry_set_invisible_char (GTK_ENTRY (passwordEntry), '*');
+        gtk_entry_set_visibility(GTK_ENTRY(verifyPasswordEntry), FALSE);  //makes text entered not be readable
+    gtk_entry_set_invisible_char (GTK_ENTRY (verifyPasswordEntry), '*');  //replaces letters with *
+
+}
+
 gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 {
     int x, y;
     GdkModifierType state;
     gdk_window_get_pointer(widget->window,&x,&y,&state);
-    
     printf("x:%d, y:%d\n",x,y);
-   
-    //gtk_text_buffer_set_text (buffer, "Your 1st GtkTextView widget!", -1);
 
     if(x>636&&x<724&&y>302&&y<333)
     {   
         char Sendstr[MAX_PUP_SIZE];
         printf("logingin\n");
         char Username[MAX_USERNAME_LEN];
-        
         char Passwd[MAX_PASSWD_LEN];
 
-        sprintf(Username,"%s",gtk_entry_get_text(username));
-        sprintf(Passwd,"%s",gtk_entry_get_text(password));
-        if(strlen(Username)==0||strlen(Passwd)==0)return 0;
+        sprintf(Username,"%s",gtk_entry_get_text(GTK_ENTRY(usernameEntry)));
+        sprintf(Passwd,"%s",gtk_entry_get_text(GTK_ENTRY(passwordEntry)));
+        if(strlen(Username)==0||strlen(Passwd)==0){
+            guio_ErrorMsg("PLEASE INPUT USERNAME/PASSWORD");
+            return 0;
+        }
         PackUnamePasswd packUP;
         packUP.action=LOGIN;
         strcpy(packUP.UserName,Username);
         strcpy(packUP.Password,Passwd); 
         encodePackUnamePasswd(Sendstr,&packUP);
         printf("%s\n",Sendstr);
-        if(UserName==NULL)UserName=malloc(strlen(Username)+1);
-        strcpy(UserName,Username);//this is for the global one
         
         char *RecvBuf=sendToServer(Sendstr);
         PackAnswerLR palr=decodeStrPALR(RecvBuf);
         if(palr.successflag==USER_LOGIN){
+            if(UserName==NULL)UserName=malloc(strlen(Username)+1);
+            strcpy(UserName,Username);//this is for the global one
             LoginFlag=LOGIN_SUCCESS;
             QueryPort=palr.QueryPort;
             FriendsList=palr.FriendList;
         }
         else if(palr.successflag==INVALID_PASSWD){
             guio_ErrorMsg("Invalid Password, Please Try Agagin!");
-            LoginFlag=NOT_YET_LOGIN;
         }
         else if(palr.successflag==NO_SUCH_USER){
             guio_ErrorMsg("No Such User, Please Register First!");
-            LoginFlag=NOT_YET_LOGIN;
         }
 	    free(RecvBuf);
         printf("Trying to login\n");
@@ -142,46 +161,27 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
         printf("Register");
         LoginFlag=NOT_YET_REGISTER;
     }
-    else if(x>124&&x<211&&y>452&&y<482)
-    {
-        printf("BACK");
-    }
 }
 
 int Login_menu()
 {
-    
+    if(!isLoginRegisterInitialized){
+        initLoginRegister();
+        isLoginRegisterInitialized=true;
+    }
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
-    Login_pixbuf=load_pixbuf_from_file(Login_menu_path);
-    Login_pixbuf=gdk_pixbuf_scale_simple(Login_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);
-    tableU=gtk_table_new (10, 10, TRUE);
-    tableP=gtk_table_new (10, 10, TRUE);
     image = gtk_image_new_from_pixbuf(Login_pixbuf);
-    username = gtk_entry_new();
-    password= gtk_entry_new();
-   // text_view=gtk_entry_get_text (buffer);
-
-    //
-//  gtk_container_add (GTK_CONTAINER (scrolled_win), text_view);
-//     gtk_container_set_border_width (GTK_CONTAINER (scrolled_win), 300);
-//     gtk_container_add (GTK_CONTAINER (layout), scrolled_win);
-    gtk_table_attach (GTK_TABLE (tableU), username, 0, 2, 0, 4,
-        GTK_EXPAND, GTK_SHRINK, 380, 168);
-    gtk_table_attach (GTK_TABLE (tableP), password, 0, 2, 0, 4,
-        GTK_EXPAND, GTK_SHRINK, 380, 219);
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
-    gtk_container_add (GTK_CONTAINER (layout), tableU);
-    gtk_container_add (GTK_CONTAINER (layout), tableP);
-    gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);
-    gtk_entry_set_invisible_char (GTK_ENTRY (password), '*');
-    
+
+    gtk_layout_put(GTK_LAYOUT(layout), usernameEntry, U_P_VP_LEFT, USERNAME_TOP );
+    gtk_layout_put(GTK_LAYOUT(layout), passwordEntry, U_P_VP_LEFT, PASSWD_TOP );
+
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Login_menu_callback),NULL);
     gtk_widget_show_all(window);
     gdk_threads_leave();//after you finich calling gtk functions, call this
     while(LoginFlag==NOT_YET_LOGIN)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
     gdk_threads_enter();//again, you know what I am gonna say
     g_signal_handler_disconnect(window,handlerID);
-
     gdk_threads_leave();
     return LoginFlag;
 }
@@ -192,9 +192,52 @@ gint Register_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     int x, y;
     GdkModifierType state;
     gdk_window_get_pointer(widget->window,&x,&y,&state);
-    if(x>630&&x<958&&y>346&&y<367)
+    GtkWidget *label;
+    printf("x:%d, y:%d\n",x,y);
+    if(x>622&&x<741&&y>351&&y<377)
     {
-        //put something to add user and pass to database
+        char Sendstr[MAX_PUP_SIZE];
+        printf("Registering\n");
+        char Username[MAX_USERNAME_LEN];
+      	char Passwd[MAX_PASSWD_LEN];
+	    char verifyPasswd[MAX_PASSWD_LEN];
+        sprintf(Username,"%s",gtk_entry_get_text(GTK_ENTRY(usernameEntry)));
+        sprintf(Passwd,"%s",gtk_entry_get_text(GTK_ENTRY(passwordEntry)));
+	    sprintf(verifyPasswd,"%s",gtk_entry_get_text(GTK_ENTRY(verifyPasswordEntry)));
+        
+        if(strcmp(verifyPasswd,Passwd)){
+            guio_ErrorMsg("PASSWORDS DOESN`T MATCH, PLEASE TRY AGAIN");
+            return 0;
+        }
+        if(strlen(Username)==0||strlen(Passwd)==0||strlen(verifyPasswd)==0){
+            guio_ErrorMsg("PLEASE INPUT USERNAME/PASSWORD/VERIFY_PASSWORD");
+            return 0;
+        }
+        PackUnamePasswd packUP;
+        packUP.action=REGISTER;
+        strcpy(packUP.UserName,Username);
+        strcpy(packUP.Password,Passwd); 
+        encodePackUnamePasswd(Sendstr,&packUP);
+        printf("%s\n",Sendstr);
+        
+        char *RecvBuf=sendToServer(Sendstr);
+        PackAnswerLR palr=decodeStrPALR(RecvBuf);
+        if(palr.successflag==USER_REGISTER){
+            LoginFlag=REGISTER_SUCCESS;
+            if(UserName==NULL)UserName=malloc(strlen(Username)+1);
+            strcpy(UserName,Username);//this is for the global one
+            QueryPort=palr.QueryPort;
+            FriendsList=palr.FriendList;
+	        printf("you have been successfully registered");
+        }
+        else if(palr.successflag==USER_ALREADY_EXIST){
+            guio_ErrorMsg("User already exist, please login");
+        }
+	    free(RecvBuf);
+        printf("Trying to Register\n");
+    }
+    else if(x>133&&x<202&&y>456&&y<478){
+        LoginFlag=NOT_YET_LOGIN;
     }
 }
 
@@ -202,30 +245,10 @@ int Register_menu()
 {
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
 
-    Register_pixbuf=load_pixbuf_from_file(Register_menu_path); //loads the background image from files
-    Register_pixbuf=gdk_pixbuf_scale_simple(Register_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);//sets bg image to size of window
-    tableU=gtk_table_new (10, 10, TRUE); //crates table for username text entry
-    tableP=gtk_table_new (10, 10, TRUE); //crates table for password text entry
-    tableVP=gtk_table_new (10, 10, TRUE); //crates table for verify password text entry
     image = gtk_image_new_from_pixbuf(Register_pixbuf); //sets variable for bg image
-    // username = gtk_entry_new(); // creates a text entry for username
-    // password= gtk_entry_new(); // creates a text entry for password
-    verifyPassword= gtk_entry_new();  // creates a text entry for verify password
-    gtk_table_attach (GTK_TABLE (tableU), username, 0, 2, 0, 4,
-        GTK_EXPAND, GTK_SHRINK, 380, 168);  //add text entry to table
-    gtk_table_attach (GTK_TABLE (tableP), password, 0, 2, 0, 4,
-        GTK_EXPAND, GTK_SHRINK, 380, 219);  //add text entry to table
-    gtk_table_attach (GTK_TABLE (tableVP), verifyPassword, 0, 2, 0, 4,
-        GTK_EXPAND, GTK_SHRINK, 380, 270);  //add text entry to table
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);  //add bg image to layout
-    gtk_container_add (GTK_CONTAINER (layout), tableU);  //add table to layout
-    gtk_container_add (GTK_CONTAINER (layout), tableP);  //add table to layout
-    gtk_container_add (GTK_CONTAINER (layout), tableVP);  //add table to layout
-    gtk_entry_set_visibility(GTK_ENTRY(password), FALSE);  //makes text entered not be readable
-    gtk_entry_set_invisible_char (GTK_ENTRY (password), '*');  //replaces letters with *
-    gtk_entry_set_visibility(GTK_ENTRY(verifyPassword), FALSE);  //makes text entered not be readable
-    gtk_entry_set_invisible_char (GTK_ENTRY (verifyPassword), '*');  //replaces letters with *
 
+    gtk_layout_put(GTK_LAYOUT(layout), verifyPasswordEntry, U_P_VP_LEFT, VERIFY_PASSWD_TOP );
     
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Register_menu_callback),NULL); //connect signals from clicking the window to active the callback
     gtk_widget_show_all(window); //shows the window to the user
@@ -233,20 +256,18 @@ int Register_menu()
     while(LoginFlag==NOT_YET_REGISTER)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
     gdk_threads_enter();//again, you know what I am gonna say
     g_signal_handler_disconnect(window,handlerID); //disconnects the signals from clicking
+    
+    gtk_container_remove(GTK_CONTAINER(layout),verifyPasswordEntry);
     gdk_threads_leave();
     return LoginFlag;
 }
 
 void LoginOrRegister()
 {
-    while(LoginFlag==NOT_YET_LOGIN){
-        Login_menu();
+    while(LoginFlag!=LOGIN_SUCCESS&&LoginFlag!=REGISTER_SUCCESS){
+        if(LoginFlag==NOT_YET_LOGIN)Login_menu();
+        if(LoginFlag==NOT_YET_REGISTER)Register_menu();
     }
-    while(LoginFlag==NOT_YET_REGISTER){
-        Register_menu();
-    }
-    gtk_container_remove(GTK_CONTAINER(layout),tableU);
-    gtk_container_remove(GTK_CONTAINER(layout),tableP);
 }
 
 gint Chats_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
@@ -257,25 +278,6 @@ gint Chats_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     printf("x:%d, y:%d\n",x,y);
 }
 
-/* This function rotates the position of the tabs */
-void rotate_book (GtkButton *button, GtkNotebook *notebook)
-{
-    gtk_notebook_set_tab_pos (notebook, (notebook->tab_pos +1) %4);
-}
-
-/* Add/Remove the page tabs and the borders */
-void tabsborder_book (GtkButton *button, GtkNotebook *notebook)
-{
-    gint tval = FALSE;
-    gint bval = FALSE;
-    if (notebook->show_tabs == 0)
-            tval = TRUE; 
-    if (notebook->show_border == 0)
-            bval = TRUE;
-    
-    gtk_notebook_set_show_tabs (notebook, tval);
-    gtk_notebook_set_show_border (notebook, bval);
-}
 
 /* Remove a page from the notebook */
 void remove_book (GtkNotebook *notebook)
@@ -287,6 +289,25 @@ void remove_book (GtkNotebook *notebook)
     /* Need to refresh the widget -- 
      This forces the widget to redraw itself. */
     gtk_widget_draw(GTK_WIDGET(notebook), NULL);
+}
+
+gchar* guio_getUserSelection(GtkWidget *list){
+    GList *dlist;
+    dlist=GTK_LIST(list)->selection;
+
+    if (!dlist) {
+        printf("Please Choose a friend to send msg");
+        return NULL;
+    }
+    GtkObject       *list_item;
+    gchar           *item_data_string;
+    while (dlist) {
+        list_item=GTK_OBJECT(dlist->data);
+        item_data_string=gtk_object_get_data(list_item,
+                                             list_item_data_key);
+        dlist=dlist->next;
+    }
+    return item_data_string;
 }
 
 void guio_CHAT_send_msg()
@@ -301,84 +322,119 @@ void guio_CHAT_send_msg()
     }
     sprintf(msg,"%s",msg);
 
-    GList *dlist;
-    dlist=GTK_LIST(friendsList)->selection;
-    
-    if (!dlist) {
-        printf("Please Choose a friend to send msg");
-        return;
-    }
-    GtkObject       *list_item;
-    gchar           *item_data_string;
-    while (dlist) {
-        list_item=GTK_OBJECT(dlist->data);
-        item_data_string=gtk_object_get_data(list_item,
-                                             list_item_data_key);
-        dlist=dlist->next;
-    }
+    gchar *selectedFriend;
+    if(gtk_notebook_get_current_page(GTK_NOTEBOOK(FriendListNotebook))==guioFriendListPageNum)
+        selectedFriend=guio_getUserSelection(guioFriendList);
+    else
+        selectedFriend=guio_getUserSelection(guioUnknownList);
 
-    SendMsgToUser(item_data_string,msg);
+    SendMsgToUser(selectedFriend,msg);
 }
 
 void guio_addfriend(char *UserName)
 {
     friendlistitem = gtk_list_item_new_with_label (UserName);
-    gtk_container_add (GTK_CONTAINER (friendsList), friendlistitem);
+    gtk_container_add (GTK_CONTAINER (guioFriendList), friendlistitem);
     
     gtk_object_set_data(GTK_OBJECT(friendlistitem),
                             list_item_data_key,
                             UserName);
-    
 }
 
-//this function adds msg to current notebook page
-//you can get 
-void guio_add_msg_NbPage(char *msg)
+void guio_addUnkown(char *UserName)
 {
+    friendlistitem = gtk_list_item_new_with_label (UserName);
+    gtk_container_add (GTK_CONTAINER (guioUnknownList), friendlistitem);
+    
+    gtk_object_set_data(GTK_OBJECT(friendlistitem),
+                            list_item_data_key,
+                            UserName);
+}
 
+gint guio_openChatPage(GtkWidget *widget, GdkEventButton *event, gpointer func_data)
+{
+    if (GTK_IS_LIST(widget) && event->type==GDK_2BUTTON_PRESS){
+        gchar *selectedFriend;
+        if(gtk_notebook_get_current_page(GTK_NOTEBOOK(FriendListNotebook))==guioFriendListPageNum)
+            selectedFriend=guio_getUserSelection(guioFriendList);
+        else
+            selectedFriend=guio_getUserSelection(guioUnknownList);
+            
+        if(msgChat_get_pageNum(selectedFriend)>=0)return 0;
+
+        GtkWidget *label;
+        char bufferl[32];
+        sprintf(bufferl, "%s", selectedFriend);
+
+        GtkWidget *newChatPage=gtk_text_view_new();
+        gtk_widget_set_size_request (newChatPage, CHAT_PAGE_WIDTH, CHAT_PAGE_HEIGHT);
+        gtk_text_view_set_editable(GTK_TEXT_VIEW(newChatPage),false);
+        
+        // GtkWidget *newScroll=gtk_scrolled_window_new(NULL, NULL);
+        // gtk_widget_set_size_request(newScroll, CHAT_PAGE_WIDTH, CHAT_PAGE_HEIGHT);
+        // gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (newScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+        // gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (newScroll), newChatPage);
+
+        
+        label = gtk_label_new (bufferl);
+        int pageNum=gtk_notebook_prepend_page (GTK_NOTEBOOK(notebook), newChatPage, label);
+        msgChat_set_pageNum(selectedFriend,pageNum);
+    }
+    return 0;
+}
+
+int _addWidgetToFriendListNotebook(GtkWidget *list, char *listName)
+{
+    GtkWidget *label;
+    char bufferl[32];
+    sprintf(bufferl,"%s",listName);
+    label = gtk_label_new (bufferl);
+    int pageNum=gtk_notebook_prepend_page (GTK_NOTEBOOK(FriendListNotebook), list, label);
+    return pageNum;
 }
 
 void guio_challenge()
 {
-    
-    GList *dlist;
-    dlist=GTK_LIST(friendsList)->selection;
-    
-    if (!dlist) {
-        printf("Please Choose a friend to send msg");
-        return;
-    }
-    GtkObject       *list_item;
-    gchar           *item_data_string;
-    while (dlist) {
-        list_item=GTK_OBJECT(dlist->data);
-        item_data_string=gtk_object_get_data(list_item,
-                                             list_item_data_key);
-        dlist=dlist->next;
-    }
-    printf("try to challenge %s\n",item_data_string);
-    ChallengeUser(item_data_string);
-    strcpy(remotePlayer.UserName,item_data_string);
-
+    gchar *selectedFriend;
+    if(gtk_notebook_get_current_page(GTK_NOTEBOOK(FriendListNotebook))==guioFriendListPageNum)
+        selectedFriend=guio_getUserSelection(guioFriendList);
+    else
+        selectedFriend=guio_getUserSelection(guioUnknownList);
+    ChallengeUser(selectedFriend);
+    strcpy(remotePlayer.UserName,selectedFriend);
     isPlayingWithOpponent=true;
 }
 
 void InitChatMenu()
 {
     gdk_threads_enter();
-    friendsList = gtk_list_new (); //creates list box
-    gtk_list_set_selection_mode (GTK_LIST (friendsList), GTK_SELECTION_BROWSE); //sets style of list box
 
-    friendlistscroll = gtk_scrolled_window_new (NULL,NULL);
-    gtk_container_border_width (GTK_CONTAINER (friendlistscroll), 10);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (friendlistscroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-    gtk_widget_set_usize(GTK_SCROLLED_WINDOW (friendlistscroll), FRIEND_LIST_WIDTH, CHAT_LIST_HEIGHT);
-    gtk_scrolled_window_add_with_viewport (GTK_CONTAINER (friendlistscroll), friendsList);
+    guioFriendList = gtk_list_new (); //creates list box
+    gtk_list_set_selection_mode (GTK_LIST (guioFriendList), GTK_SELECTION_BROWSE); //sets style of list box
+    guioUnknownList=gtk_list_new();
+    gtk_list_set_selection_mode (GTK_LIST (guioUnknownList), GTK_SELECTION_BROWSE); //sets style of list box
+    
+    guioFriendListScroll=gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_size_request(guioFriendListScroll, -1, CHAT_LIST_HEIGHT);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (guioFriendListScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (guioFriendListScroll), guioFriendList);
+
+    guioUnknownListScroll=gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_size_request(guioUnknownListScroll, -1, FRIEND_LIST_WIDTH);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (guioUnknownListScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (guioUnknownListScroll), guioUnknownList);
+
+    FriendListNotebook=gtk_notebook_new();
+    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (FriendListNotebook), GTK_POS_TOP);
+    gtk_widget_set_size_request (FriendListNotebook, FRIEND_LIST_WIDTH, CHAT_LIST_HEIGHT);
+
+    guioUnknownListPageNum=_addWidgetToFriendListNotebook(guioUnknownListScroll,"Unknown");
+    guioFriendListPageNum=_addWidgetToFriendListNotebook(guioFriendListScroll,"Friends");
 
     ChatMenuScroll = gtk_scrolled_window_new (NULL,NULL);
     gtk_container_border_width (GTK_CONTAINER (ChatMenuScroll), 10);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (ChatMenuScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-    gtk_widget_set_usize(GTK_SCROLLED_WINDOW (ChatMenuScroll), CHAT_SCROLL_WIDTH, CHAT_LIST_HEIGHT);
+    gtk_widget_set_usize(ChatMenuScroll, CHAT_SCROLL_WIDTH, CHAT_LIST_HEIGHT);
 
     notebook = gtk_notebook_new ();
     gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
@@ -390,7 +446,7 @@ void InitChatMenu()
     gtk_widget_set_size_request (MsgTextView, MSG_TEXTVIEW_FIXED_WIDTH, MSG_TEXTVIEW_FIXED_HEIGHT);
     gtk_fixed_put(GTK_FIXED(NoteBookFixed), MsgTextView, MSG_TEXTVIEW_FIXED_LEFT, MSG_TEXTVIEW_FIXED_TOP);
 
-    gtk_scrolled_window_add_with_viewport (GTK_CONTAINER (ChatMenuScroll), NoteBookFixed);
+    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (ChatMenuScroll), NoteBookFixed);
 
     SendButton = gtk_button_new_with_label ("send");
     gtk_widget_set_size_request (SendButton, CHAT_BUTTON_WIDTH, CHAT_BUTTON_HEIGHT);
@@ -435,34 +491,16 @@ void Chats_menu()
     Chats_pixbuf=gdk_pixbuf_scale_simple(Chats_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);  //sets bg image to size of window
     image = gtk_image_new_from_pixbuf(Chats_pixbuf);  //sets variable for bg image
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);  //add bg image to layout
-    gtk_layout_put(GTK_LAYOUT(layout), friendlistscroll, FRIEND_LIST_LEFT, FRIEND_LIST_TOP);
+    gtk_layout_put(GTK_LAYOUT(layout), FriendListNotebook, FRIEND_LIST_LEFT, FRIEND_LIST_TOP);
     gtk_layout_put(GTK_LAYOUT(layout), ChatMenuScroll, 20, 40);
     gtk_layout_put(GTK_LAYOUT(layout), ChallengeButton, CHALLENGE_BUTTON_LEFT, CHALLENGE_BUTTON_TOP);
 
-    //note book
 
-    GtkWidget *label;
-    char bufferf[32];
-    char bufferl[32];
-
-    for (int i=0; i < 5; i++) {
-        sprintf(bufferf, "Prepend Frame %d", i+1);
-        sprintf(bufferl, "PPage %d", i+1);
-        
-        NotebookFrame = gtk_frame_new (bufferf);
-        gtk_container_border_width (GTK_CONTAINER (NotebookFrame), 10);
-        gtk_widget_set_usize (NotebookFrame, 100, 260);
-        gtk_widget_show (NotebookFrame);
-        
-        label = gtk_label_new (bufferf);
-        gtk_container_add (GTK_CONTAINER (NotebookFrame), label);
-        gtk_widget_show (label);
-        
-        label = gtk_label_new (bufferl);
-        gtk_notebook_prepend_page (GTK_NOTEBOOK(notebook), NotebookFrame, label);
-    }
 
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Chats_menu_callback),NULL);  //connect signals from clicking the window to active the callback
+    gulong handlerID2=g_signal_connect(guioFriendList, "button_press_event", G_CALLBACK(guio_openChatPage),NULL);  //connect signals from clicking the window to active the callback
+    gulong handlerID3=g_signal_connect(guioFriendList, "button_release_event", G_CALLBACK(guio_openChatPage),NULL);  //connect signals from clicking the window to active the callback
+
     gtk_widget_show_all(window);   //shows the window to the user
     gdk_threads_leave();//after you finich calling gtk functions, call this
     while(!isPlayingWithOpponent){
@@ -656,7 +694,7 @@ void guio_gameplay_window(GameState *gameState)
 	/*create a table and draw the board*/
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
     // empty_container(window);
-    gtk_container_remove(GTK_CONTAINER(layout),friendlistscroll);
+    gtk_container_remove(GTK_CONTAINER(layout),FriendListNotebook);
     gtk_container_remove(GTK_CONTAINER(layout),ChatMenuScroll);
     gtk_container_remove(GTK_CONTAINER(layout),ChallengeButton);
     OnlinePlay_pixbuf=load_pixbuf_from_file(OnlinePlay_Background);
