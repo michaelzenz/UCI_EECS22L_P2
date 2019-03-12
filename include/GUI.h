@@ -96,6 +96,10 @@ void gui_init_window(int argc, char*argv[]);
 //draws the game menu and return GameMode from user
 int gui_main_menu();
 
+void guio_ErrorMsg(char *msg);
+
+bool guio_AskQuestion(char *msg);
+
 /*********************/
 //Offline
 /*********************/
@@ -133,6 +137,12 @@ void guio_gameplay_window(GameState *gameState);
 void guio_refresh(GameState *gameState);
 
 int guio_play(GameState *gameState);
+
+void guio_onMsgUpdate();
+
+void guio_addfriend(char *UserName);
+
+void guio_addUnkown(char *UserName);
 /*********************/
 //!Online
 /*********************/

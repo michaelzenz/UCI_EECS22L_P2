@@ -9,32 +9,31 @@ extern GtkWidget *image;
 extern GtkWidget *layout;//the layout to put on background and contain fixed widget
 extern GtkWidget *fixed;//the widget to contain table
 extern GtkWidget *table;//the widget to contain icons
-extern GtkWidget *text_view; // widget to write text into log
 
 GtkWidget *usernameEntry;
 GtkWidget *passwordEntry, *verifyPasswordEntry;
-GtkWidget *scrolled_win;
-
-GtkTextBuffer *buffer=NULL;
-GList *children, *iter;
 
 bool isLoginRegisterInitialized=false;
 
 extern bool isPlayingWithOpponent;
 
 //for chat menu
-const gchar *list_item_data_key="list_item_data";
-GtkWidget *friendlistitem;
-GtkWidget *guioFriendList;
-GtkWidget *guioFriendListScroll;
-GtkWidget *guioUnknownList;
-GtkWidget *guioUnknownListScroll;
-int guioFriendListPageNum=-1, guioUnknownListPageNum=-1;
+GtkListStore *guioFriendListStore;
+GtkListStore *guioUnknownListStore;
+GtkWidget *guioFriendTreeView;
+GtkWidget *guioUnknownTreeView;
+GtkCellRenderer *guioFriendTreeRenderer;
+GtkTreeViewColumn *FriendListColumn;
+GtkTreeViewColumn *UnknownListColumn;
+GtkWidget *guioFriendTreeScroll;
+GtkWidget *guioUnknownTreeScroll;
 
-GtkWidget *FriendListNotebook;
+int guioFriendTreePageNum,guioUnknownTreePageNum;
+
+GtkWidget *FriendTreeNotebook;
 GtkWidget *NoteBookFixed;
 GtkWidget *ChatMenuScroll;
-GtkWidget *notebook;
+GtkWidget *ChatPageBook;
 GtkWidget *MsgTextView;
 GtkWidget *SendButton;
 GtkWidget *RMpageButton;
@@ -71,9 +70,11 @@ extern char *str_piece[7];
 
 //add friend to friend list 
 void guio_addfriend(char *UserName);
+void guio_onMsgUpdate();
 
 void empty_container(GtkWidget *container)
 {
+    GList *children, *iter;
     //testing the destroy stuff in a container
     children = gtk_container_get_children(GTK_CONTAINER(container));
     for(iter = children; iter != NULL; iter = g_list_next(iter))
@@ -95,6 +96,22 @@ void guio_ErrorMsg(char *msg)
     gtk_widget_destroy (dialog);
 }
 
+
+//Only ask yes and no
+bool guio_AskQuestion(char *msg)
+{
+    GtkWidget *dialog;
+    dialog = gtk_message_dialog_new (NULL,
+                                 GTK_DIALOG_DESTROY_WITH_PARENT,
+                                 GTK_MESSAGE_OTHER,
+                                 GTK_BUTTONS_YES_NO,
+                                 "%s",
+                                 msg);
+    bool ret=gtk_dialog_run (GTK_DIALOG (dialog))==GTK_RESPONSE_YES;
+    gtk_widget_destroy (dialog);
+    return ret;
+}
+
 void initLoginRegister(){
     Login_pixbuf=load_pixbuf_from_file(Login_menu_path);
     Login_pixbuf=gdk_pixbuf_scale_simple(Login_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);
@@ -108,7 +125,6 @@ void initLoginRegister(){
     gtk_entry_set_invisible_char (GTK_ENTRY (passwordEntry), '*');
         gtk_entry_set_visibility(GTK_ENTRY(verifyPasswordEntry), FALSE);  //makes text entered not be readable
     gtk_entry_set_invisible_char (GTK_ENTRY (verifyPasswordEntry), '*');  //replaces letters with *
-
 }
 
 gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
@@ -182,6 +198,8 @@ int Login_menu()
     while(LoginFlag==NOT_YET_LOGIN)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
     gdk_threads_enter();//again, you know what I am gonna say
     g_signal_handler_disconnect(window,handlerID);
+    gtk_container_remove(GTK_CONTAINER(layout),usernameEntry);
+    gtk_container_remove(GTK_CONTAINER(layout),passwordEntry);
     gdk_threads_leave();
     return LoginFlag;
 }
@@ -248,6 +266,8 @@ int Register_menu()
     image = gtk_image_new_from_pixbuf(Register_pixbuf); //sets variable for bg image
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);  //add bg image to layout
 
+    gtk_layout_put(GTK_LAYOUT(layout), usernameEntry, U_P_VP_LEFT, USERNAME_TOP );
+    gtk_layout_put(GTK_LAYOUT(layout), passwordEntry, U_P_VP_LEFT, PASSWD_TOP );
     gtk_layout_put(GTK_LAYOUT(layout), verifyPasswordEntry, U_P_VP_LEFT, VERIFY_PASSWD_TOP );
     
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Register_menu_callback),NULL); //connect signals from clicking the window to active the callback
@@ -256,8 +276,9 @@ int Register_menu()
     while(LoginFlag==NOT_YET_REGISTER)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
     gdk_threads_enter();//again, you know what I am gonna say
     g_signal_handler_disconnect(window,handlerID); //disconnects the signals from clicking
-    
     gtk_container_remove(GTK_CONTAINER(layout),verifyPasswordEntry);
+    gtk_container_remove(GTK_CONTAINER(layout),usernameEntry);
+    gtk_container_remove(GTK_CONTAINER(layout),passwordEntry);
     gdk_threads_leave();
     return LoginFlag;
 }
@@ -285,33 +306,43 @@ void remove_book (GtkNotebook *notebook)
     gint page;
     page = gtk_notebook_current_page(notebook);
 
+    char* selectedUserName=gtk_notebook_get_tab_label_text(notebook,
+        gtk_notebook_get_nth_page(notebook,page));
+
+    msgChat_set_pageNum(selectedUserName,-1);
+    msgChat_set_lastReadPos(selectedUserName,-1);
+    msgChat_set_buffer(selectedUserName,NULL);
+
     gtk_notebook_remove_page (notebook, page);
     /* Need to refresh the widget -- 
      This forces the widget to redraw itself. */
     gtk_widget_draw(GTK_WIDGET(notebook), NULL);
+    guio_onMsgUpdate();
 }
 
-gchar* guio_getUserSelection(GtkWidget *list){
-    GList *dlist;
-    dlist=GTK_LIST(list)->selection;
-
-    if (!dlist) {
-        printf("Please Choose a friend to send msg");
-        return NULL;
+//WARNING: the gchar* return by this func must be free
+gchar* guio_getUserSelection(GtkTreeModel *model, GtkTreeView *tree){
+    GtkTreeIter iter;
+    gchar* user;
+    GtkTreeSelection *selection=gtk_tree_view_get_selection (tree);
+    if (gtk_tree_selection_get_selected (selection, &model, &iter))
+    {
+        gtk_tree_model_get(model, &iter, 0, &user, -1);
     }
-    GtkObject       *list_item;
-    gchar           *item_data_string;
-    while (dlist) {
-        list_item=GTK_OBJECT(dlist->data);
-        item_data_string=gtk_object_get_data(list_item,
-                                             list_item_data_key);
-        dlist=dlist->next;
-    }
-    return item_data_string;
+    return user;
 }
 
 void guio_CHAT_send_msg()
 {
+    int page=gtk_notebook_current_page(GTK_NOTEBOOK(ChatPageBook));
+    if(page<0){
+        guio_ErrorMsg("please specify a user to send message!");
+        return;
+    }
+    char* selectedUser=gtk_notebook_get_tab_label_text(GTK_NOTEBOOK(ChatPageBook),
+        gtk_notebook_get_nth_page(GTK_NOTEBOOK(ChatPageBook),
+        page));
+
     GtkTextIter start, end;
     GtkTextBuffer *textBuf=gtk_text_view_get_buffer(GTK_TEXT_VIEW(MsgTextView));
     gtk_text_buffer_get_bounds(textBuf, &start, &end);
@@ -320,66 +351,66 @@ void guio_CHAT_send_msg()
         printf("This message is too long, please limit to MAX_MSG_LEN\n");
         return;
     }
+    gtk_text_buffer_set_text(textBuf,"",-1);
     sprintf(msg,"%s",msg);
-
-    gchar *selectedFriend;
-    if(gtk_notebook_get_current_page(GTK_NOTEBOOK(FriendListNotebook))==guioFriendListPageNum)
-        selectedFriend=guio_getUserSelection(guioFriendList);
-    else
-        selectedFriend=guio_getUserSelection(guioUnknownList);
-
-    SendMsgToUser(selectedFriend,msg);
+    msgChat_add_msg(selectedUser,msg);
+    guio_onMsgUpdate();
+    SendMsgToUser(selectedUser,msg);
 }
 
 void guio_addfriend(char *UserName)
 {
-    friendlistitem = gtk_list_item_new_with_label (UserName);
-    gtk_container_add (GTK_CONTAINER (guioFriendList), friendlistitem);
-    
-    gtk_object_set_data(GTK_OBJECT(friendlistitem),
-                            list_item_data_key,
-                            UserName);
+    GtkTreeIter   iter;
+    gtk_list_store_append(guioFriendListStore, &iter);
+    gtk_list_store_set(guioFriendListStore,&iter, 0, UserName,-1);
 }
 
 void guio_addUnkown(char *UserName)
 {
-    friendlistitem = gtk_list_item_new_with_label (UserName);
-    gtk_container_add (GTK_CONTAINER (guioUnknownList), friendlistitem);
-    
-    gtk_object_set_data(GTK_OBJECT(friendlistitem),
-                            list_item_data_key,
-                            UserName);
+    GtkTreeIter   iter;
+    gtk_list_store_append(guioUnknownListStore, &iter);
+    gtk_list_store_set(guioUnknownListStore, &iter, 0, UserName,-1);
 }
 
-gint guio_openChatPage(GtkWidget *widget, GdkEventButton *event, gpointer func_data)
+gint guio_openChatPage(GtkTreeView *treeview, GtkTreePath *path,
+    GtkTreeViewColumn *col, gpointer userdata)
 {
-    if (GTK_IS_LIST(widget) && event->type==GDK_2BUTTON_PRESS){
-        gchar *selectedFriend;
-        if(gtk_notebook_get_current_page(GTK_NOTEBOOK(FriendListNotebook))==guioFriendListPageNum)
-            selectedFriend=guio_getUserSelection(guioFriendList);
-        else
-            selectedFriend=guio_getUserSelection(guioUnknownList);
-            
-        if(msgChat_get_pageNum(selectedFriend)>=0)return 0;
-
-        GtkWidget *label;
-        char bufferl[32];
-        sprintf(bufferl, "%s", selectedFriend);
-
-        GtkWidget *newChatPage=gtk_text_view_new();
-        gtk_widget_set_size_request (newChatPage, CHAT_PAGE_WIDTH, CHAT_PAGE_HEIGHT);
-        gtk_text_view_set_editable(GTK_TEXT_VIEW(newChatPage),false);
+    char *selectedUser;
+    if(gtk_notebook_get_current_page(GTK_NOTEBOOK(FriendTreeNotebook))==guioFriendTreePageNum)
+        selectedUser=guio_getUserSelection(GTK_TREE_MODEL(guioFriendListStore),
+            GTK_TREE_VIEW(guioFriendTreeView));
+    else
+        selectedUser=guio_getUserSelection(GTK_TREE_MODEL(guioUnknownListStore),
+            GTK_TREE_VIEW(guioUnknownTreeView));
         
-        // GtkWidget *newScroll=gtk_scrolled_window_new(NULL, NULL);
-        // gtk_widget_set_size_request(newScroll, CHAT_PAGE_WIDTH, CHAT_PAGE_HEIGHT);
-        // gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (newScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-        // gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (newScroll), newChatPage);
-
-        
-        label = gtk_label_new (bufferl);
-        int pageNum=gtk_notebook_prepend_page (GTK_NOTEBOOK(notebook), newChatPage, label);
-        msgChat_set_pageNum(selectedFriend,pageNum);
+    if(msgChat_get_pageNum(selectedUser)>=0){
+        gtk_notebook_set_current_page(GTK_NOTEBOOK(ChatPageBook),msgChat_get_pageNum(selectedUser));
+        return 0;
     }
+
+    GtkWidget *label;
+    char bufferl[32];
+    sprintf(bufferl, "%s", selectedUser);
+
+    GtkWidget *newChatPage=gtk_text_view_new();
+    gtk_widget_set_size_request (newChatPage, CHAT_PAGE_WIDTH, CHAT_PAGE_HEIGHT);
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(newChatPage),false);
+    gtk_widget_show(newChatPage);
+    GtkWidget *newScroll=gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_size_request(newScroll, CHAT_PAGE_WIDTH, CHAT_PAGE_HEIGHT);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (newScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (newScroll), newChatPage);
+
+    gtk_widget_show(newScroll);
+
+    label = gtk_label_new (bufferl);
+    int pageNum=gtk_notebook_append_page (GTK_NOTEBOOK(ChatPageBook), newScroll, label);
+    msgChat_set_pageNum(selectedUser,pageNum);
+    GtkTextBuffer *buffer=gtk_text_view_get_buffer(GTK_TEXT_VIEW(newChatPage));
+    gtk_text_buffer_get_iter_at_offset(buffer, msgChat_get_iter(selectedUser), 0);
+    msgChat_set_buffer(selectedUser,buffer);
+    free(selectedUser);
+    guio_onMsgUpdate();
     return 0;
 }
 
@@ -389,58 +420,84 @@ int _addWidgetToFriendListNotebook(GtkWidget *list, char *listName)
     char bufferl[32];
     sprintf(bufferl,"%s",listName);
     label = gtk_label_new (bufferl);
-    int pageNum=gtk_notebook_prepend_page (GTK_NOTEBOOK(FriendListNotebook), list, label);
+    int pageNum=gtk_notebook_prepend_page (GTK_NOTEBOOK(FriendTreeNotebook), list, label);
     return pageNum;
 }
 
 void guio_challenge()
 {
-    gchar *selectedFriend;
-    if(gtk_notebook_get_current_page(GTK_NOTEBOOK(FriendListNotebook))==guioFriendListPageNum)
-        selectedFriend=guio_getUserSelection(guioFriendList);
+    gchar *selectedUser;
+        if(gtk_notebook_get_current_page(GTK_NOTEBOOK(FriendTreeNotebook))==guioFriendTreePageNum)
+        selectedUser=guio_getUserSelection(GTK_TREE_MODEL(guioFriendListStore),
+            GTK_TREE_VIEW(guioFriendTreeView));
     else
-        selectedFriend=guio_getUserSelection(guioUnknownList);
-    ChallengeUser(selectedFriend);
-    strcpy(remotePlayer.UserName,selectedFriend);
+        selectedUser=guio_getUserSelection(GTK_TREE_MODEL(guioUnknownListStore),
+            GTK_TREE_VIEW(guioUnknownTreeView));
+    ChallengeUser(selectedUser);
+    strcpy(remotePlayer.UserName,selectedUser);
+    free(selectedUser);
     isPlayingWithOpponent=true;
 }
 
 void InitChatMenu()
 {
     gdk_threads_enter();
-
-    guioFriendList = gtk_list_new (); //creates list box
-    gtk_list_set_selection_mode (GTK_LIST (guioFriendList), GTK_SELECTION_BROWSE); //sets style of list box
-    guioUnknownList=gtk_list_new();
-    gtk_list_set_selection_mode (GTK_LIST (guioUnknownList), GTK_SELECTION_BROWSE); //sets style of list box
     
-    guioFriendListScroll=gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_size_request(guioFriendListScroll, -1, CHAT_LIST_HEIGHT);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (guioFriendListScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (guioFriendListScroll), guioFriendList);
+    guioFriendListStore = gtk_list_store_new (1, G_TYPE_STRING);
+    guioUnknownListStore = gtk_list_store_new (1, G_TYPE_STRING);
+    guioFriendTreeView=gtk_tree_view_new_with_model(GTK_TREE_MODEL(guioFriendListStore));
+    guioUnknownTreeView=gtk_tree_view_new_with_model(GTK_TREE_MODEL(guioUnknownListStore));
+    g_object_unref (G_OBJECT(guioFriendListStore));
+    g_object_unref (G_OBJECT(guioUnknownListStore));
+    GtkTreeSelection  *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(guioFriendTreeView));
+    gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(guioUnknownTreeView));
+    gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
+    g_signal_connect(guioFriendTreeView, "row-activated", (GCallback)guio_openChatPage, NULL);
+    g_signal_connect(guioUnknownTreeView, "row-activated", (GCallback)guio_openChatPage, NULL);
 
-    guioUnknownListScroll=gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_size_request(guioUnknownListScroll, -1, FRIEND_LIST_WIDTH);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (guioUnknownListScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (guioUnknownListScroll), guioUnknownList);
+    guioFriendTreeRenderer = gtk_cell_renderer_text_new ();
+    g_object_set (G_OBJECT (guioFriendTreeRenderer), "foreground", "orange", NULL);
 
-    FriendListNotebook=gtk_notebook_new();
-    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (FriendListNotebook), GTK_POS_TOP);
-    gtk_widget_set_size_request (FriendListNotebook, FRIEND_LIST_WIDTH, CHAT_LIST_HEIGHT);
+    FriendListColumn=gtk_tree_view_column_new_with_attributes ("", guioFriendTreeRenderer,
+         "text", 0, NULL);
+    
+    gtk_tree_view_append_column (GTK_TREE_VIEW (guioFriendTreeView), FriendListColumn);
+    guioFriendTreeRenderer = gtk_cell_renderer_text_new ();
+    g_object_set (G_OBJECT (guioFriendTreeRenderer), "foreground", "orange", NULL);
 
-    guioUnknownListPageNum=_addWidgetToFriendListNotebook(guioUnknownListScroll,"Unknown");
-    guioFriendListPageNum=_addWidgetToFriendListNotebook(guioFriendListScroll,"Friends");
+    UnknownListColumn=gtk_tree_view_column_new_with_attributes ("", guioFriendTreeRenderer,
+         "text", 0, NULL);
+    gtk_tree_view_append_column (GTK_TREE_VIEW (guioUnknownTreeView), UnknownListColumn);
+    
+    
+    guioFriendTreeScroll=gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_size_request(guioFriendTreeScroll, -1, CHAT_LIST_HEIGHT);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (guioFriendTreeScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (guioFriendTreeScroll), guioFriendTreeView);
+
+    guioUnknownTreeScroll=gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_size_request(guioUnknownTreeScroll, -1, FRIEND_LIST_WIDTH);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (guioUnknownTreeScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (guioUnknownTreeScroll), guioUnknownTreeView);
+
+    FriendTreeNotebook=gtk_notebook_new();
+    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (FriendTreeNotebook), GTK_POS_TOP);
+    gtk_widget_set_size_request (FriendTreeNotebook, FRIEND_LIST_WIDTH, CHAT_LIST_HEIGHT);
+
+    guioUnknownTreePageNum=_addWidgetToFriendListNotebook(guioUnknownTreeScroll,"Unknown");
+    guioFriendTreePageNum=_addWidgetToFriendListNotebook(guioFriendTreeScroll,"Friends");
 
     ChatMenuScroll = gtk_scrolled_window_new (NULL,NULL);
     gtk_container_border_width (GTK_CONTAINER (ChatMenuScroll), 10);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (ChatMenuScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
     gtk_widget_set_usize(ChatMenuScroll, CHAT_SCROLL_WIDTH, CHAT_LIST_HEIGHT);
 
-    notebook = gtk_notebook_new ();
-    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
-    gtk_widget_set_size_request (notebook, NOTEBOOK_FIXED_WIDTH, NOTEBOOK_FIXED_HEIGHT);
+    ChatPageBook = gtk_notebook_new ();
+    gtk_notebook_set_tab_pos (GTK_NOTEBOOK (ChatPageBook), GTK_POS_TOP);
+    gtk_widget_set_size_request (ChatPageBook, NOTEBOOK_FIXED_WIDTH, NOTEBOOK_FIXED_HEIGHT);
     NoteBookFixed=gtk_fixed_new();
-    gtk_fixed_put(GTK_FIXED(NoteBookFixed), notebook, NOTEBOOK_FIXED_LEFT, NOTEBOOK_FIXED_TOP);
+    gtk_fixed_put(GTK_FIXED(NoteBookFixed), ChatPageBook, NOTEBOOK_FIXED_LEFT, NOTEBOOK_FIXED_TOP);
 
     MsgTextView=gtk_text_view_new();
     gtk_widget_set_size_request (MsgTextView, MSG_TEXTVIEW_FIXED_WIDTH, MSG_TEXTVIEW_FIXED_HEIGHT);
@@ -458,7 +515,7 @@ void InitChatMenu()
     gtk_widget_set_size_request (RMpageButton, CHAT_BUTTON_WIDTH, CHAT_BUTTON_HEIGHT);
     gtk_signal_connect_object (GTK_OBJECT (RMpageButton), "clicked",
                             (GtkSignalFunc) remove_book,
-                            notebook);
+                            ChatPageBook);
 
     ChallengeButton = gtk_button_new_with_label ("Challenge");
     gtk_widget_set_size_request (ChallengeButton, CHALLENGE_BUTTON_WIDTH, CHALLENGE_BUTTON_HEIGHT);
@@ -468,12 +525,36 @@ void InitChatMenu()
 
     gtk_fixed_put(GTK_FIXED(NoteBookFixed), SendButton, CHAT_BUTTON_LEFT, SEND_BUTTON_TOP);
     gtk_fixed_put(GTK_FIXED(NoteBookFixed), RMpageButton, CHAT_BUTTON_LEFT, RMPAGE_BUTTON_TOP);
+
     gdk_threads_leave();
+}
+
+void guio_onMsgUpdate()
+{
+    gint page;
+    page = gtk_notebook_current_page(GTK_NOTEBOOK(ChatPageBook));
+    if(page<0)return;
+
+    char* selectedUserName=gtk_notebook_get_tab_label_text(GTK_NOTEBOOK(ChatPageBook),
+        gtk_notebook_get_nth_page(GTK_NOTEBOOK(ChatPageBook),page));
+
+    int pos=msgChat_get_lastReadPos(selectedUserName);
+    vectorStr *msgList=msgChat_get_msgList(selectedUserName);
+    int msgCnt=vectorStr_count(msgList);
+    if(pos<msgCnt-1){
+        GtkTextIter *iter=msgChat_get_iter(selectedUserName);
+        GtkTextBuffer *buffer=msgChat_get_buffer(selectedUserName);
+        char temp[MAX_MSG_LEN];
+        for(int i=pos+1;i<msgCnt;i++){
+            gtk_text_buffer_insert(buffer,iter,vectorStr_get(msgList,i,temp),-1);
+            gtk_text_buffer_insert(buffer,iter,"\n",-1);
+        }
+        msgChat_set_lastReadPos(selectedUserName,msgCnt-1);
+    }
 }
 
 void Chats_menu()
 {
-    
     if(!ChatMenuInitialized){
         InitChatMenu();
         ChatMenuInitialized=true;
@@ -491,15 +572,11 @@ void Chats_menu()
     Chats_pixbuf=gdk_pixbuf_scale_simple(Chats_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);  //sets bg image to size of window
     image = gtk_image_new_from_pixbuf(Chats_pixbuf);  //sets variable for bg image
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);  //add bg image to layout
-    gtk_layout_put(GTK_LAYOUT(layout), FriendListNotebook, FRIEND_LIST_LEFT, FRIEND_LIST_TOP);
+    gtk_layout_put(GTK_LAYOUT(layout), FriendTreeNotebook, FRIEND_LIST_LEFT, FRIEND_LIST_TOP);
     gtk_layout_put(GTK_LAYOUT(layout), ChatMenuScroll, 20, 40);
     gtk_layout_put(GTK_LAYOUT(layout), ChallengeButton, CHALLENGE_BUTTON_LEFT, CHALLENGE_BUTTON_TOP);
 
-
-
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Chats_menu_callback),NULL);  //connect signals from clicking the window to active the callback
-    gulong handlerID2=g_signal_connect(guioFriendList, "button_press_event", G_CALLBACK(guio_openChatPage),NULL);  //connect signals from clicking the window to active the callback
-    gulong handlerID3=g_signal_connect(guioFriendList, "button_release_event", G_CALLBACK(guio_openChatPage),NULL);  //connect signals from clicking the window to active the callback
 
     gtk_widget_show_all(window);   //shows the window to the user
     gdk_threads_leave();//after you finich calling gtk functions, call this
@@ -694,7 +771,7 @@ void guio_gameplay_window(GameState *gameState)
 	/*create a table and draw the board*/
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
     // empty_container(window);
-    gtk_container_remove(GTK_CONTAINER(layout),FriendListNotebook);
+    gtk_container_remove(GTK_CONTAINER(layout),FriendTreeNotebook);
     gtk_container_remove(GTK_CONTAINER(layout),ChatMenuScroll);
     gtk_container_remove(GTK_CONTAINER(layout),ChallengeButton);
     OnlinePlay_pixbuf=load_pixbuf_from_file(OnlinePlay_Background);

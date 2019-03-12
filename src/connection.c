@@ -1,6 +1,7 @@
 #include"connection.h"
 #include"PlayBetween.h"
 #include"msgChat.h"
+#include"GUI.h"
 
 extern const char *Program;
 char *UserName;
@@ -225,13 +226,23 @@ void handlePAQ(PackAnswerQuery paq)
         if(!strcmp(UserName,paq.challenger)){
             remotePlayer.color=WHITE;
             localPlayer.color=BLACK;
+            isPlayingWithOpponent=true;
         }
         else{
+            char question[70];
+            sprintf(question,
+                "%s wants to challenge you, do you want to accept?",paq.challenger);
+            gdk_threads_enter();
+            isPlayingWithOpponent=guio_AskQuestion(question);
+            gdk_threads_leave();
+            sprintf(question,"Do you want to play as WHITE?");
+            gdk_threads_enter();
+            bool LocalIsWhite=guio_AskQuestion(question);
+            gdk_threads_leave();
             strcpy(remotePlayer.UserName,paq.challenger);
-            remotePlayer.color=BLACK;
-            localPlayer.color=WHITE;
+            remotePlayer.color=LocalIsWhite?BLACK:WHITE;
+            localPlayer.color=LocalIsWhite?WHITE:BLACK;
         }
-        isPlayingWithOpponent=true;
     }
 
     int NewMsgCnt=vectorStr_count(&paq.messageList);
@@ -242,9 +253,13 @@ void handlePAQ(PackAnswerQuery paq)
             vectorStr_get(&paq.srcUserList,i,user));
         if(!msgChat_get_isUserExist(user)){
             msgChat_addUser(user,false);
+            gdk_threads_enter();
+            guio_addUnkown(user);
+            gdk_threads_leave();
         }
         msgChat_add_msg(user,msg);
     }
+    if(NewMsgCnt>0)guio_onMsgUpdate();
 }
 
 void QueryTimeredTask(char *str_PQ)

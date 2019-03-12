@@ -164,9 +164,10 @@ void GameOnline(int argc, char *argv[])
         msgChat_addUser(vectorStr_get(&FriendsList,i,temp),true);
     }
 
+    
+
     init_connection2qport();
 
-    SendMsgToUser("aria","fuck");
     InitQueryTimeredTask();
 
     Chats_menu();
