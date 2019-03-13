@@ -111,7 +111,16 @@ typedef struct _PackPlay
      uchar promotion;//the promotion that the user selects
 } PackPlay;
 
+typedef struct _PackSearch
+{
+    char *targetUserName;
+}PackSearch;
 
+
+typedef struct _PackAnswerSearch
+{
+    vectorStr MatchList;
+}PackAnswerSearch;
 
 //Encode Functions
 

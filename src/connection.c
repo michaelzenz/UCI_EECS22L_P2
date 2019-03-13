@@ -238,30 +238,24 @@ void handlePAQ(PackAnswerQuery paq)
         if(!strcmp(UserName,paq.challenger)){
             printf("got opponent server, wait for response\n");
             isWaitingChallengeRespose=true;
-            //gdk_threads_enter();
             guio_waitUserActionWithCallback("Waiting for the opponent to accept challenge",
                 stopWaitingForResponse, NULL);
-            //gdk_threads_leave();
             
         }
         else{
             char question[70];
             sprintf(question,
                 "%s wants to challenge you, do you want to accept?",paq.challenger);
-            gdk_threads_enter();
+
             bool acceptChallenge=guio_AskQuestion(question);
-            gdk_threads_leave();
+
             if(acceptChallenge){
-                gdk_threads_enter();
                 bool LocalIsWhite=guio_AskQuestion("Do you want to play as WHITE?");
-                gdk_threads_leave();
                 char *recvFromOppo=NULL;
                 if(LocalIsWhite)recvFromOppo=sendToOppo("iChooseColor:w");
                 else recvFromOppo=sendToOppo("iChooseColor:b");
                 if(!strcmp(recvFromOppo,CHALLENGE_IS_CANCELED)){
-                    gdk_threads_enter();
                     guio_InformMsg("Your Opponent has canceled the challenge");
-                    gdk_threads_leave();
                 }
                 else if(!strcmp(COLOR_SELECTION_RECEIVED,recvFromOppo)){
                     strcpy(remotePlayer.UserName,paq.challenger);
@@ -284,9 +278,7 @@ void handlePAQ(PackAnswerQuery paq)
             vectorStr_get(&paq.srcUserList,i,user));
         if(!msgChat_get_isUserExist(user)){
             msgChat_addUser(user,false);
-            gdk_threads_enter();
             guio_addUnkown(user);
-            gdk_threads_leave();
         }
         msgChat_add_msg(user,msg);
     }

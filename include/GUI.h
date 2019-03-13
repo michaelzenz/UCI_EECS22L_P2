@@ -89,12 +89,14 @@
 //!for online
 
 //init a new window
-GdkPixbuf *load_pixbuf_from_file (const char *filename);
+GdkPixbuf *_load_pixbuf_from_file (const char *filename);
 
 void gui_init_window(int argc, char*argv[]);
 
 //draws the game menu and return GameMode from user
 int gui_main_menu();
+
+//the following funcs start with guio_ is for external use
 
 void guio_ErrorMsg(char *msg);
 
@@ -108,6 +110,12 @@ typedef void(*WaitUserActionCallback)(void*);
 void guio_waitUserActionWithCallback(char *msg, WaitUserActionCallback callback, void *pdata);
 
 void guio_removeWaitActionDialog();
+
+//the following funcs start with _ is for GUI*.c internal use
+
+void _ErrorMsg(char *msg);
+void _InformMsg(char *msg);
+bool _AskQuestion(char *msg);
 
 /*********************/
 //Offline
@@ -139,7 +147,7 @@ void gui_gameplay_window(GameState *gameState);
 void LoginOrRegister();
 
 //Opens the chat menu
-void Chats_menu();
+void guio_ChatsMenu();
 
 void guio_gameplay_window(GameState *gameState);
 

@@ -92,9 +92,7 @@ void PlayPackListener(int DataSocketFD)
         }
     }
     else if(!strcmp(fullbuf,PLAYBETWEEN_USER_QUIT)){
-        gdk_threads_enter();
         guio_InformMsg("Your opponent have surrendered\nCongratulations!!!\nYou have win the game!!!");
-        gdk_threads_leave();
         isPlayingWithOpponent=false;
     }
     else{

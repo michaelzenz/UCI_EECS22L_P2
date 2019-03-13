@@ -23,8 +23,8 @@ GtkWidget *guioFriendTreeScroll;
 GtkWidget *guioUnknownTreeScroll;
 
 int guioFriendTreePageNum,guioUnknownTreePageNum;
-
 GtkWidget *FriendTreeNotebook;
+
 GtkWidget *NoteBookFixed;
 GtkWidget *ChatMenuScroll;
 GtkWidget *ChatPageBook;
@@ -36,12 +36,12 @@ GtkWidget *ChallengeButton;
 bool ChatMenuInitialized=false;
 //!for chat menu
 
-char *Chats_menu_path="res/background.png";
+char *guio_ChatsMenu_path="res/background.png";
 GdkPixbuf *Chats_pixbuf = NULL;
 GdkPixbuf *Add_friends_pixbuf = NULL;
 
 
-gint Chats_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
+gint guio_ChatsMenu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 {
     int x, y;
     GdkModifierType state;
@@ -51,7 +51,7 @@ gint Chats_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 
 
 /* Remove a page from the notebook */
-void remove_book (GtkNotebook *notebook)
+void _removeChatPage (GtkNotebook *notebook)
 {
     gint page;
     page = gtk_notebook_current_page(notebook);
@@ -71,7 +71,7 @@ void remove_book (GtkNotebook *notebook)
 }
 
 //WARNING: the gchar* return by this func must be free
-gchar* guio_getUserSelection(GtkTreeModel *model, GtkTreeView *tree){
+gchar* _getUserSelection(GtkTreeModel *model, GtkTreeView *tree){
     GtkTreeIter iter;
     gchar* user;
     GtkTreeSelection *selection=gtk_tree_view_get_selection (tree);
@@ -82,11 +82,11 @@ gchar* guio_getUserSelection(GtkTreeModel *model, GtkTreeView *tree){
     return user;
 }
 
-void guio_CHAT_send_msg()
+void _CHAT_send_msg()
 {
     int page=gtk_notebook_current_page(GTK_NOTEBOOK(ChatPageBook));
     if(page<0){
-        guio_ErrorMsg("please specify a user to send message!");
+        _ErrorMsg("please specify a user to send message!");
         return;
     }
     char* selectedUser=gtk_notebook_get_tab_label_text(GTK_NOTEBOOK(ChatPageBook),
@@ -108,29 +108,43 @@ void guio_CHAT_send_msg()
     SendMsgToUser(selectedUser,msg);
 }
 
-void guio_addfriend(char *UserName)
+void _addfriend(char *UserName)
 {
     GtkTreeIter   iter;
     gtk_list_store_append(guioFriendListStore, &iter);
     gtk_list_store_set(guioFriendListStore,&iter, 0, UserName,-1);
 }
 
-void guio_addUnkown(char *UserName)
+void guio_addfriend(char *UserName)
+{
+    gdk_threads_enter();
+    _addfriend(UserName);
+    gdk_threads_leave();
+}
+
+void _addUnkown(char *UserName)
 {
     GtkTreeIter   iter;
     gtk_list_store_append(guioUnknownListStore, &iter);
     gtk_list_store_set(guioUnknownListStore, &iter, 0, UserName,-1);
 }
 
-gint guio_openChatPage(GtkTreeView *treeview, GtkTreePath *path,
+void guio_addUnkown(char *UserName)
+{
+    gdk_threads_enter();
+    _addUnkown(UserName);
+    gdk_threads_leave();
+}
+
+gint _openChatPage(GtkTreeView *treeview, GtkTreePath *path,
     GtkTreeViewColumn *col, gpointer userdata)
 {
     char *selectedUser;
     if(gtk_notebook_get_current_page(GTK_NOTEBOOK(FriendTreeNotebook))==guioFriendTreePageNum)
-        selectedUser=guio_getUserSelection(GTK_TREE_MODEL(guioFriendListStore),
+        selectedUser=_getUserSelection(GTK_TREE_MODEL(guioFriendListStore),
             GTK_TREE_VIEW(guioFriendTreeView));
     else
-        selectedUser=guio_getUserSelection(GTK_TREE_MODEL(guioUnknownListStore),
+        selectedUser=_getUserSelection(GTK_TREE_MODEL(guioUnknownListStore),
             GTK_TREE_VIEW(guioUnknownTreeView));
         
     if(msgChat_get_pageNum(selectedUser)>=0){
@@ -174,21 +188,21 @@ int _addWidgetToFriendListNotebook(GtkWidget *list, char *listName)
     return pageNum;
 }
 
-void guio_challenge()
+void _challengeUser()
 {
     gchar *selectedUser;
         if(gtk_notebook_get_current_page(GTK_NOTEBOOK(FriendTreeNotebook))==guioFriendTreePageNum)
-        selectedUser=guio_getUserSelection(GTK_TREE_MODEL(guioFriendListStore),
+        selectedUser=_getUserSelection(GTK_TREE_MODEL(guioFriendListStore),
             GTK_TREE_VIEW(guioFriendTreeView));
     else
-        selectedUser=guio_getUserSelection(GTK_TREE_MODEL(guioUnknownListStore),
+        selectedUser=_getUserSelection(GTK_TREE_MODEL(guioUnknownListStore),
             GTK_TREE_VIEW(guioUnknownTreeView));
     ChallengeUser(selectedUser);
     strcpy(remotePlayer.UserName,selectedUser);
     free(selectedUser);
 }
 
-void InitChatMenu()
+void _InitChatMenu()
 {
     gdk_threads_enter();
     
@@ -202,8 +216,8 @@ void InitChatMenu()
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(guioUnknownTreeView));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
-    g_signal_connect(guioFriendTreeView, "row-activated", (GCallback)guio_openChatPage, NULL);
-    g_signal_connect(guioUnknownTreeView, "row-activated", (GCallback)guio_openChatPage, NULL);
+    g_signal_connect(guioFriendTreeView, "row-activated", (GCallback)_openChatPage, NULL);
+    g_signal_connect(guioUnknownTreeView, "row-activated", (GCallback)_openChatPage, NULL);
 
     guioFriendTreeRenderer = gtk_cell_renderer_text_new ();
     g_object_set (G_OBJECT (guioFriendTreeRenderer), "foreground", "orange", NULL);
@@ -257,19 +271,19 @@ void InitChatMenu()
     SendButton = gtk_button_new_with_label ("send");
     gtk_widget_set_size_request (SendButton, CHAT_BUTTON_WIDTH, CHAT_BUTTON_HEIGHT);
     gtk_signal_connect_object (GTK_OBJECT (SendButton), "clicked",
-                            (GtkSignalFunc) guio_CHAT_send_msg,
+                            (GtkSignalFunc) _CHAT_send_msg,
                             NULL);
 
     RMpageButton = gtk_button_new_with_label ("remove page");
     gtk_widget_set_size_request (RMpageButton, CHAT_BUTTON_WIDTH, CHAT_BUTTON_HEIGHT);
     gtk_signal_connect_object (GTK_OBJECT (RMpageButton), "clicked",
-                            (GtkSignalFunc) remove_book,
+                            (GtkSignalFunc) _removeChatPage,
                             ChatPageBook);
 
     ChallengeButton = gtk_button_new_with_label ("Challenge");
     gtk_widget_set_size_request (ChallengeButton, CHALLENGE_BUTTON_WIDTH, CHALLENGE_BUTTON_HEIGHT);
     gtk_signal_connect_object (GTK_OBJECT (ChallengeButton), "clicked",
-                            (GtkSignalFunc) guio_challenge,
+                            (GtkSignalFunc) _challengeUser,
                             NULL);
 
     gtk_fixed_put(GTK_FIXED(NoteBookFixed), SendButton, CHAT_BUTTON_LEFT, SEND_BUTTON_TOP);
@@ -302,20 +316,20 @@ void guio_onMsgUpdate()
     }
 }
 
-void Chats_menu()
+void guio_ChatsMenu()
 {
     if(!ChatMenuInitialized){
-        InitChatMenu();
+        _InitChatMenu();
         int friendNb=vectorStr_count(&FriendsList);
         char temp[MAX_USERNAME_LEN];
         for(int i=0;i<friendNb;i++){
-            guio_addfriend(vectorStr_get(&FriendsList,i,temp));
+            _addfriend(vectorStr_get(&FriendsList,i,temp));
         }
         ChatMenuInitialized=true;
     }
 
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
-    Chats_pixbuf=load_pixbuf_from_file(Chats_menu_path);  //loads the background image from files
+    Chats_pixbuf=_load_pixbuf_from_file(guio_ChatsMenu_path);  //loads the background image from files
     Chats_pixbuf=gdk_pixbuf_scale_simple(Chats_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);  //sets bg image to size of window
     image = gtk_image_new_from_pixbuf(Chats_pixbuf);  //sets variable for bg image
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);  //add bg image to layout
@@ -323,7 +337,7 @@ void Chats_menu()
     gtk_layout_put(GTK_LAYOUT(layout), ChatMenuScroll, 20, 40);
     gtk_layout_put(GTK_LAYOUT(layout), ChallengeButton, CHALLENGE_BUTTON_LEFT, CHALLENGE_BUTTON_TOP);
 
-    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Chats_menu_callback),NULL);  //connect signals from clicking the window to active the callback
+    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(guio_ChatsMenu_callback),NULL);  //connect signals from clicking the window to active the callback
 
     gtk_widget_show_all(window);   //shows the window to the user
     gdk_threads_leave();//after you finich calling gtk functions, call this

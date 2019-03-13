@@ -171,7 +171,7 @@ void GameOnline(int argc, char *argv[])
 
     while(true){
         
-        Chats_menu();//opens the chat menu
+        guio_ChatsMenu();//opens the chat menu
 
         strcpy(localPlayer.UserName,UserName);
         guio_gameplay_window(&gameState);

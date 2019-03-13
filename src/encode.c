@@ -174,3 +174,16 @@ void encodePackPlay(char *jsonStr, PackPlay *pack)
    strcat(jsonStr,str_promotion);
    strcat(jsonStr,"}");
 }
+
+char* encodePackSearch(PackSearch *pack)
+{
+   char *jsonStr=malloc(strlen(pack->targetUserName)+15);
+   sprintf(jsonStr,"\"target\":%s",pack->targetUserName);
+   return jsonStr;
+}
+
+char* encodePackAnswerSearch(PackAnswerSearch *pack)
+{
+   int size=MAX_USERNAME_LEN;
+   
+}

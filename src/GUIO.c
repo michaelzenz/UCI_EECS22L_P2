@@ -37,105 +37,14 @@ extern char *str_square[4];
 extern char *str_color[2];
 extern char *str_piece[7];
 
-
-
 //add friend to friend list 
 void guio_addfriend(char *UserName);
 void guio_onMsgUpdate();
 
-void empty_container(GtkWidget *container)
-{
-    GList *children, *iter;
-    //testing the destroy stuff in a container
-    children = gtk_container_get_children(GTK_CONTAINER(container));
-    for(iter = children; iter != NULL; iter = g_list_next(iter))
-    gtk_widget_destroy(GTK_WIDGET(iter->data));
-    g_list_free(children);
-    //end test
-}
-
-void guio_ErrorMsg(char *msg)
-{
-    GtkWidget *dialog;
-    dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
-                                 GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
-                                 "%s", msg);
-    gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
-}
-
-void guio_InformMsg(char *msg)
-{
-    GtkWidget *dialog;
-    dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
-                                 GTK_MESSAGE_OTHER, GTK_BUTTONS_CLOSE,
-                                 "%s", msg);
-    gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
-}
-
-//Only ask yes and no
-bool guio_AskQuestion(char *msg)
-{
-    GtkWidget *dialog;
-    dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
-                                 GTK_MESSAGE_OTHER, GTK_BUTTONS_YES_NO,
-                                 "%s", msg);
-    bool ret=gtk_dialog_run (GTK_DIALOG (dialog))==GTK_RESPONSE_YES;
-    gtk_widget_destroy (dialog);
-    return ret;
-}
-
-GtkWidget *waitActionDialog=NULL;
-WaitUserActionCallback waitUserActionCallback;
-
-void waitUserActionResponseHandler (void* pdata)
-{
-    waitUserActionCallback(pdata);
-    gtk_widget_destroy(waitActionDialog);
-}
-
-void guio_waitUserActionWithCallback(char *msg, WaitUserActionCallback callback, void *pdata)
-{
-    waitUserActionCallback=callback;
-    waitActionDialog = gtk_message_dialog_new (NULL,
-                                 GTK_DIALOG_DESTROY_WITH_PARENT,
-                                 GTK_MESSAGE_OTHER,
-                                 GTK_BUTTONS_CANCEL,
-                                 "%s",
-                                 msg);
-    g_signal_connect_swapped (waitActionDialog, "response",
-                          G_CALLBACK (waitUserActionResponseHandler),
-                          pdata);
-    //gtk_container_add(GTK_CONTAINER(waitActionDialogWindow), waitActionDialog);
-    gtk_widget_show(waitActionDialog);
-}
-
-void guio_waitUserAction(char *msg)
-{
-    waitActionDialog = gtk_message_dialog_new (NULL,
-                                 GTK_DIALOG_DESTROY_WITH_PARENT,
-                                 GTK_MESSAGE_OTHER,
-                                 GTK_BUTTONS_CANCEL,
-                                 "%s",
-                                 msg);
-    g_signal_connect_swapped (waitActionDialog, "response",
-                          G_CALLBACK (gtk_widget_destroy),
-                          waitActionDialog);
-    //gtk_container_add(GTK_CONTAINER(waitActionDialogWindow), waitActionDialog);
-    gtk_widget_show(waitActionDialog);
-}
-
-void guio_removeWaitActionDialog()
-{
-    if(waitActionDialog!=NULL)
-        gtk_widget_destroy(waitActionDialog);
-}
-
-void initLoginRegister(){
-    Login_pixbuf=load_pixbuf_from_file(Login_menu_path);
+void _initLoginRegister(){
+    Login_pixbuf=_load_pixbuf_from_file(Login_menu_path);
     Login_pixbuf=gdk_pixbuf_scale_simple(Login_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);
-    Register_pixbuf=load_pixbuf_from_file(Register_menu_path); //loads the background image from files
+    Register_pixbuf=_load_pixbuf_from_file(Register_menu_path); //loads the background image from files
     Register_pixbuf=gdk_pixbuf_scale_simple(Register_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);//sets bg image to size of window
 
     usernameEntry = gtk_entry_new();
@@ -147,7 +56,7 @@ void initLoginRegister(){
     gtk_entry_set_invisible_char (GTK_ENTRY (verifyPasswordEntry), '*');  //replaces letters with *
 }
 
-gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
+gint _Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 {
     int x, y;
     GdkModifierType state;
@@ -164,7 +73,7 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
         sprintf(Username,"%s",gtk_entry_get_text(GTK_ENTRY(usernameEntry)));
         sprintf(Passwd,"%s",gtk_entry_get_text(GTK_ENTRY(passwordEntry)));
         if(strlen(Username)==0||strlen(Passwd)==0){
-            guio_ErrorMsg("PLEASE INPUT USERNAME/PASSWORD");
+            _ErrorMsg("PLEASE INPUT USERNAME/PASSWORD");
             return 0;
         }
         PackUnamePasswd packUP;
@@ -184,10 +93,10 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
             FriendsList=palr.FriendList;
         }
         else if(palr.successflag==INVALID_PASSWD){
-            guio_ErrorMsg("Invalid Password, Please Try Agagin!");
+            _ErrorMsg("Invalid Password, Please Try Agagin!");
         }
         else if(palr.successflag==NO_SUCH_USER){
-            guio_ErrorMsg("No Such User, Please Register First!");
+            _ErrorMsg("No Such User, Please Register First!");
         }
 	    free(RecvBuf);
         printf("Trying to login\n");
@@ -195,15 +104,14 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     else if(x>613&&x<747&&y>350&&y<380)
     {
         printf("Register");
-        guio_waitUserAction("test");
         LoginFlag=NOT_YET_REGISTER;
     }
 }
 
-int Login_menu()
+int _Login_menu()
 {
     if(!isLoginRegisterInitialized){
-        initLoginRegister();
+        _initLoginRegister();
         isLoginRegisterInitialized=true;
     }
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
@@ -212,7 +120,7 @@ int Login_menu()
     gtk_layout_put(GTK_LAYOUT(layout), usernameEntry, U_P_VP_LEFT, USERNAME_TOP );
     gtk_layout_put(GTK_LAYOUT(layout), passwordEntry, U_P_VP_LEFT, PASSWD_TOP );
 
-    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Login_menu_callback),NULL);
+    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(_Login_menu_callback),NULL);
     gtk_widget_show_all(window);
     gdk_threads_leave();//after you finich calling gtk functions, call this
     while(LoginFlag==NOT_YET_LOGIN)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
@@ -227,7 +135,7 @@ int Login_menu()
 }
 
 
-gint Register_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
+gint _Register_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 {
     int x, y;
     GdkModifierType state;
@@ -246,11 +154,11 @@ gint Register_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 	    sprintf(verifyPasswd,"%s",gtk_entry_get_text(GTK_ENTRY(verifyPasswordEntry)));
         
         if(strcmp(verifyPasswd,Passwd)){
-            guio_ErrorMsg("PASSWORDS DOESN`T MATCH, PLEASE TRY AGAIN");
+            _ErrorMsg("PASSWORDS DOESN`T MATCH, PLEASE TRY AGAIN");
             return 0;
         }
         if(strlen(Username)==0||strlen(Passwd)==0||strlen(verifyPasswd)==0){
-            guio_ErrorMsg("PLEASE INPUT USERNAME/PASSWORD/VERIFY_PASSWORD");
+            _ErrorMsg("PLEASE INPUT USERNAME/PASSWORD/VERIFY_PASSWORD");
             return 0;
         }
         PackUnamePasswd packUP;
@@ -271,7 +179,7 @@ gint Register_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 	        printf("you have been successfully registered");
         }
         else if(palr.successflag==USER_ALREADY_EXIST){
-            guio_ErrorMsg("User already exist, please login");
+            _ErrorMsg("User already exist, please login");
         }
 	    free(RecvBuf);
         printf("Trying to Register\n");
@@ -281,7 +189,7 @@ gint Register_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     }
 }
 
-int Register_menu()
+int _Register_menu()
 {
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
 
@@ -292,7 +200,7 @@ int Register_menu()
     gtk_layout_put(GTK_LAYOUT(layout), passwordEntry, U_P_VP_LEFT, PASSWD_TOP );
     gtk_layout_put(GTK_LAYOUT(layout), verifyPasswordEntry, U_P_VP_LEFT, VERIFY_PASSWD_TOP );
     
-    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Register_menu_callback),NULL); //connect signals from clicking the window to active the callback
+    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(_Register_menu_callback),NULL); //connect signals from clicking the window to active the callback
     gtk_widget_show_all(window); //shows the window to the user
     gdk_threads_leave();//after you finich calling gtk functions, call this
     while(LoginFlag==NOT_YET_REGISTER)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
@@ -311,8 +219,8 @@ int Register_menu()
 void LoginOrRegister()
 {
     while(LoginFlag!=LOGIN_SUCCESS&&LoginFlag!=REGISTER_SUCCESS){
-        if(LoginFlag==NOT_YET_LOGIN)Login_menu();
-        if(LoginFlag==NOT_YET_REGISTER)Register_menu();
+        if(LoginFlag==NOT_YET_LOGIN)_Login_menu();
+        if(LoginFlag==NOT_YET_REGISTER)_Register_menu();
     }
 }
 
@@ -325,7 +233,7 @@ extern int move_end;//end poing
 extern vector cur_legal_moves;//legal moves from current starting position
 
 //Draws and refresh the board
-void guio_DrawBoard(GameState *gamestate,int start_pt,vector legal_moves)
+void _guio_DrawBoard(GameState *gamestate,int start_pt,vector legal_moves)
 {
     table = gtk_table_new (8, 8, TRUE) ;
     gtk_widget_set_size_request (table, BOARD_WIDTH, BOARD_HEIGHT);
@@ -362,14 +270,14 @@ void guio_DrawBoard(GameState *gamestate,int start_pt,vector legal_moves)
 }
 
 //window coordinates to grid coordinates
-void guio_CoordToGrid(int c_x, int c_y, int *g_x, int *g_y)
+void _guio_CoordToGrid(int c_x, int c_y, int *g_x, int *g_y)
 {
         *g_x = (c_x - ONLINE_BOARD_LEFT) / SQUARE_SIZE;
         *g_y = (c_y - ONLINE_BOARD_UP) / SQUARE_SIZE;
 }
 
 //callback for gui play
-void guio_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
+void _guio_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
     int pixelX, pixelY, gridX, gridY, index, piece;
     GameState *gameState=(GameState*)data;
@@ -395,7 +303,7 @@ void guio_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
     if(pixelX<=BOARD_BORDER_LEFT||pixelX>=BOARD_BORDER_RIGHT||
         pixelY<=BOARD_BORDER_UP||pixelY>=BOARD_BORDER_DOWN)return;
 	//change pixel to xy coordinates
-	guio_CoordToGrid(pixelX, pixelY, &gridX, &gridY);
+	_guio_CoordToGrid(pixelX, pixelY, &gridX, &gridY);
     printf("gX:%d, gY:%d\n",gridX,gridY);
     int pos=gridY*8+gridX;
 
@@ -417,14 +325,14 @@ void guio_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
         if(check_legal_start)
         {
             gtk_container_remove(GTK_CONTAINER(layout), fixed);
-            guio_DrawBoard(gameState,pos,cur_legal_moves);
+            _guio_DrawBoard(gameState,pos,cur_legal_moves);
         }
         else
         {
             vector empty;
             vector_init(&empty);
             gtk_container_remove(GTK_CONTAINER(layout), fixed);
-            guio_DrawBoard(gameState,-1,empty);
+            _guio_DrawBoard(gameState,-1,empty);
         }
         
     }
@@ -458,7 +366,7 @@ int guio_play(GameState *gameState)
         return check;
     }
 	gdk_threads_enter();
-    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(guio_play_callback), gameState);
+    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(_guio_play_callback), gameState);
     gdk_threads_leave();
     while(check_ActionMade==0){
         sleep(1);
@@ -499,13 +407,13 @@ void guio_gameplay_window(GameState *gameState)
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
     // empty_container(window);
     
-    OnlinePlay_pixbuf=load_pixbuf_from_file(OnlinePlay_Background);
+    OnlinePlay_pixbuf=_load_pixbuf_from_file(OnlinePlay_Background);
     OnlinePlay_pixbuf=gdk_pixbuf_scale_simple(OnlinePlay_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);
     image = gtk_image_new_from_pixbuf(OnlinePlay_pixbuf);
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
     vector empty;
     vector_init(&empty);
-    guio_DrawBoard(gameState,-1,empty);
+    _guio_DrawBoard(gameState,-1,empty);
     gdk_threads_leave();
 
     //when mouse presses window callback (TBD)
@@ -520,7 +428,7 @@ void guio_refresh(GameState *gameState)
     
     vector empty;
     vector_init(&empty);
-    guio_DrawBoard(gameState,-1,empty);
+    _guio_DrawBoard(gameState,-1,empty);
 
     gdk_threads_leave();
 }

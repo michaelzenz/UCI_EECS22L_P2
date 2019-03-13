@@ -34,6 +34,8 @@ void init_connection2oppo(char *host, int port);
 
 char* sendToOppo(char* msg);
 
+void SendToOppoWithoutResponse(char *msg);
+
 void SendPlayAction2Oppo(uchar Action, char *msg, int start_pt,
         int end_pt, uchar promotion);
 

@@ -6,9 +6,9 @@
 #define xy21d(x,y) (y*8+x)//convert (x,y) coordinates in board to 1D coordinates
 
 //draws different player menu
-int gui_player_HvC_menu(Player* player_arr);
-int gui_player_HvH_menu(Player* player_arr);
-int gui_player_CvC_menu(Player* player_arr);
+int _player_HvC_menu(Player* player_arr);
+int _player_HvH_menu(Player* player_arr);
+int _player_CvC_menu(Player* player_arr);
 
 
 /*Global Variables */
@@ -47,7 +47,7 @@ char *CvC_Menu_path="res/CvC_Menu.png";
 int GameMode=0;
 
 //load .png and .jpg files to pixbuf
-GdkPixbuf *load_pixbuf_from_file (const char *filename)
+GdkPixbuf *_load_pixbuf_from_file (const char *filename)
 {
     GError *error = NULL;
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file (filename, &error);
@@ -63,7 +63,7 @@ GdkPixbuf *load_pixbuf_from_file (const char *filename)
 
 
 //the thread to show and render the window
-void gui_render()
+void _render()
 {
     gdk_threads_enter();
     gtk_main();
@@ -92,9 +92,9 @@ void gui_init_window(int argc, char*argv[])
 
     gdk_threads_init();
 #ifdef SUPEROLD
-	g_thread_create((GThreadFunc)gui_render,NULL,TRUE,NULL);
+	g_thread_create((GThreadFunc)_render,NULL,TRUE,NULL);
 #else
-    g_thread_new("render",(GThreadFunc)gui_render,NULL);
+    g_thread_new("render",(GThreadFunc)_render,NULL);
 #endif
 }
 
@@ -110,9 +110,9 @@ void gui_init_offline(GameState *gameState,Player player_arr[2]){
     int play;
 
     do{
-        if(GameMode==GameMode_HvC)play=gui_player_HvC_menu(player_arr);
-        else if(GameMode==GameMode_HvH)play=gui_player_HvH_menu(player_arr);
-        else if(GameMode==GameMode_CvC)play=gui_player_CvC_menu(player_arr);
+        if(GameMode==GameMode_HvC)play=_player_HvC_menu(player_arr);
+        else if(GameMode==GameMode_HvH)play=_player_HvH_menu(player_arr);
+        else if(GameMode==GameMode_CvC)play=_player_CvC_menu(player_arr);
 
     }while(play!=1);
 
@@ -126,7 +126,7 @@ void gui_init_offline(GameState *gameState,Player player_arr[2]){
 
 
 //Not used right now
-static gboolean on_delete_event (GtkWidget *widget, GdkEvent  *event, gpointer data)
+static gboolean _on_delete_event (GtkWidget *widget, GdkEvent  *event, gpointer data)
 {
     /* If you return FALSE in the "delete_event" signal handler,
     * GTK will emit the "destroy" signal. Returning TRUE means
@@ -142,7 +142,7 @@ static gboolean on_delete_event (GtkWidget *widget, GdkEvent  *event, gpointer d
 }
 
 //The callback for main menu window
-gint main_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
+gint _main_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 {
     int x, y;
     GdkModifierType state;
@@ -171,14 +171,14 @@ gint main_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 int gui_main_menu()
 {
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
-    main_menu_pixbuf=load_pixbuf_from_file(main_menu_path);
+    main_menu_pixbuf=_load_pixbuf_from_file(main_menu_path);
     main_menu_pixbuf=gdk_pixbuf_scale_simple(main_menu_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);
     
     image = gtk_image_new_from_pixbuf(main_menu_pixbuf);
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
 
     
-    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(main_menu_callback),NULL);
+    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(_main_menu_callback),NULL);
     gtk_widget_show_all(window);
     gdk_threads_leave();//after you finich calling gtk functions, call this
     while(GameMode==0)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
@@ -194,7 +194,7 @@ typedef struct _PlayerOptions{
 }PlayerOptions;
 
 
-gint HvC_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
+gint _HvC_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 {
     int x, y;
     GdkModifierType state;
@@ -226,19 +226,19 @@ gint HvC_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     if(x>71&&x<159&&y>472&&y<500)options->play=2;//BACK
 
 }
-int gui_player_HvC_menu(Player* player_arr)
+int _player_HvC_menu(Player* player_arr)
 {
     PlayerOptions options;
     options.player_arr=player_arr;
     options.play=0;
 
     gdk_threads_enter();
-    HvC_pixbuf=load_pixbuf_from_file(HvC_Menu_path);
+    HvC_pixbuf=_load_pixbuf_from_file(HvC_Menu_path);
     HvC_pixbuf=gdk_pixbuf_scale_simple(HvC_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);
     
     image = gtk_image_new_from_pixbuf(HvC_pixbuf);
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
-    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(HvC_menu_callback), &options);
+    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(_HvC_menu_callback), &options);
     gtk_widget_show_all(window);
     gdk_threads_leave();
     while(options.play==0)sleep(1);
@@ -248,7 +248,7 @@ int gui_player_HvC_menu(Player* player_arr)
     return options.play;
 }
 
-gint HvH_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
+gint _HvH_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 {
     int x, y;
     GdkModifierType state;
@@ -286,19 +286,19 @@ gint HvH_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     if(x>71&&x<159&&y>472&&y<500)options->play=2;//BACK
 }
 
-int gui_player_HvH_menu(Player* player_arr)
+int _player_HvH_menu(Player* player_arr)
 {
     PlayerOptions options;
     options.player_arr=player_arr;
     options.play=0;
 
     gdk_threads_enter();
-    HvH_pixbuf=load_pixbuf_from_file(HvH_Menu_path);
+    HvH_pixbuf=_load_pixbuf_from_file(HvH_Menu_path);
     HvH_pixbuf=gdk_pixbuf_scale_simple(HvH_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);
     
     image = gtk_image_new_from_pixbuf(HvH_pixbuf);
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
-    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(HvH_menu_callback), &options);
+    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(_HvH_menu_callback), &options);
     gtk_widget_show_all(window);
     gdk_threads_leave();
     while(options.play==0)sleep(1);
@@ -307,7 +307,7 @@ int gui_player_HvH_menu(Player* player_arr)
     gdk_threads_leave();
     return options.play;
 }
-gint CvC_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
+gint _CvC_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 {
     int x, y;
     GdkModifierType state;
@@ -340,7 +340,7 @@ gint CvC_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
 
     if(x>71&&x<159&&y>472&&y<500)options->play=2;//BACK
 }
-int gui_player_CvC_menu(Player* player_arr)
+int _player_CvC_menu(Player* player_arr)
 {
 
     PlayerOptions options;
@@ -348,12 +348,12 @@ int gui_player_CvC_menu(Player* player_arr)
     options.play=0;
 
     gdk_threads_enter();
-    CvC_pixbuf=load_pixbuf_from_file(CvC_Menu_path);
+    CvC_pixbuf=_load_pixbuf_from_file(CvC_Menu_path);
     CvC_pixbuf=gdk_pixbuf_scale_simple(CvC_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);
 
     image = gtk_image_new_from_pixbuf(CvC_pixbuf);
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
-    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(CvC_menu_callback), &options);
+    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(_CvC_menu_callback), &options);
     gtk_widget_show_all(window);
     gdk_threads_leave();
     while(options.play==0)sleep(1);
@@ -363,7 +363,7 @@ int gui_player_CvC_menu(Player* player_arr)
     return options.play;
 }
 
-void DrawLog (){
+void _DrawLog (){
 //Still needs to pass the parameters to know what moves have been done
 
 //create a log
@@ -379,11 +379,11 @@ void DrawLog (){
     gtk_container_add (GTK_CONTAINER (scrolled_window), text_view);
     gtk_container_set_border_width (GTK_CONTAINER (scrolled_window), 2);
     gtk_container_add (GTK_CONTAINER (layout), scrolled_window);
-//end DrawLog
+//end _DrawLog
 }
 
 //Draws and refresh the board
-void DrawBoard(GameState *gamestate,int start_pt,vector legal_moves)
+void _DrawBoard(GameState *gamestate,int start_pt,vector legal_moves)
 {
     table = gtk_table_new (8, 8, TRUE) ;
     gtk_widget_set_size_request (table, BOARD_WIDTH, BOARD_HEIGHT);
@@ -412,7 +412,7 @@ void DrawBoard(GameState *gamestate,int start_pt,vector legal_moves)
         chess_icon=gtk_image_new_from_file(path);
         gtk_table_attach(GTK_TABLE(table), chess_icon, x, x+1, y, y+1, GTK_FILL, GTK_FILL, 0, 0);
     }
-    DrawLog();
+    //_DrawLog();
     fixed = gtk_fixed_new();
     gtk_fixed_put(GTK_FIXED(fixed), table, BOARD_BORDER_LEFT, BOARD_BORDER_UP);
     gtk_container_add(GTK_CONTAINER(layout), fixed);
@@ -420,7 +420,7 @@ void DrawBoard(GameState *gamestate,int start_pt,vector legal_moves)
 }
 
 //window coordinates to grid coordinates
-void CoordToGrid(int c_x, int c_y, int *g_x, int *g_y)
+void _CoordToGrid(int c_x, int c_y, int *g_x, int *g_y)
 {
         *g_x = (c_x - BOARD_BORDER_LEFT) / SQUARE_SIZE;
         *g_y = (c_y - BOARD_BORDER_UP) / SQUARE_SIZE;
@@ -432,13 +432,13 @@ void gui_gameplay_window(GameState *gameState)
 	/*create a table and draw the board*/
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
     
-    Background_pixbuf=load_pixbuf_from_file(Background_path);
+    Background_pixbuf=_load_pixbuf_from_file(Background_path);
     Background_pixbuf=gdk_pixbuf_scale_simple(Background_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);
     image = gtk_image_new_from_pixbuf(Background_pixbuf);
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
     vector empty;
     vector_init(&empty);
-    DrawBoard(gameState,-1,empty);
+    _DrawBoard(gameState,-1,empty);
     
     gdk_threads_leave();
 
@@ -453,7 +453,7 @@ int move_end=-1;//end poing
 vector cur_legal_moves;//legal moves from current starting position
 
 //callback for gui play
-void gui_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
+void _gui_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
     int pixelX, pixelY, gridX, gridY, index, piece;
     GameState *gameState=(GameState*)data;
@@ -479,7 +479,7 @@ void gui_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
     if(pixelX<=BOARD_BORDER_LEFT||pixelX>=BOARD_BORDER_RIGHT||
         pixelY<=BOARD_BORDER_UP||pixelY>=BOARD_BORDER_DOWN)return;
 	//change pixel to xy coordinates
-	CoordToGrid(pixelX, pixelY, &gridX, &gridY);
+	_CoordToGrid(pixelX, pixelY, &gridX, &gridY);
     printf("gX:%d, gY:%d\n",gridX,gridY);
     int pos=gridY*8+gridX;
 
@@ -501,14 +501,14 @@ void gui_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
         if(check_legal_start)
         {
             gtk_container_remove(GTK_CONTAINER(layout), fixed);
-            DrawBoard(gameState,pos,cur_legal_moves);
+            _DrawBoard(gameState,pos,cur_legal_moves);
         }
         else
         {
             vector empty;
             vector_init(&empty);
             gtk_container_remove(GTK_CONTAINER(layout), fixed);
-            DrawBoard(gameState,-1,empty);
+            _DrawBoard(gameState,-1,empty);
         }
         
     }
@@ -541,7 +541,7 @@ int gui_play(GameState *gameState,Player *player)
         return check;
     }
 	gdk_threads_enter();
-    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(gui_play_callback), gameState);
+    gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(_gui_play_callback), gameState);
     gdk_threads_leave();
     while(check_ActionMade==0){
         sleep(1);
@@ -595,7 +595,7 @@ void gui_refresh(GameState *gameState,Player *player_arr)
     
     vector empty;
     vector_init(&empty);
-    DrawBoard(gameState,-1,empty);
+    _DrawBoard(gameState,-1,empty);
 
     gdk_threads_leave();
 }
@@ -604,14 +604,16 @@ void gui_refresh(GameState *gameState,Player *player_arr)
 void gui_checkmate_window(GameState *gameState, int quit)
 {
   /*register event handlers*/
-//   g_signal_connect(window, "delete_event", G_CALLBACK(on_delete_event), NULL) ;
+//   g_signal_connect(window, "delete_event", G_CALLBACK(_on_delete_event), NULL) ;
     int colorID=MAX(gameState->playerTurn,0);
     char EndMessage[20];
     memset(EndMessage,'\0',sizeof(EndMessage));
     if(quit==ACTION_PLAY) strcat(EndMessage,str_color[colorID]);
     else if(quit==ACTION_UNDO) strcat(EndMessage,str_color[colorID]);
     strcat(EndMessage," WINS!!!");
-    printf("%s\n",EndMessage);
+    gdk_threads_enter();
+    _InformMsg(EndMessage);
+    gdk_threads_leave();
 }
 
 

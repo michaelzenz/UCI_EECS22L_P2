@@ -118,7 +118,6 @@ void _SendToOppoWithoutResponse(char* msg)
 
     free(fullRecvBuf);
     close(SocketFD);
-    return fullRecvBuf;
 }
 
 void SendToOppoWithoutResponse(char *msg)
