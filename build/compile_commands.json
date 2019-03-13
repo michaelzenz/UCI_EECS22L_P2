@@ -1,0 +1,72 @@
+[
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/gio-unix-2.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/x86_64-linux-gnu/freetype2  -std=c99  -g   -o CMakeFiles/kchat-client.dir/src/jsmn.c.o   -c /home/armando/Desktop/project/kchat-client/src/jsmn.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/jsmn.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/gio-unix-2.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/x86_64-linux-gnu/freetype2  -std=c99  -g   -o CMakeFiles/kchat-client.dir/src/stack.c.o   -c /home/armando/Desktop/project/kchat-client/src/stack.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/stack.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/gio-unix-2.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/x86_64-linux-gnu/freetype2  -std=c99  -g   -o CMakeFiles/kchat-client.dir/src/encode.c.o   -c /home/armando/Desktop/project/kchat-client/src/encode.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/encode.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/gio-unix-2.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/x86_64-linux-gnu/freetype2  -std=c99  -g   -o CMakeFiles/kchat-client.dir/src/ENV.c.o   -c /home/armando/Desktop/project/kchat-client/src/ENV.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/ENV.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/gio-unix-2.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/x86_64-linux-gnu/freetype2  -std=c99  -g   -o CMakeFiles/kchat-client.dir/src/GUIO.c.o   -c /home/armando/Desktop/project/kchat-client/src/GUIO.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/GUIO.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/gio-unix-2.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/x86_64-linux-gnu/freetype2  -std=c99  -g   -o CMakeFiles/kchat-client.dir/src/decode.c.o   -c /home/armando/Desktop/project/kchat-client/src/decode.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/decode.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/gio-unix-2.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/x86_64-linux-gnu/freetype2  -std=c99  -g   -o CMakeFiles/kchat-client.dir/src/GUI.c.o   -c /home/armando/Desktop/project/kchat-client/src/GUI.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/GUI.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/gio-unix-2.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/x86_64-linux-gnu/freetype2  -std=c99  -g   -o CMakeFiles/kchat-client.dir/src/vector.c.o   -c /home/armando/Desktop/project/kchat-client/src/vector.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/vector.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/gio-unix-2.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/x86_64-linux-gnu/freetype2  -std=c99  -g   -o CMakeFiles/kchat-client.dir/src/main.c.o   -c /home/armando/Desktop/project/kchat-client/src/main.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/main.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include -I/usr/include/gtk-2.0 -I/usr/lib/x86_64-linux-gnu/gtk-2.0/include -I/usr/include/gio-unix-2.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/atk-1.0 -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/freetype2 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/x86_64-linux-gnu/freetype2  -std=c99  -g   -o CMakeFiles/kchat-client.dir/src/connection.c.o   -c /home/armando/Desktop/project/kchat-client/src/connection.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/connection.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build/src/AI",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include  -std=c99  -g   -o CMakeFiles/AI_LIB.dir/AI_Aux.c.o   -c /home/armando/Desktop/project/kchat-client/src/AI/AI_Aux.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/AI/AI_Aux.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build/src/AI",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include  -std=c99  -g   -o CMakeFiles/AI_LIB.dir/AI_model3.c.o   -c /home/armando/Desktop/project/kchat-client/src/AI/AI_model3.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/AI/AI_model3.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build/src/AI",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include  -std=c99  -g   -o CMakeFiles/AI_LIB.dir/AI_model2.c.o   -c /home/armando/Desktop/project/kchat-client/src/AI/AI_model2.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/AI/AI_model2.c"
+},
+{
+  "directory": "/home/armando/Desktop/project/kchat-client/build/src/AI",
+  "command": "/usr/bin/gcc  -DDEBUG -DSUPEROLD -I/home/armando/Desktop/project/kchat-client/include  -std=c99  -g   -o CMakeFiles/AI_LIB.dir/AI_model1.c.o   -c /home/armando/Desktop/project/kchat-client/src/AI/AI_model1.c",
+  "file": "/home/armando/Desktop/project/kchat-client/src/AI/AI_model1.c"
+}
+]

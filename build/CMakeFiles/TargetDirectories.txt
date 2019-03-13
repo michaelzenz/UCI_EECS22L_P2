@@ -1,0 +1,9 @@
+/home/armando/Desktop/project/kchat-client/build/CMakeFiles/test.dir
+/home/armando/Desktop/project/kchat-client/build/CMakeFiles/kchat-client.dir
+/home/armando/Desktop/project/kchat-client/build/CMakeFiles/tar.dir
+/home/armando/Desktop/project/kchat-client/build/CMakeFiles/rebuild_cache.dir
+/home/armando/Desktop/project/kchat-client/build/CMakeFiles/edit_cache.dir
+/home/armando/Desktop/project/kchat-client/build/src/AI/CMakeFiles/test.dir
+/home/armando/Desktop/project/kchat-client/build/src/AI/CMakeFiles/edit_cache.dir
+/home/armando/Desktop/project/kchat-client/build/src/AI/CMakeFiles/rebuild_cache.dir
+/home/armando/Desktop/project/kchat-client/build/src/AI/CMakeFiles/AI_LIB.dir

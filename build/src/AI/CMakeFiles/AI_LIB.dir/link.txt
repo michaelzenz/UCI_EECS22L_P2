@@ -1,0 +1,2 @@
+/usr/bin/ar qc libAI_LIB.a  CMakeFiles/AI_LIB.dir/AI_Aux.c.o CMakeFiles/AI_LIB.dir/AI_model3.c.o CMakeFiles/AI_LIB.dir/AI_model2.c.o CMakeFiles/AI_LIB.dir/AI_model1.c.o
+/usr/bin/ranlib libAI_LIB.a
