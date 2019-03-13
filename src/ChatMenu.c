@@ -4,10 +4,11 @@
 extern int PlayBetweenServerPort;
 extern vectorStr FriendsList;
 extern OnlinePlayer remotePlayer;
-
+GtkWidget *friendwindow;
 extern GtkWidget *window;
 extern GtkWidget *image;
 extern GtkWidget *layout;//the layout to put on background and contain fixed widget
+GtkWidget *Friendentry;
 
 //for chat menu
 extern bool isPlayingWithOpponent;
@@ -32,6 +33,9 @@ GtkWidget *MsgTextView;
 GtkWidget *SendButton;
 GtkWidget *RMpageButton;
 GtkWidget *ChallengeButton;
+GtkWidget *AddFriendButton;
+GtkWidget *DeleteFriendButton;
+GtkWidget *layout2;
 
 bool ChatMenuInitialized=false;
 //!for chat menu
@@ -111,8 +115,29 @@ void guio_CHAT_send_msg()
 void guio_addfriend(char *UserName)
 {
     GtkTreeIter   iter;
+    GtkWidget *addbutton;
+    
     gtk_list_store_append(guioFriendListStore, &iter);
     gtk_list_store_set(guioFriendListStore,&iter, 0, UserName,-1);
+    friendwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(friendwindow), "Add Friend");
+    gtk_window_set_default_size(GTK_WINDOW(friendwindow), 320, 200);
+    layout2=gtk_fixed_new();
+     Friendentry=gtk_entry_new();
+    addbutton = gtk_button_new_with_label("Add");
+    gtk_fixed_put(layout2,addbutton,150,100);
+    gtk_container_add(GTK_CONTAINER(friendwindow), layout2);
+
+   gtk_container_add(GTK_CONTAINER(friendwindow), Friendentry);
+
+   gtk_widget_show_all(friendwindow);
+}
+void guio(char *UserName)
+{
+    GtkTreeIter   iter;
+    gtk_list_store_append(guioFriendListStore, &iter);
+    gtk_list_store_set(guioFriendListStore,&iter, 0, UserName,-1);
+    
 }
 
 void guio_addUnkown(char *UserName)
@@ -272,6 +297,18 @@ void InitChatMenu()
                             (GtkSignalFunc) guio_challenge,
                             NULL);
 
+    AddFriendButton = gtk_button_new_with_label ("Add Friend");
+    gtk_widget_set_size_request (AddFriendButton, CHALLENGE_BUTTON_WIDTH, CHALLENGE_BUTTON_HEIGHT);
+    gtk_signal_connect_object (GTK_OBJECT (AddFriendButton), "clicked",
+                            (GtkSignalFunc) guio_addfriend,
+                            NULL);
+
+    DeleteFriendButton = gtk_button_new_with_label ("Delete Friend");
+    gtk_widget_set_size_request (DeleteFriendButton, CHALLENGE_BUTTON_WIDTH, CHALLENGE_BUTTON_HEIGHT);
+    gtk_signal_connect_object (GTK_OBJECT (DeleteFriendButton), "clicked",
+                            (GtkSignalFunc) guio_challenge,
+                            NULL);
+
     gtk_fixed_put(GTK_FIXED(NoteBookFixed), SendButton, CHAT_BUTTON_LEFT, SEND_BUTTON_TOP);
     gtk_fixed_put(GTK_FIXED(NoteBookFixed), RMpageButton, CHAT_BUTTON_LEFT, RMPAGE_BUTTON_TOP);
 
@@ -322,6 +359,9 @@ void Chats_menu()
     gtk_layout_put(GTK_LAYOUT(layout), FriendTreeNotebook, FRIEND_LIST_LEFT, FRIEND_LIST_TOP);
     gtk_layout_put(GTK_LAYOUT(layout), ChatMenuScroll, 20, 40);
     gtk_layout_put(GTK_LAYOUT(layout), ChallengeButton, CHALLENGE_BUTTON_LEFT, CHALLENGE_BUTTON_TOP);
+    gtk_layout_put(GTK_LAYOUT(layout), AddFriendButton, ADDFRIEND_BUTTON_LEFT, ADDFRIEND_BUTTON_TOP);
+    gtk_layout_put(GTK_LAYOUT(layout), DeleteFriendButton, DELETEFRIEND_BUTTON_LEFT, DELETEFRIEND_BUTTON_TOP);
+
 
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(Chats_menu_callback),NULL);  //connect signals from clicking the window to active the callback
 
@@ -335,9 +375,13 @@ void Chats_menu()
     g_object_ref(FriendTreeNotebook);
     g_object_ref(ChatMenuScroll);
     g_object_ref(ChallengeButton);
+    g_object_ref(AddFriendButton);
+    g_object_ref(DeleteFriendButton);
     gtk_container_remove(GTK_CONTAINER(layout),FriendTreeNotebook);
     gtk_container_remove(GTK_CONTAINER(layout),ChatMenuScroll);
     gtk_container_remove(GTK_CONTAINER(layout),ChallengeButton);
+    gtk_container_remove(GTK_CONTAINER(layout),AddFriendButton);
+    gtk_container_remove(GTK_CONTAINER(layout),DeleteFriendButton);
     g_signal_handler_disconnect(window,handlerID);
     gdk_threads_leave();
 }

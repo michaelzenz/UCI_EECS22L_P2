@@ -143,7 +143,7 @@ void initLoginRegister(){
     verifyPasswordEntry= gtk_entry_new();  // creates a text entry for verify password
     gtk_entry_set_visibility(GTK_ENTRY(passwordEntry), FALSE);
     gtk_entry_set_invisible_char (GTK_ENTRY (passwordEntry), '*');
-        gtk_entry_set_visibility(GTK_ENTRY(verifyPasswordEntry), FALSE);  //makes text entered not be readable
+    gtk_entry_set_visibility(GTK_ENTRY(verifyPasswordEntry), FALSE);  //makes text entered not be readable
     gtk_entry_set_invisible_char (GTK_ENTRY (verifyPasswordEntry), '*');  //replaces letters with *
 }
 
