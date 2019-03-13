@@ -15,9 +15,6 @@ GtkWidget *passwordEntry, *verifyPasswordEntry;
 
 bool isLoginRegisterInitialized=false;
 
-
-
-
 //the pixbuf to load image and resize from a .jpg or .png file
 GdkPixbuf *Login_pixbuf = NULL;
 GdkPixbuf *Register_pixbuf = NULL;
@@ -60,30 +57,79 @@ void empty_container(GtkWidget *container)
 void guio_ErrorMsg(char *msg)
 {
     GtkWidget *dialog;
-    dialog = gtk_message_dialog_new (NULL,
-                                 GTK_DIALOG_DESTROY_WITH_PARENT,
-                                 GTK_MESSAGE_ERROR,
-                                 GTK_BUTTONS_CLOSE,
-                                 "%s",
-                                 msg);
+    dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+                                 GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
+                                 "%s", msg);
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
 }
 
+void guio_InformMsg(char *msg)
+{
+    GtkWidget *dialog;
+    dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+                                 GTK_MESSAGE_OTHER, GTK_BUTTONS_CLOSE,
+                                 "%s", msg);
+    gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
+}
 
 //Only ask yes and no
 bool guio_AskQuestion(char *msg)
 {
     GtkWidget *dialog;
-    dialog = gtk_message_dialog_new (NULL,
-                                 GTK_DIALOG_DESTROY_WITH_PARENT,
-                                 GTK_MESSAGE_OTHER,
-                                 GTK_BUTTONS_YES_NO,
-                                 "%s",
-                                 msg);
+    dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+                                 GTK_MESSAGE_OTHER, GTK_BUTTONS_YES_NO,
+                                 "%s", msg);
     bool ret=gtk_dialog_run (GTK_DIALOG (dialog))==GTK_RESPONSE_YES;
     gtk_widget_destroy (dialog);
     return ret;
+}
+
+GtkWidget *waitActionDialog=NULL;
+WaitUserActionCallback waitUserActionCallback;
+
+void waitUserActionResponseHandler (void* pdata)
+{
+    waitUserActionCallback(pdata);
+    gtk_widget_destroy(waitActionDialog);
+}
+
+void guio_waitUserActionWithCallback(char *msg, WaitUserActionCallback callback, void *pdata)
+{
+    waitUserActionCallback=callback;
+    waitActionDialog = gtk_message_dialog_new (NULL,
+                                 GTK_DIALOG_DESTROY_WITH_PARENT,
+                                 GTK_MESSAGE_OTHER,
+                                 GTK_BUTTONS_CANCEL,
+                                 "%s",
+                                 msg);
+    g_signal_connect_swapped (waitActionDialog, "response",
+                          G_CALLBACK (waitUserActionResponseHandler),
+                          pdata);
+    //gtk_container_add(GTK_CONTAINER(waitActionDialogWindow), waitActionDialog);
+    gtk_widget_show(waitActionDialog);
+}
+
+void guio_waitUserAction(char *msg)
+{
+    waitActionDialog = gtk_message_dialog_new (NULL,
+                                 GTK_DIALOG_DESTROY_WITH_PARENT,
+                                 GTK_MESSAGE_OTHER,
+                                 GTK_BUTTONS_CANCEL,
+                                 "%s",
+                                 msg);
+    g_signal_connect_swapped (waitActionDialog, "response",
+                          G_CALLBACK (gtk_widget_destroy),
+                          waitActionDialog);
+    //gtk_container_add(GTK_CONTAINER(waitActionDialogWindow), waitActionDialog);
+    gtk_widget_show(waitActionDialog);
+}
+
+void guio_removeWaitActionDialog()
+{
+    if(waitActionDialog!=NULL)
+        gtk_widget_destroy(waitActionDialog);
 }
 
 void initLoginRegister(){
@@ -149,6 +195,7 @@ gint Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
     else if(x>613&&x<747&&y>350&&y<380)
     {
         printf("Register");
+        guio_waitUserAction("test");
         LoginFlag=NOT_YET_REGISTER;
     }
 }
@@ -162,7 +209,6 @@ int Login_menu()
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
     image = gtk_image_new_from_pixbuf(Login_pixbuf);
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);
-
     gtk_layout_put(GTK_LAYOUT(layout), usernameEntry, U_P_VP_LEFT, USERNAME_TOP );
     gtk_layout_put(GTK_LAYOUT(layout), passwordEntry, U_P_VP_LEFT, PASSWD_TOP );
 
@@ -172,6 +218,8 @@ int Login_menu()
     while(LoginFlag==NOT_YET_LOGIN)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
     gdk_threads_enter();//again, you know what I am gonna say
     g_signal_handler_disconnect(window,handlerID);
+    g_object_ref(usernameEntry);
+    g_object_ref(passwordEntry);
     gtk_container_remove(GTK_CONTAINER(layout),usernameEntry);
     gtk_container_remove(GTK_CONTAINER(layout),passwordEntry);
     gdk_threads_leave();
@@ -250,6 +298,9 @@ int Register_menu()
     while(LoginFlag==NOT_YET_REGISTER)sleep(1);//must call sleep to release some cpu resources for gtk thread to run
     gdk_threads_enter();//again, you know what I am gonna say
     g_signal_handler_disconnect(window,handlerID); //disconnects the signals from clicking
+    g_object_ref(usernameEntry);
+    g_object_ref(passwordEntry);
+    g_object_ref(verifyPasswordEntry);
     gtk_container_remove(GTK_CONTAINER(layout),verifyPasswordEntry);
     gtk_container_remove(GTK_CONTAINER(layout),usernameEntry);
     gtk_container_remove(GTK_CONTAINER(layout),passwordEntry);
@@ -331,12 +382,12 @@ void guio_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
 
 
     printf("pX: %d, pY: %d\n",pixelX,pixelY);
-    if(pixelX>=842&&pixelX<=940&&pixelY>=66&&pixelY<=95)
+    if(pixelX>=821&&pixelX<=894&&pixelY>=474&&pixelY<=498)
     {
         check_ActionMade=ACTION_UNDO;
         return;
     }
-    if(pixelX>=852&&pixelX<=931&&pixelY>=117&&pixelY<=149)
+    if(pixelX>=64&&pixelX<=132&&pixelY>=476&&pixelY<=497)
     {
         check_ActionMade=ACTION_QUIT;
         return;
@@ -427,8 +478,10 @@ int guio_play(GameState *gameState)
         env_undo(gameState);
         SendPlayAction2Oppo(PLAYBETWEEN_UNDO,"",move_start,move_end,BLANK);
     }
-    else if(check_ActionMade==ACTION_QUIT)
+    else if(check_ActionMade==ACTION_QUIT){
         check= ACTION_QUIT;
+        SendToOppoWithoutResponse(PLAYBETWEEN_USER_QUIT);
+    }
     move_start=-1;
     move_start=-1;
     check_legal_start=0;
@@ -453,7 +506,6 @@ void guio_gameplay_window(GameState *gameState)
     vector empty;
     vector_init(&empty);
     guio_DrawBoard(gameState,-1,empty);
-    
     gdk_threads_leave();
 
     //when mouse presses window callback (TBD)

@@ -98,7 +98,16 @@ int gui_main_menu();
 
 void guio_ErrorMsg(char *msg);
 
+void guio_InformMsg(char *msg);
+
 bool guio_AskQuestion(char *msg);
+
+void guio_waitUserAction(char *msg);
+
+typedef void(*WaitUserActionCallback)(void*);
+void guio_waitUserActionWithCallback(char *msg, WaitUserActionCallback callback, void *pdata);
+
+void guio_removeWaitActionDialog();
 
 /*********************/
 //Offline

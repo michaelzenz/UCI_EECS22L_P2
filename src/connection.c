@@ -3,18 +3,20 @@
 #include"msgChat.h"
 #include"GUI.h"
 
+//everything to do with server is in this file
+
 extern const char *Program;
 char *UserName;
 int QueryPort;
 vectorStr FriendsList;
 
-struct sockaddr_in ServerAddress;	/* server address we connect with */
+struct sockaddr_in ServerAddress;//for user port	/* server address we connect with */
 int ServerPort;
 struct hostent *Server;
 
 char Host[15];
 
-struct sockaddr_in ServerAddressQport;
+struct sockaddr_in ServerAddressQport;//for qport
 struct hostent *ServerQport;
 
 pthread_t QueryTaskID;
@@ -23,14 +25,16 @@ bool MutexInitialized=false;
 
 bool StopQuery=false;
 
-extern int PlayBetweenServerPort;
+extern int PlayBetweenServerPort;//for client to client
 extern OnlinePlayer localPlayer, remotePlayer;
 bool isPlayingWithOpponent=false;
+bool isWaitingChallengeRespose=false;
 
 //WARNING: the char* that this function returns must be free
 //Otherwise there will be memory leak
 //WARNING2: this function only reads a full json string
 //other that json string must not be longer that BUFFERSIZE
+//read whatever you receive
 char* readFullBuffer(int DataSocketFD)
 {
     int LastReadLen;
@@ -77,6 +81,9 @@ char* readFullBuffer(int DataSocketFD)
 WARNING: the RecvBuf must be NULL to store the full buffer
 and the char* that this function returns must be free
 otherwise there will be memory leak*/
+//WARNING: the char* that this function returns must be free
+//Otherwise there will be memory leak
+//send to server user port
 char* sendToServer(char* msg)
 {
     if(!MutexInitialized){
@@ -118,7 +125,7 @@ char* sendToServer(char* msg)
     printf("%s: Closing the connection...\n", Program);
 #endif
 
-    // free(fullRecvBuf);
+    //free(fullRecvBuf);
     close(SocketFD);
     //pthread_mutex_unlock(&mutex);
 
@@ -129,6 +136,7 @@ char* sendToServer(char* msg)
 WARNING: the RecvBuf must be NULL to store the full buffer
 and the char* that this function returns must be free
 otherwise there will be memory leak*/
+//send to server qport
 char* sendToServerQport(char* msg)
 {
     if(!MutexInitialized){
@@ -218,30 +226,53 @@ void init_connection2qport()
     ServerAddressQport.sin_port = htons(QueryPort);
     ServerAddressQport.sin_addr = *(struct in_addr*)ServerQport->h_addr_list[0];
 }
+void stopWaitingForResponse(void *pdata){
+    isWaitingChallengeRespose=false;
+}
 
+//
 void handlePAQ(PackAnswerQuery paq)
 {
-    if(strlen(paq.challenger)>0){
+    if(!isWaitingChallengeRespose&&strlen(paq.challenger)>0){
         init_connection2oppo(paq.opponentHost,paq.opponentPort);
         if(!strcmp(UserName,paq.challenger)){
-            remotePlayer.color=WHITE;
-            localPlayer.color=BLACK;
-            isPlayingWithOpponent=true;
+            printf("got opponent server, wait for response\n");
+            isWaitingChallengeRespose=true;
+            //gdk_threads_enter();
+            guio_waitUserActionWithCallback("Waiting for the opponent to accept challenge",
+                stopWaitingForResponse, NULL);
+            //gdk_threads_leave();
+            
         }
         else{
             char question[70];
             sprintf(question,
                 "%s wants to challenge you, do you want to accept?",paq.challenger);
             gdk_threads_enter();
-            isPlayingWithOpponent=guio_AskQuestion(question);
+            bool acceptChallenge=guio_AskQuestion(question);
             gdk_threads_leave();
-            sprintf(question,"Do you want to play as WHITE?");
-            gdk_threads_enter();
-            bool LocalIsWhite=guio_AskQuestion(question);
-            gdk_threads_leave();
-            strcpy(remotePlayer.UserName,paq.challenger);
-            remotePlayer.color=LocalIsWhite?BLACK:WHITE;
-            localPlayer.color=LocalIsWhite?WHITE:BLACK;
+            if(acceptChallenge){
+                gdk_threads_enter();
+                bool LocalIsWhite=guio_AskQuestion("Do you want to play as WHITE?");
+                gdk_threads_leave();
+                char *recvFromOppo=NULL;
+                if(LocalIsWhite)recvFromOppo=sendToOppo("iChooseColor:w");
+                else recvFromOppo=sendToOppo("iChooseColor:b");
+                if(!strcmp(recvFromOppo,CHALLENGE_IS_CANCELED)){
+                    gdk_threads_enter();
+                    guio_InformMsg("Your Opponent has canceled the challenge");
+                    gdk_threads_leave();
+                }
+                else if(!strcmp(COLOR_SELECTION_RECEIVED,recvFromOppo)){
+                    strcpy(remotePlayer.UserName,paq.challenger);
+                    remotePlayer.color=LocalIsWhite?BLACK:WHITE;
+                    localPlayer.color=LocalIsWhite?WHITE:BLACK;
+                    isPlayingWithOpponent=true;
+                }
+                else
+                    FatalError("Your Opponent fail to receive your color selection\n");
+                if(recvFromOppo!=NULL)free(recvFromOppo);
+            }
         }
     }
 
@@ -314,6 +345,7 @@ void ChallengeUser(char *dstUser)
     char str_pq[MAX_PQ_SIZE];
     encodePackQuery(str_pq,&pq);
     char *fullBuf=sendToServerQport(str_pq);
+    printf("%s\n",fullBuf);
     PackAnswerQuery paq=decodeStrPAQ(fullBuf);
 
     handlePAQ(paq);

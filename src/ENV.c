@@ -48,6 +48,18 @@ void env_free_GameState(GameState *gameState)
     stack_free(&gameState->moves_stack);
 }
 
+void env_reset_GameState(GameState *gameState)
+{
+    env_free_container(gameState);
+    stack_free(&gameState->moves_stack);
+    gameState->playerTurn=WHITE;
+    gameState->castling_arr[PLAYER1].Left=gameState->castling_arr[PLAYER1].Right=0;
+    gameState->castling_arr[PLAYER2].Left=gameState->castling_arr[PLAYER2].Right=0;
+    gameState->moves_vector_cnt=0;
+    memcpy(gameState->board,initial_board,sizeof(int)*64);
+    gameState->moves_stack=NULL;
+}
+
 //play on the gameState by the player
 void env_play(GameState *gameState, Player *player, int start_pt, int end_pt)
 {

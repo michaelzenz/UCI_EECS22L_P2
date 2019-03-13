@@ -10,6 +10,7 @@ extern const char *Program;//the name of program
 extern char *UserName;
 extern OnlinePlayer localPlayer, remotePlayer;
 extern vectorStr FriendsList;
+extern bool isPlayingWithOpponent;
 
 #define MODEL 1
 
@@ -140,13 +141,13 @@ void testCodec()
 void GameOnline(int argc, char *argv[])
 {
 
-    // testCodec();
+    // testCodec(); 
 
     GameState gameState=env_init();
     OnlinePlayCallback onlineCallback={&gameState};
 
     //end of test code insertion
-    int portNb=InitPlayBetweenServer(&onlineCallback);
+    int portNb=InitPlayBetweenServer(&onlineCallback);//inits the local server
 
     if (argc < 3)
     {   
@@ -157,43 +158,48 @@ void GameOnline(int argc, char *argv[])
 
     LoginOrRegister();
 
-    msgChat_init();
+    msgChat_init();//for message map
     int friendNb=vectorStr_count(&FriendsList);
     char temp[MAX_USERNAME_LEN];
     for(int i=0;i<friendNb;i++){
         msgChat_addUser(vectorStr_get(&FriendsList,i,temp),true);
     }
 
-    
-
     init_connection2qport();
 
-    InitQueryTimeredTask();
+    InitQueryTimeredTask();//starts a new thread that do routine query to server
 
-    Chats_menu();
+    while(true){
+        
+        Chats_menu();//opens the chat menu
 
-    strcpy(localPlayer.UserName,UserName);
+        strcpy(localPlayer.UserName,UserName);
+        guio_gameplay_window(&gameState);
 
-    guio_gameplay_window(&gameState);
-
-    int quit=0;
-    while(quit==0){
-        quit=onlinePlay(&gameState);
-        print_stack_log(&(gameState.moves_stack));
-        if(quit==CUR_PLAYER_LOSE||quit==CUR_PLAYER_WIN)
-        {
-            guio_refresh(&gameState);
-            gui_checkmate_window(&gameState,quit);
-            return;
+        int quit=0;
+        while(quit==0){
+            if(!isPlayingWithOpponent)break;
+            quit=onlinePlay(&gameState);
+            print_stack_log(&(gameState.moves_stack));
+            if(quit==CUR_PLAYER_LOSE||quit==CUR_PLAYER_WIN)
+            {
+                guio_refresh(&gameState);
+                gui_checkmate_window(&gameState,quit);
+                isPlayingWithOpponent=false;
+                break;
+            }
+            else if(quit==QUIT)
+            {
+                isPlayingWithOpponent=false;
+                break;
+            }
+            else guio_refresh(&gameState);
         }
-        else if(quit==QUIT)
-        {
-            return;
-        }
-        else guio_refresh(&gameState);
+        env_reset_GameState(&gameState);
     }
+    
 
-    int hit=1;
+
     env_free_GameState(&gameState);
 }
 

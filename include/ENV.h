@@ -16,6 +16,9 @@
 //initialize the GameState
 GameState env_init();
 
+//reset gameState
+void env_reset_GameState(GameState *gameState);
+
 //free up the memory of the container
 void env_free_container(GameState *gameState);
 

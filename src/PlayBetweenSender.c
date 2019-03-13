@@ -18,9 +18,7 @@ extern bool isPlayingWithOpponent;
 //open socket and record the server address
 void init_connection2oppo(char *host, int port)
 {
-#ifdef PRINT_LOG
-    printf("%s: Starting...\n", Program);
-#endif
+    printf("Start initing connection to host:%s, port:%d\n", host,port);
 
     OppoServer = gethostbyname(host);
     if (OppoServer == NULL)
@@ -81,6 +79,52 @@ char* sendToOppo(char* msg)
     // free(fullRecvBuf);
     close(SocketFD);
     return fullRecvBuf;
+}
+
+void _SendToOppoWithoutResponse(char* msg)
+{
+    int n;
+    int SocketFD;
+
+    SocketFD = socket(AF_INET, SOCK_STREAM, 0);
+    if (SocketFD < 0)
+    {   FatalError("socket creation failed");
+    }
+#ifdef PRINT_LOG
+    printf("%s: Connecting to the server at port %d...\n",
+		Program, ntohs(OppoServerAddress.sin_port));
+#endif
+    if (connect(SocketFD, (struct sockaddr*)&OppoServerAddress,
+		sizeof(struct sockaddr_in)) < 0)
+    {   FatalError("connecting to server failed");
+    }
+#ifdef PRINT_LOG
+    printf("%s: Sending message '%s'...\n", Program, msg);
+#endif
+    n = write(SocketFD, msg, strlen(msg));
+    if (n < 0)
+    {   FatalError("writing to socket failed");
+    }
+#ifdef PRINT_LOG
+    printf("%s: Waiting for response...\n", Program);
+#endif
+
+    char *fullRecvBuf=readFullBuffer(SocketFD);
+    
+#ifdef PRINT_LOG
+    printf("%s: Received response: %s\n", Program, fullRecvBuf);
+    printf("%s: Closing the connection...\n", Program);
+#endif
+
+    free(fullRecvBuf);
+    close(SocketFD);
+    return fullRecvBuf;
+}
+
+void SendToOppoWithoutResponse(char *msg)
+{
+    pthread_t tmp;
+    pthread_create(&tmp,NULL,(void*)_SendToOppoWithoutResponse,msg);
 }
 
 void SendPlayAction2Oppo(uchar Action, char *msg, int start_pt,

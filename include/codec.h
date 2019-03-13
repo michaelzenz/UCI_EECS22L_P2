@@ -43,6 +43,7 @@
 #define QUERY_CHALLENGE 1
 #define QUERY_ADD_FRIEND 2
 #define QUERY_CHECK_UPDATE 3
+#define QUERY_DELETE_FRIEND 4
 
 //for PackAnswerQuery
 #define MAX_PAQ_SIZE (MAX_FRIEND_NB+10+MAX_USERNAME_LEN+12+MAX_MSG_LEN*MAX_FRIEND_NB+10+MAX_USERNAME_LEN*MAX_FRIEND_NB+10)
@@ -80,8 +81,8 @@ typedef struct _PackQuery
     //depends on the action
     char dstUser[MAX_USERNAME_LEN];
     char Message[MAX_MSG_LEN];//if you want to say something
-    uchar action;//please see query actions part above
-    int portNb;
+    uchar action;//please see query actions part above (see codec.h for list of actions)
+    int portNb;//the local host port
 } PackQuery;
 
 //For server answering client query for online status and new message or new challenges
@@ -89,7 +90,10 @@ typedef struct _PackAnswerQuery
 {
     int friendNumber;//this will not be pack into the encoded string, but is necessary for encoding
     uchar onlineFlagList[MAX_FRIEND_NB];//The online status of the friend list of current user
-    char challenger[MAX_USERNAME_LEN];//The list of friends that want to challenge current user
+    //The user that want to challenge current user
+    //important: the challenger can also be the user, which means the
+    //current user is the challenger
+    char challenger[MAX_USERNAME_LEN];
     char opponentHost[20];//the opponent`s host
     int opponentPort;//the opponent`s port
     vectorStr messageList;//the list of new messages

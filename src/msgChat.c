@@ -6,7 +6,7 @@ map_void_t msgChat;
 
 typedef struct _ChatInfo
 {
-    vectorStr msgList;
+    vectorStr msgList;//vectorStr_count gets the msg number
     bool isFriend;
     int pageNum;//this is for guio, the page number in the notebook
     GtkTextIter iter;//for guo, records the current pos in chat page
@@ -68,6 +68,11 @@ vectorStr* msgChat_get_msgList(char *user)
 {
     ChatInfo *info=map_get(&msgChat,user);
     return &info->msgList;
+}
+
+int msgChat_get_newMsgCount(char *user)
+{
+    
 }
 
 bool msgChat_get_isFriend(char* user)

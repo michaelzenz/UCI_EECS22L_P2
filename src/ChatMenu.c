@@ -186,7 +186,6 @@ void guio_challenge()
     ChallengeUser(selectedUser);
     strcpy(remotePlayer.UserName,selectedUser);
     free(selectedUser);
-    isPlayingWithOpponent=true;
 }
 
 void InitChatMenu()
@@ -307,17 +306,15 @@ void Chats_menu()
 {
     if(!ChatMenuInitialized){
         InitChatMenu();
+        int friendNb=vectorStr_count(&FriendsList);
+        char temp[MAX_USERNAME_LEN];
+        for(int i=0;i<friendNb;i++){
+            guio_addfriend(vectorStr_get(&FriendsList,i,temp));
+        }
         ChatMenuInitialized=true;
     }
 
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first
-
-    int friendNb=vectorStr_count(&FriendsList);
-    char temp[MAX_USERNAME_LEN];
-    for(int i=0;i<friendNb;i++){
-        guio_addfriend(vectorStr_get(&FriendsList,i,temp));
-    }
-
     Chats_pixbuf=load_pixbuf_from_file(Chats_menu_path);  //loads the background image from files
     Chats_pixbuf=gdk_pixbuf_scale_simple(Chats_pixbuf,WINDOW_WIDTH,WINDOW_HEIGHT,GDK_INTERP_BILINEAR);  //sets bg image to size of window
     image = gtk_image_new_from_pixbuf(Chats_pixbuf);  //sets variable for bg image
@@ -335,6 +332,9 @@ void Chats_menu()
     }
     
     gdk_threads_enter();//again, you know what I am gonna say
+    g_object_ref(FriendTreeNotebook);
+    g_object_ref(ChatMenuScroll);
+    g_object_ref(ChallengeButton);
     gtk_container_remove(GTK_CONTAINER(layout),FriendTreeNotebook);
     gtk_container_remove(GTK_CONTAINER(layout),ChatMenuScroll);
     gtk_container_remove(GTK_CONTAINER(layout),ChallengeButton);

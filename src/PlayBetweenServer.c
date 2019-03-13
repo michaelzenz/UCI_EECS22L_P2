@@ -1,5 +1,5 @@
 #include"PlayBetween.h"
-
+#include"GUI.h"
 
 
 extern const char *Program;
@@ -19,7 +19,9 @@ OnlinePlayCallback *RecvCallback;
 
 int TimeOutMicroSec=250000;
 
+extern OnlinePlayer localPlayer, remotePlayer;
 extern bool isPlayingWithOpponent;
+extern bool isWaitingChallengeRespose;
 
 void PlayBetweenTimeOutHandler()//the hanle function for timeout
 {
@@ -62,29 +64,50 @@ int MakeServerSocket(		/* create a socket on this server */
     return ServSocketFD;
 } /* end of MakeServerSocket */
 
-
-
 void PlayPackListener(int DataSocketFD)
 {
     firstTimeOut=false;
     int  l;
-    
+    char *SendBuf=NULL;
     char *fullbuf=readFullBuffer(DataSocketFD);
-    if(matchRegex(fullbuf,"color:*")){
-
+    printf("Someone just send you:%s\n",fullbuf);
+    if(matchRegex("iChooseColor:.",fullbuf)){
+        if(isWaitingChallengeRespose){
+            isWaitingChallengeRespose=false;
+            isPlayingWithOpponent=true;
+            char strColor=fullbuf[13];
+            if(strColor=='w'){
+                remotePlayer.color=WHITE;
+                localPlayer.color=BLACK;
+            }
+            else{
+                remotePlayer.color=BLACK;
+                localPlayer.color=WHITE;
+            }
+            SendBuf=COLOR_SELECTION_RECEIVED;
+            guio_removeWaitActionDialog();
+        }
+        else{
+            SendBuf=CHALLENGE_IS_CANCELED;
+        }
+    }
+    else if(!strcmp(fullbuf,PLAYBETWEEN_USER_QUIT)){
+        gdk_threads_enter();
+        guio_InformMsg("Your opponent have surrendered\nCongratulations!!!\nYou have win the game!!!");
+        gdk_threads_leave();
+        isPlayingWithOpponent=false;
     }
     else{
         PackPlay packPlay=decodeStrPP(fullbuf);
         RecvCallback->RecvCallback(packPlay);
+        SendBuf=PLAY_PACK_RECEIVED;
     }
-
-    
 
     free(fullbuf);
 
     //TODO: answer request
-    char *SendBuf=PLAY_PACK_RECEIVED;
-
+    
+    if(SendBuf==NULL)SendBuf="";
     l = strlen(SendBuf);
 #ifdef PRINT_LOG
     printf("%s: Sending response: %s.\n", Program, SendBuf);
