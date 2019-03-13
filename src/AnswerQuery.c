@@ -90,8 +90,6 @@ PackAnswerQuery handleQuery(PackQuery pack,char *host)
         paq.messageList=messageList;
         paq.srcUserList=srcUserList;
     }
-
-
     //OutputUserPack(packUP);
     return paq;
 }

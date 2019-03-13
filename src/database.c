@@ -1,5 +1,5 @@
 #include"database.h"
-
+#include"codec.h"
 
 
 typedef struct _User_Node
@@ -40,7 +40,6 @@ User_Node* data_newNode(char *new_password, int port, bool new_online_status)
 void database_add_user(char* user_name, char* user_password, int port, bool user_online_status)
 {
     User_Node *newNode = data_newNode(user_password, port, user_online_status);
-    void *test=(void*)newNode;
     map_set(&DataBaseMap, user_name, newNode);
 }
 
@@ -96,6 +95,25 @@ void database_set_onlineStatus(char* user, bool onlineStatus)
 {
     User_Node *node = map_get(&DataBaseMap, user);
     node->online_status = onlineStatus;
+}
+
+//return false if no such friend
+bool database_delete_friends(char* user, char *friend)
+{
+    User_Node *node = map_get(&DataBaseMap, user);
+    vectorStr friends=node->friends;
+    int friendNb=vectorStr_count(&friends);
+    char temp[MAX_USERNAME_LEN];
+
+    int i=0;
+    for(;i<friendNb;i++)
+    {
+        if(!strcmp(vectorStr_get(&friends,i,temp),friend)){
+            vectorStr_delete(&friends,i);
+            break;
+        }
+    }
+    if(i==friendNb)return false;
 }
 
 //get the message queue of a user

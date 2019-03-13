@@ -127,8 +127,17 @@ PackAnswerLR handleLoginRegister(PackUnamePasswd packUP, char *host)
         }
         else palr.successflag=INVALID_PASSWD;
     }
-    if(packUP.action==REGISTER){
-        database_add_user(packUP.UserName,packUP.Password,packUP.port,1);
+    else if(packUP.action==REGISTER){
+        if(database_isUserExist(packUP.UserName)){
+            palr.successflag=USER_ALREADY_EXIST;
+        }
+        database_add_user(packUP.UserName,packUP.Password,packUP.port,true);
+        database_set_host(packUP.UserName,host);
+        palr.successflag=USER_REGISTER;
+        vectorStr dummyFriends;
+        vectorStr_init(&dummyFriends);
+        palr.FriendList=dummyFriends;
+        palr.QueryPort=QueryPort;
     }
     //OutputUserPack(packUP);
     return palr;

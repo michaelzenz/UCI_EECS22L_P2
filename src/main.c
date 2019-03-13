@@ -30,7 +30,10 @@ int main(int argc, char *argv[]){
     #ifdef TEST_MSGING
     database_add_user("michaelz","25619",-1,false);
     database_add_user("aria","no",-1,false);
+    database_add_user("keenan","1",-1,false);
     database_add_friend("michaelz","aria");
+    database_add_friend("michaelz","keenan");
+    database_add_friend("keenan","michaelz");
     #endif
 
     InitServiceStatusViewer();

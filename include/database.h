@@ -9,8 +9,6 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-
-
 //initialize database
 void database_intialize();
 
