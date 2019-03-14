@@ -42,7 +42,18 @@ PackAnswerQuery handleQuery(PackQuery pack,char *host)
             
         }
         if(pack.action==QUERY_ADD_FRIEND&&database_isUserExist(pack.dstUser)){
-            database_add_friend(pack.UserName,pack.dstUser);
+            bool i = database_add_friend(pack.UserName,pack.dstUser);
+            if (i == false)
+                paq.port = -2; //failure
+            else 
+                paq.port = -4; //success
+        }
+        if(pack.action==QUERY_DELETE_FRIEND&&database_isUserExist(pack.dstUser)){
+            bool i = database_delete_friend(pack.UserName,pack.dstUser);
+            if (i == false)
+                paq.port = -2; //failure 
+            else 
+                paq.port = -4 // success
         }
         if(pack.action==QUERY_CHALLENGE&&database_get_onlineStatus(pack.dstUser)){
             database_add_challenger(pack.dstUser,pack.UserName);

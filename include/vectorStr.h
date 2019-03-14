@@ -21,4 +21,5 @@ void vectorStr_delete(vectorStr*, int);
 void vectorStr_free(vectorStr*);
 void vectorStr_cat(vectorStr *v1, vectorStr *v2);
 void vectorStr_printAll(vectorStr *v);
+int vectorStr_element_exists(vectorStr *v, char* str);
 #endif
