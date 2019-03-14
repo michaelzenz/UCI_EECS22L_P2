@@ -38,7 +38,7 @@ extern char *str_color[2];
 extern char *str_piece[7];
 
 //add friend to friend list 
-void guio_addfriend(char *UserName);
+void guio_addfriend2Tree(char *UserName);
 
 void _initLoginRegister(){
     Login_pixbuf=_load_pixbuf_from_file(Login_menu_path);

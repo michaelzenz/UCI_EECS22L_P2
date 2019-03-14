@@ -157,9 +157,11 @@ int guio_play(GameState *gameState);
 
 void guio_onMsgUpdate();
 
-void guio_addfriend(char *UserName);
+void guio_addfriend2Tree(char *UserName);
 
-void guio_addUnkown(char *UserName);
+void guio_addUnkown2Tree(char *UserName);
+
+void guio_onFriendAdded();
 /*********************/
 //!Online
 /*********************/

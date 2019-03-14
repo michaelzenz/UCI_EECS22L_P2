@@ -105,8 +105,7 @@ gchar* _getUserSelection(GtkTreeModel *model, GtkTreeView *tree){
     GtkTreeIter iter;
     gchar* user;
     GtkTreeSelection *selection=gtk_tree_view_get_selection (tree);
-    if (gtk_tree_selection_get_selected (selection, &model, &iter))
-    {
+    if (gtk_tree_selection_get_selected (selection, &model, &iter)){
         gtk_tree_model_get(model, &iter, 0, &user, -1);
     }
     return user;
@@ -142,12 +141,36 @@ void _CHAT_send_msg()
 
 void _addfriend(char *UserName)
 {
-    GtkTreeIter   iter;
+    GtkTreeIter iter;
     gtk_list_store_append(guioFriendListStore, &iter);
     gtk_list_store_set(guioFriendListStore,&iter, 0, UserName,-1);
 }
 
-void guio_addfriend(char *UserName)
+
+
+void guio_onFriendDeleted(char *userName)
+{
+
+}
+
+void guio_onFriendAdded(char *userName)
+{
+
+}
+
+//calls keenans add friend func here
+void _addFriendCallback()
+{
+    
+}
+
+//the func creates window
+void _createAddFriendWinCallback()
+{
+
+}
+
+void guio_addfriend2Tree(char *UserName)
 {
     gdk_threads_enter();
     _addfriend(UserName);
@@ -161,7 +184,7 @@ void _addUnkown(char *UserName)
     gtk_list_store_set(guioUnknownListStore, &iter, 0, UserName,-1);
 }
 
-void guio_addUnkown(char *UserName)
+void guio_addUnkown2Tree(char *UserName)
 {
     gdk_threads_enter();
     _addUnkown(UserName);
@@ -323,8 +346,6 @@ void _InitChatMenu()
 
     gdk_threads_leave();
 }
-
-
 
 void guio_ChatsMenu()
 {

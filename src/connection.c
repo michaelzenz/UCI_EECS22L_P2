@@ -233,7 +233,7 @@ void stopWaitingForResponse(void *pdata){
 //
 void handlePAQ(PackAnswerQuery paq)
 {
-    if(!isWaitingChallengeRespose&&strlen(paq.challenger)>0){
+    if(!isWaitingChallengeRespose&&strlen(paq.challenger)>0&&paq.opponentPort>=0){
         init_connection2oppo(paq.opponentHost,paq.opponentPort);
         if(!strcmp(UserName,paq.challenger)){
             printf("got opponent server, wait for response\n");
@@ -269,6 +269,12 @@ void handlePAQ(PackAnswerQuery paq)
             }
         }
     }
+    else if(strlen(paq.challenger)>0) {
+        if(paq.opponentPort==ADD_FRIENDS_SUCCESSFULLY){
+            vectorStr_add(&FriendsList,paq.challenger);
+            guio_onFriendAdded(paq.challenger);
+        }
+    }
 
     int NewMsgCnt=vectorStr_count(&paq.messageList);
     char msg[MAX_MSG_LEN],user[MAX_USERNAME_LEN];
@@ -278,7 +284,7 @@ void handlePAQ(PackAnswerQuery paq)
             vectorStr_get(&paq.srcUserList,i,user));
         if(!msgChat_get_isUserExist(user)){
             msgChat_addUser(user,false);
-            guio_addUnkown(user);
+            guio_addUnkown2Tree(user);
         }
         msgChat_add_msg(user,msg);
     }
@@ -347,7 +353,7 @@ void ChallengeUser(char *dstUser)
 
 void AddNewFriend(char *newFriend)
 {
-
+    
 }
 
 void InitQueryTimeredTask()
