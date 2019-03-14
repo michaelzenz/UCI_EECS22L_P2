@@ -11,11 +11,17 @@ void vectorStr_init(vectorStr *v)//intializes vector
     v->data = NULL;
     v->size = 0;
     v->count = 0;
+    v->totalLength=0;
 }
 
 int vectorStr_count(vectorStr *v)//returns count of vector
 {
     return v->count;
+}
+
+int vectorStr_totalLength(vectorStr *v)
+{
+    return v->totalLength;
 }
 
 void vectorStr_add(vectorStr *v, char *str)//add string to vector list
@@ -30,9 +36,10 @@ void vectorStr_add(vectorStr *v, char *str)//add string to vector list
         v->data = realloc(v->data, sizeof(char*) * v->size);//everytime after first and we reach the total space already allocated, double the space allocated to vector
     }
     
-    v->data[v->count] = malloc(sizeof(str)); //allocate space for string
+    v->data[v->count] = malloc(1+strlen(str)); //allocate space for string
     strcpy(v->data[v->count],str);//copy string into vector
     v->count++;
+    v->totalLength+=strlen(str);
 }
 
 
@@ -41,8 +48,9 @@ void vectorStr_set(vectorStr *v, int index, char *str)//changes value of string 
     if (index >= v->count) {
         return;
     }
-    if(sizeof(v->data[index])<sizeof(str))
-        v->data[index]=realloc(v->data[index],sizeof(str));
+    if(strlen(v->data[index])<strlen(str))
+        v->data[index]=realloc(v->data[index],strlen(str)+1);
+    v->totalLength+=strlen(str)-strlen(v->data[index]);
     strcpy(v->data[index], str);
 }
 
@@ -62,9 +70,9 @@ char* _vectorStr_get(vectorStr *v, int index, char** str)
         return NULL;
     }
     if(*str==NULL)
-        *str=malloc(sizeof(v->data[index]));
-    else if(sizeof(*str)<sizeof(v->data[index]))
-        *str=realloc(*str,sizeof(v->data[index]));
+        *str=malloc(1+strlen(v->data[index]));
+    else if(1+strlen(*str)<1+strlen(v->data[index]))
+        *str=realloc(*str,1+strlen(v->data[index]));
     vectorStr_get(v,index,*str);
     return *str;
 }
@@ -80,6 +88,7 @@ void vectorStr_delete(vectorStr *v, int index)
     for (int i = index, j = index+1; i < cnt-1; i++,j++) {
         vectorStr_set(v,i,v->data[j]);
     }
+    v->totalLength-=strlen(v->data[cnt-1]);
     free(v->data[cnt-1]);
     v->count--;
 }

@@ -5,10 +5,12 @@ typedef struct vectorStr_ {
     char** data;
     int size;
     int count;
+    int totalLength;
 } vectorStr;
 
 void vectorStr_init(vectorStr*);
 int vectorStr_count(vectorStr*);
+int vectorStr_totalLength(vectorStr *v);
 void vectorStr_add(vectorStr *v, char *str);
 void vectorStr_set(vectorStr*, int, char*);
 char* vectorStr_get(vectorStr*, int, char *str);

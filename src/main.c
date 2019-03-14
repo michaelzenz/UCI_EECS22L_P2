@@ -141,8 +141,6 @@ void testCodec()
 void GameOnline(int argc, char *argv[])
 {
 
-    // testCodec(); 
-
     GameState gameState=env_init();
     OnlinePlayCallback onlineCallback={&gameState};
 
@@ -150,8 +148,8 @@ void GameOnline(int argc, char *argv[])
     int portNb=InitPlayBetweenServer(&onlineCallback);//inits the local server
 
     if (argc < 3)
-    {   
-        printf("Usage: %s hostname port\n", argv[0]);
+    {
+        printf("Usage: %s host_address port\n", argv[0]);
 	    exit(10);
     }
     init_connection2server(argv[0],argv[1],argv[2]);

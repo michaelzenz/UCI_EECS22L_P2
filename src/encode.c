@@ -65,7 +65,7 @@ void encodePackQuery(char *jsonStr, PackQuery *pack)
 {
    char str_UserName[MAX_USERNAME_LEN+10];
    char str_DstUserName[MAX_USERNAME_LEN+10];
-   char str_MSG[MAX_MSG_LEN];
+   char str_MSG[MAX_MSG_LEN+strlen("\"msg\":\"%s\"")+1];
    char str_Action[10];
    char str_portNb[12];
 
@@ -133,6 +133,10 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    strcat(jsonStr,",");
    strcat(jsonStr,str_Challenger);
    strcat(jsonStr,",");
+   strcat(jsonStr,str_ChallengerHost);
+   strcat(jsonStr,",");
+   strcat(jsonStr,str_ChallengerPort);
+   strcat(jsonStr,",");
    strcat(jsonStr,str_messageList);
    strcat(jsonStr,",");
    strcat(jsonStr,str_srcUserList);
@@ -173,17 +177,4 @@ void encodePackPlay(char *jsonStr, PackPlay *pack)
    strcat(jsonStr,",");
    strcat(jsonStr,str_promotion);
    strcat(jsonStr,"}");
-}
-
-char* encodePackSearch(PackSearch *pack)
-{
-   char *jsonStr=malloc(strlen(pack->targetUserName)+15);
-   sprintf(jsonStr,"\"target\":%s",pack->targetUserName);
-   return jsonStr;
-}
-
-char* encodePackAnswerSearch(PackAnswerSearch *pack)
-{
-   int size=MAX_USERNAME_LEN;
-   
 }

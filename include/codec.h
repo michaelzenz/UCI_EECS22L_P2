@@ -8,7 +8,6 @@
 #ifndef CODEC_H
 #define CODEC_H
 
-#define MAX_JSON_OBJ_LEN 50
 #define MAX_JSMN_TOKEN_NB 128
 
 #define MAX_USERNAME_LEN 30
@@ -36,7 +35,7 @@
 //for PackQuery
 #define MAX_PQ_SIZE (MAX_USERNAME_LEN+10+MAX_USERNAME_LEN+12+MAX_MSG_LEN+MAX_USERNAME_LEN+10)
 
-#define MAX_MSG_LEN 100
+#define MAX_MSG_LEN 50
 
 //query actions
 #define QUERY_CHAT 0
@@ -54,6 +53,8 @@
 #define PLAYBETWEEN_CHAT 1
 #define PLAYBETWEEN_PLAY 2
 #define PLAYBETWEEN_UNDO 3
+
+#define MAX_JSON_OBJ_LEN 50
 
 //the pack that contains username and password
 typedef struct _PackUnamePasswd
@@ -129,7 +130,8 @@ void encodePackAnswerLR(char *jsonStr, PackAnswerLR *pack);
 void encodePackQuery(char *jsonStr, PackQuery *pack);
 void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack);
 void encodePackPlay(char *jsonStr, PackPlay *pack);
-
+char* encodePackSearch(PackSearch *pack);
+char* encodePackAnswerSearch(PackAnswerSearch *pack);
 
 //Decode Functions
 
@@ -138,5 +140,7 @@ PackAnswerLR decodeStrPALR(char *jsonStr);
 PackQuery decodeStrPQ(char *jsonStr);
 PackAnswerQuery decodeStrPAQ(char *jsonStr);
 PackPlay decodeStrPP(char *jsonStr);
+PackSearch decodePS(char *jsonStr);
+PackAnswerSearch decodeStrPAS(char *jsonStr);
 
 #endif

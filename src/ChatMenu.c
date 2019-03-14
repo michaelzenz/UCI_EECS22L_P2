@@ -97,8 +97,10 @@ void _CHAT_send_msg()
     GtkTextBuffer *textBuf=gtk_text_view_get_buffer(GTK_TEXT_VIEW(MsgTextView));
     gtk_text_buffer_get_bounds(textBuf, &start, &end);
     char *msg = gtk_text_buffer_get_text(textBuf, &start, &end, TRUE);
-    if(sizeof(msg)>MAX_MSG_LEN){
-        printf("This message is too long, please limit to MAX_MSG_LEN\n");
+    if(strlen(msg)>MAX_MSG_LEN){
+        char errMsg[50];
+        sprintf(errMsg,"This message is too long, please limit to %d",MAX_MSG_LEN);
+        _ErrorMsg(errMsg);
         return;
     }
     gtk_text_buffer_set_text(textBuf,"",-1);

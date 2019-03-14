@@ -114,7 +114,7 @@ PackQuery decodeStrPQ(char *jsonStr)
         }
         else if(jsoneq(jsonStr,&t[i],"act")==0){
             sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
-            pack.portNb=atoi(temp);
+            pack.action=atoi(temp);
             i++;
         }
         else if(jsoneq(jsonStr,&t[i],"port")==0){
@@ -189,11 +189,10 @@ PackPlay decodeStrPP(char *jsonStr)
 {
     jsmn_parser json_str_parser;//create a json string parser
     jsmn_init(&json_str_parser);//init the jsmn json string parser
-    PackPlay pack;
-
     jsmntok_t t[MAX_JSMN_TOKEN_NB];//the tokens for the json string
     int r=jsmn_parse(&json_str_parser, jsonStr, strlen(jsonStr),t,sizeof(t)/sizeof(t[0]));
-
+    
+    PackPlay pack;
     char temp[MAX_JSON_OBJ_LEN];//a temporary string
     memset(temp,'\0',sizeof(temp));//initialize it
 
@@ -232,3 +231,51 @@ PackPlay decodeStrPP(char *jsonStr)
     }
     return pack;
 }
+
+PackSearch decodePS(char *jsonStr)
+{
+    jsmn_parser json_str_parser;//create a json string parser
+    jsmn_init(&json_str_parser);//init the jsmn json string parser
+    jsmntok_t t[MAX_JSMN_TOKEN_NB];//the tokens for the json string
+    int r=jsmn_parse(&json_str_parser, jsonStr, strlen(jsonStr),t,sizeof(t)/sizeof(t[0]));
+
+    PackSearch pack;
+    char temp[MAX_JSON_OBJ_LEN];//a temporary string
+    
+    for(int i=1;i<r;i++){
+        if(jsoneq(jsonStr,&t[i],"target")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.targetUserName=malloc(strlen(temp)+1);
+            strcpy(pack.targetUserName,temp);
+            i++;
+        }
+    }
+    return pack;
+}
+
+PackAnswerSearch decodeStrPAS(char *jsonStr)
+{
+    jsmn_parser json_str_parser;//create a json string parser
+    jsmn_init(&json_str_parser);//init the jsmn json string parser
+    jsmntok_t t[MAX_JSMN_TOKEN_NB];//the tokens for the json string
+    int r=jsmn_parse(&json_str_parser, jsonStr, strlen(jsonStr),t,sizeof(t)/sizeof(t[0]));
+
+    PackAnswerSearch pack;
+    vectorStr_init(&pack.MatchList);
+
+    char temp[MAX_JSON_OBJ_LEN];//a temporary string
+
+    for(int i=1;i<r;i++){
+        if(jsoneq(jsonStr,&t[i],"match")==0){
+            if (t[i+1].type != JSMN_ARRAY)continue; /* groups should be an array of strings */
+            for (int j = 0; j < t[i+1].size; j++) {
+                jsmntok_t *g = &t[i+j+2];
+                sprintf(temp,"%.*s", g->end - g->start, jsonStr + g->start);
+                vectorStr_add(&pack.MatchList,temp);
+            }
+            i += t[i+1].size + 1;
+        }
+    }
+    return pack;
+}
+
