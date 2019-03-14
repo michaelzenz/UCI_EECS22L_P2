@@ -133,6 +133,10 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    strcat(jsonStr,",");
    strcat(jsonStr,str_Challenger);
    strcat(jsonStr,",");
+   strcat(jsonStr,str_ChallengerHost);
+   strcat(jsonStr,",");
+   strcat(jsonStr,str_ChallengerPort);
+   strcat(jsonStr,",");
    strcat(jsonStr,str_messageList);
    strcat(jsonStr,",");
    strcat(jsonStr,str_srcUserList);
