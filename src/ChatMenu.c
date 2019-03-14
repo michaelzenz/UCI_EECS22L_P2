@@ -85,7 +85,7 @@ void _removeChatPage (GtkNotebook *notebook)
 {
     gint page;
     page = gtk_notebook_current_page(notebook);
-
+    if(page<0)return;
     char* selectedUserName=gtk_notebook_get_tab_label_text(notebook,
         gtk_notebook_get_nth_page(notebook,page));
 
@@ -161,7 +161,7 @@ void guio_onFriendAdded(char *userName)
 //calls keenans add friend func here
 void _addFriendCallback()
 {
-    
+
 }
 
 //the func creates window
