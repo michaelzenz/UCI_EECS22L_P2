@@ -182,3 +182,8 @@ void test_database()
         int hit=1;
     }
 }
+
+char* encodeDatabaseNode()
+{
+    
+}
