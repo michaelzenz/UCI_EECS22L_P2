@@ -353,9 +353,51 @@ void ChallengeUser(char *dstUser)
     free(fullBuf);
 }
 
+//Work in progress
 void AddNewFriend(char *newFriend)
 {
+    #ifdef PRINT_LOG
+    printf("adding friend %s\n",dstUser);
+    #endif
+    printf("adding friend %s\n",newFriend);
+    PackQuery pq;
+    strcpy(pq.UserName,UserName);
+    strcpy(pq.dstUser,newFriend);
+    strcpy(pq.Message,"");
+    pq.action=QUERY_ADD_FRIEND;
+    pq.portNb=PlayBetweenServerPort;
+    char str_pq[MAX_PQ_SIZE];
+    encodePackQuery(str_pq,&pq);
+    char *fullBuf=sendToServerQport(str_pq);
+    printf("%s\n",fullBuf);
+    PackAnswerQuery paq=decodeStrPAQ(fullBuf);
 
+    handlePAQ(paq);
+
+    free(fullBuf);
+}
+//work in progress
+void DeleteFriend(char *oldFriend)
+{
+    #ifdef PRINT_LOG
+    printf("adding friend %s\n",dstUser);
+    #endif
+    printf("adding friend %s\n",oldFriend);
+    PackQuery pq;
+    strcpy(pq.UserName,UserName);
+    strcpy(pq.dstUser,oldFriend);
+    strcpy(pq.Message,"");
+    pq.action=QUERY_DELETE_FRIEND;
+    pq.portNb=PlayBetweenServerPort;
+    char str_pq[MAX_PQ_SIZE];
+    encodePackQuery(str_pq,&pq);
+    char *fullBuf=sendToServerQport(str_pq);
+    printf("%s\n",fullBuf);
+    PackAnswerQuery paq=decodeStrPAQ(fullBuf);
+
+    handlePAQ(paq);
+
+    free(fullBuf);
 }
 
 void InitQueryTimeredTask()
