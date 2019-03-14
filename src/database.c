@@ -68,10 +68,17 @@ void database_set_port(char* user, int port)
 }
 
 //add a friend to a user`s friend list
-void database_add_friend(char* user, char* friend)
+bool database_add_friend(char* user, char* friend)
 {
     User_Node *node = map_get(&DataBaseMap, user);
-    vectorStr_add(&(node->friends), friend);
+    //check if user is in friendslist
+    if (!(vectorStr_element_exists(&(node->friends), friend)))
+    {
+        vectorStr_add(&(node->friends), friend);
+        return true;
+    }
+    // else do nothing
+    return false;
 }
 
 //add a message to a user`s message queue
@@ -98,7 +105,7 @@ void database_set_onlineStatus(char* user, bool onlineStatus)
 }
 
 //return false if no such friend
-bool database_delete_friends(char* user, char *friend)
+bool database_delete_friend(char* user, char *friend)
 {
     User_Node *node = map_get(&DataBaseMap, user);
     vectorStr friends=node->friends;
