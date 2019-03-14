@@ -200,6 +200,7 @@ void PPcalllbackFunc(PackPlay pack)
     }
     else if(pack.Action==PLAYBETWEEN_UNDO)
         env_undo(RecvCallback->pGameState);
+        env_undo(RecvCallback->pGameState);
 }
 
 

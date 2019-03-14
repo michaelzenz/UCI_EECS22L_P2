@@ -39,7 +39,6 @@ extern char *str_piece[7];
 
 //add friend to friend list 
 void guio_addfriend(char *UserName);
-void guio_onMsgUpdate();
 
 void _initLoginRegister(){
     Login_pixbuf=_load_pixbuf_from_file(Login_menu_path);

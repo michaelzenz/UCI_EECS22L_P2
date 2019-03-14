@@ -49,6 +49,36 @@ gint guio_ChatsMenu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data
     printf("x:%d, y:%d\n",x,y);
 }
 
+void _onMsgUpdate()
+{
+    gint page;
+    page = gtk_notebook_current_page(GTK_NOTEBOOK(ChatPageBook));
+    if(page<0)return;
+
+    char* selectedUserName=gtk_notebook_get_tab_label_text(GTK_NOTEBOOK(ChatPageBook),
+        gtk_notebook_get_nth_page(GTK_NOTEBOOK(ChatPageBook),page));
+
+    int pos=msgChat_get_lastReadPos(selectedUserName);
+    vectorStr *msgList=msgChat_get_msgList(selectedUserName);
+    int msgCnt=vectorStr_count(msgList);
+    if(pos<msgCnt-1){
+        GtkTextIter *iter=msgChat_get_iter(selectedUserName);
+        GtkTextBuffer *buffer=msgChat_get_buffer(selectedUserName);
+        char temp[MAX_MSG_LEN];
+        for(int i=pos+1;i<msgCnt;i++){
+            gtk_text_buffer_insert(buffer,iter,vectorStr_get(msgList,i,temp),-1);
+            gtk_text_buffer_insert(buffer,iter,"\n",-1);
+        }
+        msgChat_set_lastReadPos(selectedUserName,msgCnt-1);
+    }
+}
+
+void guio_onMsgUpdate()
+{
+    gdk_threads_enter();
+    _onMsgUpdate();
+    gdk_threads_leave();
+}
 
 /* Remove a page from the notebook */
 void _removeChatPage (GtkNotebook *notebook)
@@ -67,7 +97,7 @@ void _removeChatPage (GtkNotebook *notebook)
     /* Need to refresh the widget -- 
      This forces the widget to redraw itself. */
     gtk_widget_draw(GTK_WIDGET(notebook), NULL);
-    guio_onMsgUpdate();
+    _onMsgUpdate();
 }
 
 //WARNING: the gchar* return by this func must be free
@@ -106,7 +136,7 @@ void _CHAT_send_msg()
     gtk_text_buffer_set_text(textBuf,"",-1);
     sprintf(msg,"%s",msg);
     msgChat_add_msg(selectedUser,msg);
-    guio_onMsgUpdate();
+    _onMsgUpdate();
     SendMsgToUser(selectedUser,msg);
 }
 
@@ -176,7 +206,7 @@ gint _openChatPage(GtkTreeView *treeview, GtkTreePath *path,
     gtk_text_buffer_get_iter_at_offset(buffer, msgChat_get_iter(selectedUser), 0);
     msgChat_set_buffer(selectedUser,buffer);
     free(selectedUser);
-    guio_onMsgUpdate();
+    _onMsgUpdate();
     return 0;
 }
 
@@ -294,29 +324,7 @@ void _InitChatMenu()
     gdk_threads_leave();
 }
 
-void guio_onMsgUpdate()
-{
-    gint page;
-    page = gtk_notebook_current_page(GTK_NOTEBOOK(ChatPageBook));
-    if(page<0)return;
 
-    char* selectedUserName=gtk_notebook_get_tab_label_text(GTK_NOTEBOOK(ChatPageBook),
-        gtk_notebook_get_nth_page(GTK_NOTEBOOK(ChatPageBook),page));
-
-    int pos=msgChat_get_lastReadPos(selectedUserName);
-    vectorStr *msgList=msgChat_get_msgList(selectedUserName);
-    int msgCnt=vectorStr_count(msgList);
-    if(pos<msgCnt-1){
-        GtkTextIter *iter=msgChat_get_iter(selectedUserName);
-        GtkTextBuffer *buffer=msgChat_get_buffer(selectedUserName);
-        char temp[MAX_MSG_LEN];
-        for(int i=pos+1;i<msgCnt;i++){
-            gtk_text_buffer_insert(buffer,iter,vectorStr_get(msgList,i,temp),-1);
-            gtk_text_buffer_insert(buffer,iter,"\n",-1);
-        }
-        msgChat_set_lastReadPos(selectedUserName,msgCnt-1);
-    }
-}
 
 void guio_ChatsMenu()
 {
