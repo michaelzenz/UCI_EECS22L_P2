@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #ifndef vectorSTR_H
 #define vectorSTR_H
@@ -21,5 +22,5 @@ void vectorStr_delete(vectorStr*, int);
 void vectorStr_free(vectorStr*);
 void vectorStr_cat(vectorStr *v1, vectorStr *v2);
 void vectorStr_printAll(vectorStr *v);
-int vectorStr_element_exists(vectorStr *v, char* str);
+bool vectorStr_element_exists(vectorStr *v, char* str);
 #endif

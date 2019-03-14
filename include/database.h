@@ -24,7 +24,8 @@ void database_set_host(char* user, char* host);
 void database_set_port(char* user, int port);
 
 //add a friend to a user`s friend list
-void database_add_friend(char* user, char* friend);
+bool database_add_friend(char* user, char* friend);
+bool database_delete_friend(char* user, char *friend);
 
 //add a message to a user`s message queue
 void database_add_msg(char* user, char* msg, char *srcUser);

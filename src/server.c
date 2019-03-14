@@ -44,7 +44,7 @@ int GetServiceID(char *service)
 
 void PrintStatus(Service service)
 {
-    pthread_mutex_lock(&ShowServiceStatusMutex);
+    // pthread_mutex_lock(&ShowServiceStatusMutex);
     int RewindBackLines=vectorStr_count(&services)-service.ServiceID-1;
     if(RewindBackLines!=0)RewindBackLines++;
     printf("\033[%dA",RewindBackLines);
@@ -61,7 +61,7 @@ void PrintStatus(Service service)
     printf("%s",StatusLine);
     fflush(stdout);
     printf("\033[%dB",RewindBackLines);
-    pthread_mutex_unlock(&ShowServiceStatusMutex);
+    // pthread_mutex_unlock(&ShowServiceStatusMutex);
 }
 
 

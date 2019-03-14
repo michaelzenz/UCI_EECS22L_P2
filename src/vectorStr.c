@@ -110,13 +110,13 @@ void vectorStr_printAll(vectorStr *v)
     printf("\nend printing\n");
 }
 
-int vectorStr_element_exists(vectorStr *v, char* str)
+bool vectorStr_element_exists(vectorStr *v, char* str)
 {
     int cnt=v->count;
     for(int i=0; i<cnt; i++)
     {
-        if (strcmp(str, v->data[i]))
-            return 1;
+        if (!strcmp(str, v->data[i]))
+            return true;
     }
-    return 0;
+    return false;
 }
