@@ -19,8 +19,8 @@ QNodeMsg* _newMsgNode(char *new_msg, char *srcUser)
 {
     QNodeMsg *newNode;
     newNode=malloc(sizeof(QNodeMsg));
-    newNode->msg=malloc(sizeof(new_msg));
-    newNode->srcUser=malloc(sizeof(srcUser));
+    newNode->msg=malloc(strlen(new_msg)+1);
+    newNode->srcUser=malloc(strlen(srcUser)+1);
     newNode->next=NULL;
 
     strcpy(newNode->msg,new_msg);
@@ -33,8 +33,8 @@ QNodeChallenger* _newChallengerNode(char *challenger, char *host, int port)
 {
     QNodeChallenger *newNode;
     newNode=malloc(sizeof(QNodeChallenger));
-    newNode->challenger=malloc(sizeof(challenger));
-    newNode->host=malloc(sizeof(host));
+    newNode->challenger=malloc(strlen(challenger)+1);
+    newNode->host=malloc(strlen(host)+1);
     newNode->next=NULL;
 
     strcpy(newNode->challenger,challenger);

@@ -28,7 +28,7 @@ void vectorStr_add(vectorStr *v, char *str)//add string to vector list
         v->data = realloc(v->data, sizeof(char*) * v->size);//everytime after first and we reach the total space already allocated, double the space allocated to vector
     }
     
-    v->data[v->count] = malloc(sizeof(str)); //allocate space for string
+    v->data[v->count] = malloc(strlen(str)+1); //allocate space for string
     strcpy(v->data[v->count],str);//copy string into vector
     v->count++;
 }
@@ -39,8 +39,8 @@ void vectorStr_set(vectorStr *v, int index, char *str)//changes value of string 
     if (index >= v->count) {
         return;
     }
-    if(sizeof(v->data[index])<sizeof(str))
-        v->data[index]=realloc(v->data[index],sizeof(str));
+    if(1+strlen(v->data[index])<strlen(str)+1)
+        v->data[index]=realloc(v->data[index],strlen(str)+1);
     strcpy(v->data[index], str);
 }
 
@@ -60,9 +60,9 @@ char* _vectorStr_get(vectorStr *v, int index, char** str)
         return NULL;
     }
     if(*str==NULL)
-        *str=malloc(sizeof(v->data[index]));
-    else if(sizeof(*str)<sizeof(v->data[index]))
-        *str=realloc(*str,sizeof(v->data[index]));
+        *str=malloc(strlen(v->data[index])+1);
+    else if(strlen(*str)+1<strlen(v->data[index])+1)
+        *str=realloc(*str,strlen(v->data[index])+1);
     vectorStr_get(v,index,*str);
     return *str;
 }

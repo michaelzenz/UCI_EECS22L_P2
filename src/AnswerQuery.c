@@ -39,7 +39,6 @@ PackAnswerQuery handleQuery(PackQuery pack,char *host)
         database_set_port(pack.UserName,pack.portNb);
         if(database_isUserExist(pack.dstUser)&&strlen(pack.Message)>0){
             database_add_msg(pack.dstUser,pack.Message,pack.UserName);
-            
         }
         if(pack.action==QUERY_ADD_FRIEND&&database_isUserExist(pack.dstUser)){
             database_add_friend(pack.UserName,pack.dstUser);
@@ -65,9 +64,6 @@ PackAnswerQuery handleQuery(PackQuery pack,char *host)
                 paq.opponentPort=-1;
             }
         }
-
-
-
         //for online status
         vectorStr friends=database_get_friends(pack.UserName);
         int friendNumber=vectorStr_count(&friends);

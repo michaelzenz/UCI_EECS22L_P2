@@ -25,7 +25,7 @@ void database_intialize()
 User_Node* data_newNode(char *new_password, int port, bool new_online_status)
 {
     User_Node *new_node=malloc(sizeof(User_Node));
-    new_node->password=malloc(sizeof(new_password));
+    new_node->password=malloc(strlen(new_password)+1);
     strcpy(new_node->password, new_password);
     new_node->host=NULL;
     new_node->port = port;
@@ -47,7 +47,7 @@ void database_add_user(char* user_name, char* user_password, int port, bool user
 void database_set_passwd(char* user, char* passwd)
 {
     User_Node *node = map_get(&DataBaseMap, user);
-    node->password=realloc(node->password, sizeof(passwd));
+    node->password=realloc(node->password, strlen(passwd));
     strcpy(node->password, passwd);
 }
 
@@ -55,8 +55,8 @@ void database_set_passwd(char* user, char* passwd)
 void database_set_host(char* user, char* host)
 {
     User_Node *node = map_get(&DataBaseMap, user);
-    if(node->host==NULL)node->host=malloc(sizeof(host));
-    else node->host=realloc(node->host, sizeof(host));
+    if(node->host==NULL)node->host=malloc(1+strlen(host));
+    else node->host=realloc(node->host, 1+strlen(host));
     strcpy(node->host, host);
 }
 

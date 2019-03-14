@@ -109,6 +109,10 @@ PackQuery decodeStrPQ(char *jsonStr)
         }
         else if(jsoneq(jsonStr,&t[i],"msg")==0){
             sprintf(temp, "%.*s", t[i+1].end-t[i+1].start, jsonStr + t[i+1].start);
+            if(strlen(temp)>0)
+            {
+                int hit=1;
+            }
             strcpy(pack.Message,temp);
             i++;
         }
