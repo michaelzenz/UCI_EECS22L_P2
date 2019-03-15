@@ -5,7 +5,7 @@ Team 11: K-Chat!
 By Aria Javanmard	Armando Rodriguez	Keenan Lau	Marshall Payatt		Michael Zeng  
 University of California Irvine
 
-Alpha Version
+release Version
 March 2, 2019
 
 Background image used: https://www.udemy.com/learn-chess/
