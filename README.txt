@@ -5,23 +5,37 @@ Team 11: K-Chat!
 By Aria Javanmard	Armando Rodriguez	Keenan Lau	Marshall Payatt		Michael Zeng  
 University of California Irvine
 
-release Version
-March 2, 2019
+Final Version
+March 15, 2019
 
 Background image used: https://www.udemy.com/learn-chess/
 
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++
-This is the Alpha version of the project. 
-At the moment, The program can demonstrate basic socket and package communication. 
+This is the Release version of the project. The following are features in the current version
 
-By selecting Online in the main menu of the client version, the GUI closes and the client will send a hardcoded series of packages with login attempts that the server will respond to. 
-After the GUI closes, the login process communication can be seen in the terminal as it is automatically demonstrated.
+Required Features
+-----------------
+1. Users register with the server.
+2. Users can to log in to the client app.
+3. Users can add other users to their contacts (friend list).
+4. Each user should be able to delete users in the contacts.
+5. The Server communicates with clients
+6. The Server manages and saves User information.
+7. The server responds to client requests with various information.
+8. The provider processes login attempts and compares against registered login credentials
 
-For make, make test, make test-gui,make test-comm, make clean, make tar command, please cd into build dir where you can find the makefile(after you compile) and run these commands
+Bonus Features
+--------------
+*Robust chat GUI
+*View contact list on sidebar of chat
+*Messages from contacts and strangers are in separate tabs
+*Chat threads are housed in separate tabs that can be opened and closed
+*Challenge other users to Chess with Robust GUI
+*Chess challenges can be declined
+*Undo move feature on online chess
+*Offline chess suite
 
-offline chess features are still selectable from the main menu.
-which is still under development.
 ++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
