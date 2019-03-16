@@ -55,7 +55,6 @@ PackAnswerQuery handleQuery(PackQuery pack,char *host)
             else{
                 paq.ADflag = DELETE_FRIENDS_SUCCESSFULLY; // success
             }
-                
         }
         if(pack.action==QUERY_CHALLENGE&&database_get_onlineStatus(pack.dstUser)){
             database_add_challenger(pack.dstUser,pack.UserName);
