@@ -29,10 +29,10 @@ Bonus Features
 --------------
 *Robust chat GUI
 *View contact list on sidebar of chat
-*Messages from contacts and strangers are in separate tabs
-*Chat threads are housed in separate tabs that can be opened and closed
+*Messages from contacts and strangers are in separate pages
+*Chat threads are housed in separate pages that can be opened and closed
 *Challenge other users to Chess with Robust GUI
-*Chess challenges can be declined
+*Chess challenges can be declined and peice color chan be chosen
 *Undo move feature on online chess
 *Offline chess suite
 
