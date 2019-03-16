@@ -269,12 +269,6 @@ void handlePAQ(PackAnswerQuery paq)
             }
         }
     }
-    else if(strlen(paq.challenger)>0) {
-        if(paq.opponentPort==ADD_FRIENDS_SUCCESSFULLY){
-            vectorStr_add(&FriendsList,paq.challenger);
-            guio_onFriendAdded(paq.challenger);
-        }
-    }
 
     int NewMsgCnt=vectorStr_count(&paq.messageList);
     char msg[MAX_MSG_LEN],user[MAX_USERNAME_LEN];
@@ -351,7 +345,8 @@ void ChallengeUser(char *dstUser)
     free(fullBuf);
 }
 
-void AddNewFriend(char *newFriend)
+
+void AddNewFriend(char *newFriend, AddNewFriendCallback callback)
 {
     printf("adding friend %s\n",newFriend);
     PackQuery pq;
@@ -368,15 +363,17 @@ void AddNewFriend(char *newFriend)
 
     handlePAQ(paq);
 
+    if(paq.ADflag==ADD_FRIENDS_SUCCESSFULLY){
+        vectorStr_add(&FriendsList,newFriend);
+        callback(newFriend);
+        msgChat_addUser(newFriend,true);
+    }
     free(fullBuf);
 }
 //work in progress
-void DeleteFriend(char *oldFriend)
+void DeleteFriend(char *oldFriend, RemoveFriendCallback callback)
 {
-    #ifdef PRINT_LOG
-    printf("adding friend %s\n",dstUser);
-    #endif
-    printf("adding friend %s\n",oldFriend);
+    printf("deleting friend %s\n",oldFriend);
     PackQuery pq;
     strcpy(pq.UserName,UserName);
     strcpy(pq.dstUser,oldFriend);
@@ -390,7 +387,12 @@ void DeleteFriend(char *oldFriend)
     PackAnswerQuery paq=decodeStrPAQ(fullBuf);
 
     handlePAQ(paq);
-
+    if(paq.ADflag==DELETE_FRIENDS_SUCCESSFULLY){
+        //vectorStr_add(&FriendsList,newFriend);
+        callback();
+        //msgChat_addUser(newFriend,true);
+        //TODO: fix this
+    }
     free(fullBuf);
 }
 

@@ -9,7 +9,7 @@ extern GtkWidget *window;
 extern GtkWidget *image;
 extern GtkWidget *layout;//the layout to put on background and contain fixed widget
 GtkWidget *Friendentry;
-
+gulong handlerId;
 //for chat menu
 extern bool isPlayingWithOpponent;
 
@@ -143,33 +143,86 @@ void _CHAT_send_msg()
     SendMsgToUser(selectedUser,msg);
 }
 
+gboolean SearchAndDelete (GtkTreeModel *model, GtkTreePath *path, 
+    GtkTreeIter  *iter, gpointer pData){
+    char *user2del=pData;
+    gchar* user;
+    gtk_tree_model_get(model, iter, 0, &user, -1);
+    if(!strcmp(user,user2del)){
+        gtk_list_store_remove(GTK_LIST_STORE(model), iter);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+void _removeUnkownFromTree(char *UserName)
+{
+    gtk_tree_model_foreach(GTK_TREE_MODEL(guioUnknownListStore),
+        SearchAndDelete, UserName);
+}
+
+void _addUnkown2Tree(char *UserName)
+{
+    GtkTreeIter   iter;
+    gtk_list_store_append(guioUnknownListStore, &iter);
+    gtk_list_store_set(guioUnknownListStore, &iter, 0, UserName,-1);
+}
+
+void guio_removeUnkownFromTree(char *UserName)
+{
+    gdk_threads_enter();
+    _removeUnkownFromTree(UserName);
+    gdk_threads_leave();
+}
+
 void _addfriend2Tree(char *UserName)
 {
     GtkTreeIter iter;
     gtk_list_store_append(guioFriendListStore, &iter);
     gtk_list_store_set(guioFriendListStore,&iter, 0, UserName,-1);
-
-   
+    gtk_widget_show_all(guioFriendTreeView);
 }
 
-void _addfriend(){
-   
-}
-
-void guio_onFriendDeleted(char *userName)
+void _removefriendFromTree(char *friend2del)
 {
-
+    gtk_tree_model_foreach(GTK_TREE_MODEL(guioFriendListStore),
+        SearchAndDelete, friend2del);
 }
 
-void guio_onFriendAdded(char *userName)
+void _onFriendDeleted()
 {
-
+    GtkTreeIter iter;
+    gchar* user;
+    GtkTreeSelection *selection=
+        gtk_tree_view_get_selection(GTK_TREE_VIEW(guioFriendTreeView));
+    GtkTreeModel *model=GTK_TREE_MODEL(&guioFriendListStore);
+    if (gtk_tree_selection_get_selected (selection, 
+        &model, &iter)){
+        gtk_list_store_remove(guioFriendListStore, &iter);
+    }
 }
+
+void _onFriendAdded(char* userName)
+{
+    _addfriend2Tree(userName);
+    _removeUnkownFromTree(userName);
+}
+
+void guio_removefriendFromTree(char *UserName)
+{
+    gdk_threads_enter();
+    _removefriendFromTree(UserName);
+    gdk_threads_leave();
+}
+
 
 //calls keenans add friend func here
 void _addFriendCallback()
 {
-
+  char addFriend[MAX_PUP_SIZE];
+    sprintf(addFriend,"%s",gtk_entry_get_text(GTK_ENTRY(Friendentry)));
+    AddNewFriend(addFriend,_onFriendAdded);
+    gtk_widget_destroy(GTK_WIDGET(friendwindow));
 }
 
 //the func creates window
@@ -179,16 +232,21 @@ void _createAddFriendWinCallback()
     friendwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(friendwindow), "Add Friend");
     gtk_window_set_default_size(GTK_WINDOW(friendwindow), 320, 200);
-
     Friendentry=gtk_entry_new();
     layout2=gtk_layout_new(NULL,NULL);
     addbutton = gtk_button_new_with_label("Add");
     gtk_layout_put(GTK_LAYOUT(layout2),addbutton,150,100);
+    gtk_layout_put(GTK_LAYOUT(layout2),Friendentry,110,70);
     gtk_container_add(GTK_CONTAINER(friendwindow), layout2);
-
-    gtk_container_add(GTK_CONTAINER(friendwindow), Friendentry);
-
+    g_signal_connect(addbutton, "button_press_event", 
+        G_CALLBACK(_addFriendCallback),NULL);
     gtk_widget_show_all(friendwindow);
+}
+
+void _removeFriendCallback(){
+    char *selectedUser=_getUserSelection(GTK_TREE_MODEL(guioFriendListStore),
+            GTK_TREE_VIEW(guioFriendTreeView));
+    DeleteFriend(selectedUser, _onFriendDeleted);
 }
 
 void guio_addfriend2Tree(char *UserName)
@@ -196,13 +254,6 @@ void guio_addfriend2Tree(char *UserName)
     gdk_threads_enter();
     _addfriend2Tree(UserName);
     gdk_threads_leave();
-}
-
-void _addUnkown2Tree(char *UserName)
-{
-    GtkTreeIter   iter;
-    gtk_list_store_append(guioUnknownListStore, &iter);
-    gtk_list_store_set(guioUnknownListStore, &iter, 0, UserName,-1);
 }
 
 void guio_addUnkown2Tree(char *UserName)
@@ -363,13 +414,13 @@ void _InitChatMenu()
     AddFriendButton = gtk_button_new_with_label ("Add Friend");
     gtk_widget_set_size_request (AddFriendButton, CHALLENGE_BUTTON_WIDTH, CHALLENGE_BUTTON_HEIGHT);
     gtk_signal_connect_object (GTK_OBJECT (AddFriendButton), "clicked",
-                            (GtkSignalFunc) _addfriend,
+                            (GtkSignalFunc) _createAddFriendWinCallback,
                             NULL);
 
     DeleteFriendButton = gtk_button_new_with_label ("Delete Friend");
     gtk_widget_set_size_request (DeleteFriendButton, CHALLENGE_BUTTON_WIDTH, CHALLENGE_BUTTON_HEIGHT);
     gtk_signal_connect_object (GTK_OBJECT (DeleteFriendButton), "clicked",
-                            (GtkSignalFunc) _addfriend,
+                            (GtkSignalFunc) _removeFriendCallback,
                             NULL);
 
     gtk_layout_put(GTK_LAYOUT(ChatMenuLayout),SendButton,CHAT_BUTTON_LEFT,SEND_BUTTON_TOP);

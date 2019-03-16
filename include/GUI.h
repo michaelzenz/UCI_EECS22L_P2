@@ -169,6 +169,8 @@ void guio_addfriend2Tree(char *UserName);
 void guio_addUnkown2Tree(char *UserName);
 
 void guio_onFriendAdded();
+
+void _createAddFriendWinCallback();
 /*********************/
 //!Online
 /*********************/

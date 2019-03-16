@@ -56,4 +56,10 @@ void init_connection2qport();
 
 void InitQueryTimeredTask();
 
+typedef void(*AddNewFriendCallback)(char *);
+void AddNewFriend(char *newFriend, AddNewFriendCallback callback);
+
+typedef void(*RemoveFriendCallback)();
+void DeleteFriend(char *oldFriend, RemoveFriendCallback callback);
+
 #endif

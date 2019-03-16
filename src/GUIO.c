@@ -92,7 +92,7 @@ gint _Login_menu_callback (GtkWidget *widget, GdkEvent  *event, gpointer data)
             FriendsList=palr.FriendList;
         }
         else if(palr.successflag==INVALID_PASSWD){
-            _ErrorMsg("Invalid Password, Please Try Agagin!");
+            _ErrorMsg("Invalid Password, Please Try Again!");
         }
         else if(palr.successflag==NO_SUCH_USER){
             _ErrorMsg("No Such User, Please Register First!");

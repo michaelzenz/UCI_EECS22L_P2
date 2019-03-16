@@ -126,6 +126,7 @@ PackQuery decodeStrPQ(char *jsonStr)
     return pack;
 }
 
+
 //Convert a json string into PackAnswerLR
 PackAnswerQuery decodeStrPAQ(char *jsonStr)
 {
@@ -160,6 +161,11 @@ PackAnswerQuery decodeStrPAQ(char *jsonStr)
         else if(jsoneq(jsonStr,&t[i],"cport")==0){
             sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
             pack.opponentPort=atoi(temp);
+            i++;
+        }
+        else if(jsoneq(jsonStr,&t[i],"AD")==0){
+            sprintf(temp, "%.*s", t[i+1].end-t[i+1].start,jsonStr + t[i+1].start);
+            pack.ADflag=atoi(temp);
             i++;
         }
         else if(jsoneq(jsonStr,&t[i],"msgs")==0){

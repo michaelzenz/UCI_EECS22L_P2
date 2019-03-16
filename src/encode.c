@@ -96,6 +96,7 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    char str_Challenger[MAX_USERNAME_LEN+12];
    char str_ChallengerHost[30];
    char str_ChallengerPort[12];
+   char str_ADflag[12];
    char str_messageList[MAX_MSG_LEN*MAX_FRIEND_NB+10]="\"msgs\":[";
    char str_srcUserList[MAX_USERNAME_LEN*MAX_FRIEND_NB+10]="\"srcs\":[";
 
@@ -108,7 +109,7 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    sprintf(str_Challenger,"\"cger\":\"%s\"",pack->challenger);
    sprintf(str_ChallengerHost,"\"chost\":\"%s\"",pack->opponentHost);
    sprintf(str_ChallengerPort,"\"cport\":%d",pack->opponentPort);
-
+   sprintf(str_ADflag,"\"AD\":%d",pack->ADflag);
    int newMsgNb=vectorStr_count(&pack->messageList);
    char temp[max(MAX_MSG_LEN,MAX_USERNAME_LEN)];
    char tempMsg[MAX_MSG_LEN];
@@ -136,6 +137,8 @@ void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
    strcat(jsonStr,str_ChallengerHost);
    strcat(jsonStr,",");
    strcat(jsonStr,str_ChallengerPort);
+   strcat(jsonStr,",");
+   strcat(jsonStr,str_ADflag);
    strcat(jsonStr,",");
    strcat(jsonStr,str_messageList);
    strcat(jsonStr,",");

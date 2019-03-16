@@ -47,10 +47,10 @@
 //for PackAnswerQuery
 #define MAX_PAQ_SIZE (MAX_FRIEND_NB+10+MAX_USERNAME_LEN+12+MAX_MSG_LEN*MAX_FRIEND_NB+10+MAX_USERNAME_LEN*MAX_FRIEND_NB+10)
 
-#define ADD_FRIENDS_SUCCESSFULLY -2
-#define FRIENDS_ALREADY_EXIST -3
-#define DELETE_FRIENDS_SUCCESSFULLY -4
-#define USER_NOT_YOUR_FRIENDS -5
+#define ADD_FRIENDS_SUCCESSFULLY 0
+#define FRIENDS_ALREADY_EXIST 1
+#define DELETE_FRIENDS_SUCCESSFULLY 2
+#define USER_NOT_YOUR_FRIENDS 3
 
 //for PackPlay
 #define MAX_PP_SIZE (MAX_MSG_LEN+50)
@@ -102,6 +102,7 @@ typedef struct _PackAnswerQuery
     char challenger[MAX_USERNAME_LEN];
     char opponentHost[20];//the opponent`s host
     int opponentPort;//the opponent`s port
+    uchar ADflag;//the flag for add/delete friend
     vectorStr messageList;//the list of new messages
     vectorStr srcUserList;//from who
 } PackAnswerQuery;
