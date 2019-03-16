@@ -25,8 +25,7 @@ GtkWidget *guioUnknownTreeScroll;
 int guioFriendTreePageNum,guioUnknownTreePageNum;
 GtkWidget *FriendTreeNotebook;
 
-GtkWidget *NoteBookFixed;
-GtkWidget *ChatMenuScroll;
+GtkWidget *ChatMenuLayout;
 GtkWidget *ChatPageBook;
 GtkWidget *MsgTextView;
 GtkWidget *SendButton;
@@ -215,7 +214,8 @@ gint _openChatPage(GtkTreeView *treeview, GtkTreePath *path,
     gtk_widget_set_size_request (newChatPage, CHAT_PAGE_WIDTH, CHAT_PAGE_HEIGHT);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(newChatPage),false);
     gtk_widget_show(newChatPage);
-    GtkWidget *newScroll=gtk_scrolled_window_new(NULL, NULL);
+    GtkWidget *newScroll=gtk_scrolled_window_new(NULL, 
+        gtk_text_view_get_vadjustment(GTK_TEXT_VIEW(newChatPage)));
     gtk_widget_set_size_request(newScroll, CHAT_PAGE_WIDTH, CHAT_PAGE_HEIGHT);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (newScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
     gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (newScroll), newChatPage);
@@ -306,22 +306,19 @@ void _InitChatMenu()
     guioUnknownTreePageNum=_addWidgetToFriendListNotebook(guioUnknownTreeScroll,"Unknown");
     guioFriendTreePageNum=_addWidgetToFriendListNotebook(guioFriendTreeScroll,"Friends");
 
-    ChatMenuScroll = gtk_scrolled_window_new (NULL,NULL);
-    gtk_container_border_width (GTK_CONTAINER (ChatMenuScroll), 10);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (ChatMenuScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-    gtk_widget_set_usize(ChatMenuScroll, CHAT_SCROLL_WIDTH, CHAT_LIST_HEIGHT);
+    ChatMenuLayout = gtk_layout_new (NULL,NULL);
+    gtk_container_border_width (GTK_CONTAINER (ChatMenuLayout), 10);
+    gtk_widget_set_usize(ChatMenuLayout, CHAT_SCROLL_WIDTH, CHAT_LIST_HEIGHT);
 
     ChatPageBook = gtk_notebook_new ();
     gtk_notebook_set_tab_pos (GTK_NOTEBOOK (ChatPageBook), GTK_POS_TOP);
     gtk_widget_set_size_request (ChatPageBook, NOTEBOOK_FIXED_WIDTH, NOTEBOOK_FIXED_HEIGHT);
-    NoteBookFixed=gtk_fixed_new();
-    gtk_fixed_put(GTK_FIXED(NoteBookFixed), ChatPageBook, NOTEBOOK_FIXED_LEFT, NOTEBOOK_FIXED_TOP);
+    
+    gtk_layout_put(GTK_LAYOUT(ChatMenuLayout),ChatPageBook,NOTEBOOK_FIXED_LEFT,NOTEBOOK_FIXED_TOP);
 
     MsgTextView=gtk_text_view_new();
     gtk_widget_set_size_request (MsgTextView, MSG_TEXTVIEW_FIXED_WIDTH, MSG_TEXTVIEW_FIXED_HEIGHT);
-    gtk_fixed_put(GTK_FIXED(NoteBookFixed), MsgTextView, MSG_TEXTVIEW_FIXED_LEFT, MSG_TEXTVIEW_FIXED_TOP);
-
-    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (ChatMenuScroll), NoteBookFixed);
+    gtk_layout_put(GTK_LAYOUT(ChatMenuLayout),MsgTextView,MSG_TEXTVIEW_FIXED_LEFT,MSG_TEXTVIEW_FIXED_TOP);
 
     SendButton = gtk_button_new_with_label ("send");
     gtk_widget_set_size_request (SendButton, CHAT_BUTTON_WIDTH, CHAT_BUTTON_HEIGHT);
@@ -341,8 +338,8 @@ void _InitChatMenu()
                             (GtkSignalFunc) _challengeUser,
                             NULL);
 
-    gtk_fixed_put(GTK_FIXED(NoteBookFixed), SendButton, CHAT_BUTTON_LEFT, SEND_BUTTON_TOP);
-    gtk_fixed_put(GTK_FIXED(NoteBookFixed), RMpageButton, CHAT_BUTTON_LEFT, RMPAGE_BUTTON_TOP);
+    gtk_layout_put(GTK_LAYOUT(ChatMenuLayout),SendButton,CHAT_BUTTON_LEFT,SEND_BUTTON_TOP);
+    gtk_layout_put(GTK_LAYOUT(ChatMenuLayout),RMpageButton,CHAT_BUTTON_LEFT,RMPAGE_BUTTON_TOP);
 
     gdk_threads_leave();
 }
@@ -365,7 +362,7 @@ void guio_ChatsMenu()
     image = gtk_image_new_from_pixbuf(Chats_pixbuf);  //sets variable for bg image
     gtk_layout_put(GTK_LAYOUT(layout), image, 0, 0);  //add bg image to layout
     gtk_layout_put(GTK_LAYOUT(layout), FriendTreeNotebook, FRIEND_LIST_LEFT, FRIEND_LIST_TOP);
-    gtk_layout_put(GTK_LAYOUT(layout), ChatMenuScroll, 20, 40);
+    gtk_layout_put(GTK_LAYOUT(layout), ChatMenuLayout, 20, 40);
     gtk_layout_put(GTK_LAYOUT(layout), ChallengeButton, CHALLENGE_BUTTON_LEFT, CHALLENGE_BUTTON_TOP);
 
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(guio_ChatsMenu_callback),NULL);  //connect signals from clicking the window to active the callback
@@ -378,10 +375,10 @@ void guio_ChatsMenu()
     
     gdk_threads_enter();//again, you know what I am gonna say
     g_object_ref(FriendTreeNotebook);
-    g_object_ref(ChatMenuScroll);
+    g_object_ref(ChatMenuLayout);
     g_object_ref(ChallengeButton);
     gtk_container_remove(GTK_CONTAINER(layout),FriendTreeNotebook);
-    gtk_container_remove(GTK_CONTAINER(layout),ChatMenuScroll);
+    gtk_container_remove(GTK_CONTAINER(layout),ChatMenuLayout);
     gtk_container_remove(GTK_CONTAINER(layout),ChallengeButton);
     g_signal_handler_disconnect(window,handlerID);
     gdk_threads_leave();
