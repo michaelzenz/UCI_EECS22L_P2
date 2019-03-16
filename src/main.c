@@ -31,9 +31,11 @@ int main(int argc, char *argv[]){
     database_add_user("michaelz","25619",-1,false);
     database_add_user("aria","no",-1,false);
     database_add_user("keenan","1",-1,false);
+    database_add_user("demoman", "1234", -1, false);
     database_add_friend("michaelz","aria");
     database_add_friend("michaelz","keenan");
     database_add_friend("keenan","michaelz");
+    database_add_challenger("demoman", "aria");
     #endif
 
     InitServiceStatusViewer();
