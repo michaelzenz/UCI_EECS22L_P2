@@ -43,20 +43,17 @@ PackAnswerQuery handleQuery(PackQuery pack,char *host)
         if(pack.action==QUERY_ADD_FRIEND&&database_isUserExist(pack.dstUser)){
             bool ret = database_add_friend(pack.UserName,pack.dstUser);
             if (ret == false)
-                paq.opponentPort = -2; //failure
+                paq.ADflag = FRIENDS_ALREADY_EXIST; //failure
             else{
-                strcpy(paq.challenger,pack.dstUser);
-                paq.opponentPort = -4; //success
+                paq.ADflag = ADD_FRIENDS_SUCCESSFULLY; //success
             }
-                
         }
         if(pack.action==QUERY_DELETE_FRIEND&&database_isUserExist(pack.dstUser)){
             bool ret = database_delete_friend(pack.UserName,pack.dstUser);
             if (ret == false)
-                paq.opponentPort = -2; //failure
+                paq.ADflag = USER_NOT_YOUR_FRIENDS; //failure
             else{
-                paq.opponentPort = -4; // success
-                strcpy(paq.challenger,pack.dstUser);
+                paq.ADflag = DELETE_FRIENDS_SUCCESSFULLY; // success
             }
                 
         }
