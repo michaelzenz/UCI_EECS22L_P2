@@ -278,7 +278,6 @@ gint _openChatPage(GtkTreeView *treeview, GtkTreePath *path,
         gtk_notebook_set_current_page(GTK_NOTEBOOK(ChatPageBook),msgChat_get_pageNum(selectedUser));
         return 0;
     }
-
     GtkWidget *label;
     char bufferl[32];
     sprintf(bufferl, "%s", selectedUser);

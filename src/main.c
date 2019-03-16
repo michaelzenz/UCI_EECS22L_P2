@@ -28,8 +28,11 @@ int onlinePlay(GameState *gameState)
 {
     if(gameState->playerTurn==localPlayer.color)guio_play(gameState);
     else{
+        Player dummy;
+        int check=env_check_end(gameState,&dummy);
+        env_free_container(gameState);
         sleep(1);//wait for the opponent to make the move
-        return 0;
+        return check;
     }
 }
 
@@ -66,75 +69,6 @@ void GameOffline(){
         else gui_refresh(&gameState,player_arr);
     }
     env_free_GameState(&gameState);
-}
-
-void testCodec()
-{
-    vectorStr friendList;
-    vectorStr_init(&friendList);
-    vectorStr msgList,srcUserList;
-    vectorStr_init(&msgList);
-    vectorStr_init(&srcUserList);
-    vectorStr_add(&msgList,"hello");
-    vectorStr_add(&msgList,"hello");
-    vectorStr_add(&srcUserList,"keenan");
-    vectorStr_add(&srcUserList,"aria");
-
-    vectorStr_printAll(&friendList);
-    vectorStr_printAll(&msgList);
-    vectorStr_printAll(&srcUserList);
-
-    PackUnamePasswd pup={LOGIN,"michaelz","25619"};
-    PackAnswerLR palr={USER_LOGIN,friendList,11001};
-    PackQuery pq={"michaelz","aria","hello",QUERY_CHAT,11000};
-    PackAnswerQuery paq={2};
-    paq.onlineFlagList[0]=paq.onlineFlagList[1]=1;
-    strcpy(paq.challenger,"aria");
-    paq.messageList=msgList;
-    paq.srcUserList=srcUserList;
-    PackPlay pp={"michaelz",PLAYBETWEEN_PLAY,"hello",48,40,QUEEN};
-
-    char str_pup[MAX_PUP_SIZE],str_palr[MAX_PALR_SIZE],str_pq[MAX_PQ_SIZE],str_paq[MAX_PAQ_SIZE],str_pp[MAX_PP_SIZE];
-    encodePackUnamePasswd(str_pup,&pup);
-    encodePackAnswerLR(str_palr,&palr);
-    encodePackQuery(str_pq,&pq);
-    encodePackAnswerQuery(str_paq,&paq);
-    encodePackPlay(str_pp,&pp);
-
-    printf("pup:%s\n",str_pup);
-    printf("palr:%s\n",str_palr);
-    printf("pq:%s\n",str_pq);
-    printf("paq:%s\n",str_paq);
-    printf("pp:%s\n",str_pp);
-
-    PackUnamePasswd dpup;
-    PackAnswerLR dpalr;
-    PackQuery dpq;
-    PackAnswerQuery dpaq;
-    PackPlay dpp;
-
-    dpup=decodeStrPUP(str_pup);
-    dpalr=decodeStrPALR(str_palr);
-    dpq=decodeStrPQ(str_pq);
-    dpaq=decodeStrPAQ(str_paq);
-    dpp=decodeStrPP(str_pp);
-    dpaq.friendNumber=2;
-
-    encodePackUnamePasswd(str_pup,&dpup);
-    encodePackAnswerLR(str_palr,&dpalr);
-    encodePackQuery(str_pq,&dpq);
-    encodePackAnswerQuery(str_paq,&dpaq);
-    encodePackPlay(str_pp,&dpp);
-
-    printf("\ntest decode\n");
-
-    printf("dpup:%s\n",str_pup);
-    printf("dpalr:%s\n",str_palr);
-    printf("dpq:%s\n",str_pq);
-    printf("dpaq:%s\n",str_paq);
-    printf("dpp:%s\n",str_pp);
-
-    return;
 }
 
 //a simple demo of online game(only login, and there is only one user michaelz)
