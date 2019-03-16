@@ -35,7 +35,6 @@ Bonus Features
 *Chess challenges can be declined
 *Undo move feature on online chess
 *Offline chess suite
-*Non-Volatile database storage.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++
 
