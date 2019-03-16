@@ -143,27 +143,19 @@ void _CHAT_send_msg()
     SendMsgToUser(selectedUser,msg);
 }
 
-void _addfriend(char *UserName)
+void _addfriend2Tree(char *UserName)
 {
     GtkTreeIter iter;
-    GtkWidget *addbutton;
-    
     gtk_list_store_append(guioFriendListStore, &iter);
     gtk_list_store_set(guioFriendListStore,&iter, 0, UserName,-1);
-    friendwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(friendwindow), "Add Friend");
-    gtk_window_set_default_size(GTK_WINDOW(friendwindow), 320, 200);
 
-    Friendentry=gtk_entry_new();
-    layout2=gtk_layout_new();
-    addbutton = gtk_button_new_with_label("Add");
-    gtk_layout_put(layout2,addbutton,150,100);
-    gtk_container_add(GTK_CONTAINER(friendwindow), layout2);
-
-   gtk_container_add(GTK_CONTAINER(friendwindow), Friendentry);
-
-   gtk_widget_show_all(friendwindow);
+   
 }
+
+void _addfriend(){
+   
+}
+
 void guio_onFriendDeleted(char *userName)
 {
 
@@ -183,17 +175,30 @@ void _addFriendCallback()
 //the func creates window
 void _createAddFriendWinCallback()
 {
+    GtkWidget *addbutton;
+    friendwindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(friendwindow), "Add Friend");
+    gtk_window_set_default_size(GTK_WINDOW(friendwindow), 320, 200);
 
+    Friendentry=gtk_entry_new();
+    layout2=gtk_layout_new(NULL,NULL);
+    addbutton = gtk_button_new_with_label("Add");
+    gtk_layout_put(GTK_LAYOUT(layout2),addbutton,150,100);
+    gtk_container_add(GTK_CONTAINER(friendwindow), layout2);
+
+    gtk_container_add(GTK_CONTAINER(friendwindow), Friendentry);
+
+    gtk_widget_show_all(friendwindow);
 }
 
 void guio_addfriend2Tree(char *UserName)
 {
     gdk_threads_enter();
-    _addfriend(UserName);
+    _addfriend2Tree(UserName);
     gdk_threads_leave();
 }
 
-void _addUnkown(char *UserName)
+void _addUnkown2Tree(char *UserName)
 {
     GtkTreeIter   iter;
     gtk_list_store_append(guioUnknownListStore, &iter);
@@ -203,7 +208,7 @@ void _addUnkown(char *UserName)
 void guio_addUnkown2Tree(char *UserName)
 {
     gdk_threads_enter();
-    _addUnkown(UserName);
+    _addUnkown2Tree(UserName);
     gdk_threads_leave();
 }
 
@@ -355,6 +360,18 @@ void _InitChatMenu()
                             (GtkSignalFunc) _challengeUser,
                             NULL);
 
+    AddFriendButton = gtk_button_new_with_label ("Add Friend");
+    gtk_widget_set_size_request (AddFriendButton, CHALLENGE_BUTTON_WIDTH, CHALLENGE_BUTTON_HEIGHT);
+    gtk_signal_connect_object (GTK_OBJECT (AddFriendButton), "clicked",
+                            (GtkSignalFunc) _addfriend,
+                            NULL);
+
+    DeleteFriendButton = gtk_button_new_with_label ("Delete Friend");
+    gtk_widget_set_size_request (DeleteFriendButton, CHALLENGE_BUTTON_WIDTH, CHALLENGE_BUTTON_HEIGHT);
+    gtk_signal_connect_object (GTK_OBJECT (DeleteFriendButton), "clicked",
+                            (GtkSignalFunc) _addfriend,
+                            NULL);
+
     gtk_layout_put(GTK_LAYOUT(ChatMenuLayout),SendButton,CHAT_BUTTON_LEFT,SEND_BUTTON_TOP);
     gtk_layout_put(GTK_LAYOUT(ChatMenuLayout),RMpageButton,CHAT_BUTTON_LEFT,RMPAGE_BUTTON_TOP);
 
@@ -368,7 +385,7 @@ void guio_ChatsMenu()
         int friendNb=vectorStr_count(&FriendsList);
         char temp[MAX_USERNAME_LEN];
         for(int i=0;i<friendNb;i++){
-            _addfriend(vectorStr_get(&FriendsList,i,temp));
+            _addfriend2Tree(vectorStr_get(&FriendsList,i,temp));
         }
         ChatMenuInitialized=true;
     }
@@ -381,6 +398,8 @@ void guio_ChatsMenu()
     gtk_layout_put(GTK_LAYOUT(layout), FriendTreeNotebook, FRIEND_LIST_LEFT, FRIEND_LIST_TOP);
     gtk_layout_put(GTK_LAYOUT(layout), ChatMenuLayout, 20, 40);
     gtk_layout_put(GTK_LAYOUT(layout), ChallengeButton, CHALLENGE_BUTTON_LEFT, CHALLENGE_BUTTON_TOP);
+    gtk_layout_put(GTK_LAYOUT(layout), AddFriendButton, ADDFRIEND_BUTTON_LEFT, ADDFRIEND_BUTTON_TOP);
+    gtk_layout_put(GTK_LAYOUT(layout), DeleteFriendButton, DELETEFRIEND_BUTTON_LEFT, DELETEFRIEND_BUTTON_TOP);
 
     gulong handlerID=g_signal_connect(window, "button_press_event", G_CALLBACK(guio_ChatsMenu_callback),NULL);  //connect signals from clicking the window to active the callback
 

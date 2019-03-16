@@ -198,9 +198,10 @@ void PPcalllbackFunc(PackPlay pack)
     else if(pack.Action==PLAYBETWEEN_PLAY){
         env_play2(RecvCallback->pGameState,pack.start_pt,pack.end_pt,0);
     }
-    else if(pack.Action==PLAYBETWEEN_UNDO)
+    else if(pack.Action==PLAYBETWEEN_UNDO){
         env_undo(RecvCallback->pGameState);
         env_undo(RecvCallback->pGameState);
+    }
 }
 
 
