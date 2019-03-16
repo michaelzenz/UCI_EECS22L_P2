@@ -108,19 +108,20 @@ void database_set_onlineStatus(char* user, bool onlineStatus)
 bool database_delete_friend(char* user, char *friend)
 {
     User_Node *node = map_get(&DataBaseMap, user);
-    vectorStr friends=node->friends;
-    int friendNb=vectorStr_count(&friends);
+    vectorStr *friends=&node->friends;
+    int friendNb=vectorStr_count(friends);
     char temp[MAX_USERNAME_LEN];
 
     int i=0;
     for(;i<friendNb;i++)
     {
-        if(!strcmp(vectorStr_get(&friends,i,temp),friend)){
-            vectorStr_delete(&friends,i);
+        if(!strcmp(vectorStr_get(friends,i,temp),friend)){
+            vectorStr_delete(friends,i);
             break;
         }
     }
     if(i==friendNb)return false;
+    else return true;
 }
 
 //get the message queue of a user

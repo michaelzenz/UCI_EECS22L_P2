@@ -35,7 +35,7 @@ int main(int argc, char *argv[]){
     database_add_friend("michaelz","aria");
     database_add_friend("michaelz","keenan");
     database_add_friend("keenan","michaelz");
-    database_add_challenger("demoman", "aria");
+    database_add_friend("demoman", "aria");
     #endif
 
     InitServiceStatusViewer();
