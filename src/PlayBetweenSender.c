@@ -1,4 +1,5 @@
 #include"PlayBetween.h"
+//the file that implement the connection part of online chess
 
 extern const char *Program;
 extern char *UserName;
@@ -8,12 +9,13 @@ extern char *UserName;
 //for connection to server
 struct sockaddr_in OppoServerAddress;	/* server address we connect with */
 
-int OppoServerPort;
+int OppoServerPort;//opponent`s server port
 struct hostent *OppoServer;
 
+//creates the two online player
 OnlinePlayer localPlayer={true}, remotePlayer={false};
 
-extern bool isPlayingWithOpponent;
+extern bool isPlayingWithOpponent;//as is its name describes
 
 //open socket and record the server address
 void init_connection2oppo(char *host, int port)
@@ -80,7 +82,8 @@ char* sendToOppo(char* msg)
     close(SocketFD);
     return fullRecvBuf;
 }
-
+//send a string to opponent
+//the response will be omitted
 void _SendToOppoWithoutResponse(char* msg)
 {
     int n;
@@ -119,13 +122,13 @@ void _SendToOppoWithoutResponse(char* msg)
     free(fullRecvBuf);
     close(SocketFD);
 }
-
+//for external calls
 void SendToOppoWithoutResponse(char *msg)
 {
     pthread_t tmp;
     pthread_create(&tmp,NULL,(void*)_SendToOppoWithoutResponse,msg);
 }
-
+//as is its name describes
 void SendPlayAction2Oppo(uchar Action, char *msg, int start_pt,
         int end_pt, uchar promotion)
 {

@@ -1,5 +1,8 @@
 #include"GUI.h"
 
+//contains some useful functions that can
+//create dialogs and show messages
+//check gui.h for more detail
 
 void _ErrorMsg(char *msg)
 {
@@ -35,22 +38,22 @@ void guio_InformMsg(char *msg)
     gdk_threads_leave();
 }
 
-bool _AskQuestion(char *msg)
+bool _AskQuestion(char *question)
 {
     GtkWidget *dialog;
     dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
                                  GTK_MESSAGE_OTHER, GTK_BUTTONS_YES_NO,
-                                 "%s", msg);
+                                 "%s", question);
     bool ret=gtk_dialog_run (GTK_DIALOG (dialog))==GTK_RESPONSE_YES;
     gtk_widget_destroy (dialog);
     return ret;
 }
 
 //Only ask yes and no
-bool guio_AskQuestion(char *msg)
+bool guio_AskQuestion(char *question)
 {
     gdk_threads_enter();
-    bool ret=_AskQuestion(msg);
+    bool ret=_AskQuestion(question);
     gdk_threads_leave();
     return ret;
 }

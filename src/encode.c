@@ -89,7 +89,7 @@ void encodePackQuery(char *jsonStr, PackQuery *pack)
    strcat(jsonStr,str_portNb);
    strcat(jsonStr,"}");
 }
-
+//as is its name describes
 void encodePackAnswerQuery(char *jsonStr, PackAnswerQuery *pack)
 {
    char str_OnlineFlagList[MAX_FRIEND_NB+10]="\"ol\":\"";

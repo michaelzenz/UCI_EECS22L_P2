@@ -1,6 +1,8 @@
 
 #include"GUI.h"
 
+//the chat menu`s gui file
+
 extern int PlayBetweenServerPort;
 extern vectorStr FriendsList;
 extern OnlinePlayer remotePlayer;

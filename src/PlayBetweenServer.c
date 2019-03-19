@@ -6,23 +6,24 @@ extern const char *Program;
 
 int Shutdown = 0;/* keep running until Shutdown == 1 */
 
-bool firstTimeOut=true;
+bool firstTimeOut=true;//as is its name describes
 bool ServicesListInit=false;
 char RotateLine[]={'-','\\','|','/'};//for showing a rotating line after still waiting...
 uchar RotateDirection=0;//the current rotate direction
 
-int PlayBetweenSocketFD;
-int PlayBetweenServerPort;
+int PlayBetweenSocketFD;//as is its name describes
+int PlayBetweenServerPort;//as is its name describes
 
-pthread_t PlayBetweenLooperID;
-OnlinePlayCallback *RecvCallback;
+pthread_t PlayBetweenLooperID;//the thread id for the playbetween server looper
+OnlinePlayCallback *RecvCallback;//will be called when a play pack is received
 
-int TimeOutMicroSec=250000;
+int TimeOutMicroSec=250000;//as is its name describes
 
-extern OnlinePlayer localPlayer, remotePlayer;
-extern bool isPlayingWithOpponent;
-extern bool isWaitingChallengeRespose;
+extern OnlinePlayer localPlayer, remotePlayer;//as is its name describes
+extern bool isPlayingWithOpponent;//as is its name describes
+extern bool isWaitingChallengeRespose;//as is its name describes
 
+//as is its name describes
 void PlayBetweenTimeOutHandler()//the hanle function for timeout
 {
     if(firstTimeOut){
@@ -64,6 +65,7 @@ int MakeServerSocket(		/* create a socket on this server */
     return ServSocketFD;
 } /* end of MakeServerSocket */
 
+//the listener for play pack
 void PlayPackListener(int DataSocketFD)
 {
     firstTimeOut=false;
@@ -117,6 +119,7 @@ void PlayPackListener(int DataSocketFD)
     if (LastSendLen < 0)FatalError("writing to data socket failed");
 }
 
+//the main looper for local server
 void PlayBetweenLooper()
 {
     int Timeout=TimeOutMicroSec;
@@ -189,6 +192,7 @@ void PlayBetweenLooper()
     }
 } /* end of ServerMainLoop */
 
+//the callback for play pack
 void PPcalllbackFunc(PackPlay pack)
 {
     if(!isPlayingWithOpponent)return;
@@ -205,7 +209,7 @@ void PPcalllbackFunc(PackPlay pack)
 }
 
 
-
+//as is its name describes
 //callback: this function will be called when a PackPlay is received
 int InitPlayBetweenServer(OnlinePlayCallback *callback)
 {
@@ -234,7 +238,7 @@ int InitPlayBetweenServer(OnlinePlayCallback *callback)
 
     return PortNb;
 }
-
+//as is its name describes
 void ShutPlayBetweenServer()
 {
     #ifdef PRINT_LOG

@@ -1,5 +1,7 @@
 #ifndef vectorSTR_H
 #define vectorSTR_H
+//almost the same as vector
+//thus no more explanation
 
 typedef struct vectorStr_ {
     char** data;

@@ -1,10 +1,10 @@
 #include"GUI.h"
+//this file is for login/register and online chess
+extern int PlayBetweenServerPort;//as is its name describes
+extern vectorStr FriendsList;//as is its name describes
+extern OnlinePlayer remotePlayer;//as is its name describes
 
-extern int PlayBetweenServerPort;
-extern vectorStr FriendsList;
-extern OnlinePlayer remotePlayer;
-
-extern GtkWidget *window;
+extern GtkWidget *window;//the main window
 extern GtkWidget *image;
 extern GtkWidget *layout;//the layout to put on background and contain fixed widget
 extern GtkWidget *fixed;//the widget to contain table
@@ -13,7 +13,7 @@ extern GtkWidget *table;//the widget to contain icons
 GtkWidget *usernameEntry;
 GtkWidget *passwordEntry, *verifyPasswordEntry;
 
-bool isLoginRegisterInitialized=false;
+bool isLoginRegisterInitialized=false;//is the widgets for login/register initialized
 
 //the pixbuf to load image and resize from a .jpg or .png file
 GdkPixbuf *Login_pixbuf = NULL;
@@ -275,20 +275,16 @@ void _guio_CoordToGrid(int c_x, int c_y, int *g_x, int *g_y)
         *g_y = (c_y - ONLINE_BOARD_UP) / SQUARE_SIZE;
 }
 
-//callback for gui play
+//callback for guio play
 void _guio_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
     int pixelX, pixelY, gridX, gridY, index, piece;
     GameState *gameState=(GameState*)data;
-	
-
  	GdkModifierType state;
-	
 	//gets the location of where the person clicked
 	gdk_window_get_pointer(widget->window, &pixelX, &pixelY, &state);
-
-
     printf("pX: %d, pY: %d\n",pixelX,pixelY);
+
     if(pixelX>=821&&pixelX<=894&&pixelY>=474&&pixelY<=498)
     {
         check_ActionMade=ACTION_UNDO;
@@ -306,7 +302,6 @@ void _guio_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
     printf("gX:%d, gY:%d\n",gridX,gridY);
     int pos=gridY*8+gridX;
 
-    
     if(!check_legal_start)
     {
         int move_vector_cnt=gameState->moves_vector_cnt;
@@ -333,7 +328,6 @@ void _guio_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
             gtk_container_remove(GTK_CONTAINER(layout), fixed);
             _guio_DrawBoard(gameState,-1,empty);
         }
-        
     }
     else 
     {
@@ -349,8 +343,6 @@ void _guio_play_callback(GtkWidget *widget, GdkEvent *event, gpointer data)
             move_start=-1;
         }
     }
-    
-    
 }
 
 //called if a human is the turn to play
@@ -418,7 +410,7 @@ void guio_gameplay_window(GameState *gameState)
     //when mouse presses window callback (TBD)
   	//g_signal_connect(window, "button_press_event", G_CALLBACK( TBD ), NULL) ;
 }
-
+//refresh the gui online board
 void guio_refresh(GameState *gameState)
 {
     gdk_threads_enter();//this is important, before you call any gtk_* or g_* or gdk_* functions, call this function first

@@ -179,6 +179,7 @@ Move string2move(char *str_move)
     return move;
 }
 
+//check if the userString matches the regex pattern
 bool matchRegex(const char* pattern, const char* userString)
 {
     bool result = false;

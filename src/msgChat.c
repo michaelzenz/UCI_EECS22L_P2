@@ -1,6 +1,8 @@
 
 #include"msgChat.h"
 
+//the local database for messages between different users
+//please check msgChat.h header file
 
 map_void_t msgChat;
 
@@ -70,10 +72,6 @@ vectorStr* msgChat_get_msgList(char *user)
     return &info->msgList;
 }
 
-int msgChat_get_newMsgCount(char *user)
-{
-    
-}
 
 bool msgChat_get_isFriend(char* user)
 {

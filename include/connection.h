@@ -16,7 +16,9 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-
+//this header and it`s corresponding c file 
+//contains the connection functions that 
+//can be used for the connection of both server and another client
 
 //the buffer size to send
 #define BUFFERSIZE 256
@@ -48,17 +50,23 @@ char* readFullBuffer(int DataSocketFD);
 
 //Send a msg to user
 void SendMsgToUser(char *dstUser, char* msg);
-
+//as is its name describes
 void ChallengeUser(char *dstUser);
 
 //init the connection to the qport of the server
 void init_connection2qport();
 
+//inits the routine query task
+//as is its name describes....
 void InitQueryTimeredTask();
 
+//as is its name describes
 typedef void(*AddNewFriendCallback)(char *);
+//if friend is added successfully, this callback will be called
 void AddNewFriend(char *newFriend, AddNewFriendCallback callback);
 
+//as is its name describes
+//same as above
 typedef void(*RemoveFriendCallback)();
 void DeleteFriend(char *oldFriend, RemoveFriendCallback callback);
 

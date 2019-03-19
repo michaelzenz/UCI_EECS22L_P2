@@ -5,30 +5,30 @@
 
 //everything to do with server is in this file
 
-extern const char *Program;
-char *UserName;
-int QueryPort;
-vectorStr FriendsList;
+extern const char *Program;//program name
+char *UserName;//local user name
+int QueryPort;//the queryport of the server
+vectorStr FriendsList;//the friendlist of local user
 
 struct sockaddr_in ServerAddress;//for user port	/* server address we connect with */
-int ServerPort;
-struct hostent *Server;
+int ServerPort;//the server`s login/register port
+struct hostent *Server;//the socket struct of server, user port
 
 char Host[15];
 
-struct sockaddr_in ServerAddressQport;//for qport
-struct hostent *ServerQport;
+struct sockaddr_in ServerAddressQport;//for query port
+struct hostent *ServerQport;//for query port
 
-pthread_t QueryTaskID;
-pthread_mutex_t mutex;
-bool MutexInitialized=false;
+pthread_t QueryTaskID;//the thread id of the routine query task
+pthread_mutex_t mutex;//a mutex, not used, but may be useful later
+bool MutexInitialized=false;//is the mutex initialized
 
-bool StopQuery=false;
+bool StopQuery=false;//as is its name describes
 
 extern int PlayBetweenServerPort;//for client to client
-extern OnlinePlayer localPlayer, remotePlayer;
-bool isPlayingWithOpponent=false;
-bool isWaitingChallengeRespose=false;
+extern OnlinePlayer localPlayer, remotePlayer;//as is its name describes
+bool isPlayingWithOpponent=false;//as is its name describes
+bool isWaitingChallengeRespose=false;//as is its name describes
 
 //WARNING: the char* that this function returns must be free
 //Otherwise there will be memory leak
@@ -230,7 +230,7 @@ void stopWaitingForResponse(void *pdata){
     isWaitingChallengeRespose=false;
 }
 
-//
+//handles the pack answer query from server
 void handlePAQ(PackAnswerQuery paq)
 {
     if(!isWaitingChallengeRespose&&strlen(paq.challenger)>0&&paq.opponentPort>=0){
@@ -284,7 +284,7 @@ void handlePAQ(PackAnswerQuery paq)
     }
     if(NewMsgCnt>0)guio_onMsgUpdate();
 }
-
+//the routien query task looper
 void QueryTimeredTask(char *str_PQ)
 {
     while(!StopQuery){
@@ -299,7 +299,7 @@ void QueryTimeredTask(char *str_PQ)
     }
     free(str_PQ);
 }
-
+//as is its name describes
 void SendMsgToUser(char *dstUser, char* msg)
 {
     #ifdef PRINT_LOG
@@ -321,7 +321,7 @@ void SendMsgToUser(char *dstUser, char* msg)
 
     free(fullBuf);
 }
-
+//as is its name describes
 void ChallengeUser(char *dstUser)
 {
     #ifdef PRINT_LOG
@@ -345,7 +345,7 @@ void ChallengeUser(char *dstUser)
     free(fullBuf);
 }
 
-
+//as is its name describes
 void AddNewFriend(char *newFriend, AddNewFriendCallback callback)
 {
     printf("adding friend %s\n",newFriend);
@@ -370,7 +370,7 @@ void AddNewFriend(char *newFriend, AddNewFriendCallback callback)
     }
     free(fullBuf);
 }
-//work in progress
+//as is its name describes
 void DeleteFriend(char *oldFriend, RemoveFriendCallback callback)
 {
     printf("deleting friend %s\n",oldFriend);
@@ -395,7 +395,7 @@ void DeleteFriend(char *oldFriend, RemoveFriendCallback callback)
     }
     free(fullBuf);
 }
-
+//as is its name describes
 void InitQueryTimeredTask()
 {
     printf("Start Regular Query Check\n");
@@ -414,7 +414,7 @@ void InitQueryTimeredTask()
         exit(1);
     }
 }
-
+//as is its name describes
 void StopQueryTimeredTask()
 {
     StopQuery=true;

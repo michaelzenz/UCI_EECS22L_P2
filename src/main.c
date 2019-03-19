@@ -7,10 +7,10 @@
 #include"PlayBetween.h"
 
 extern const char *Program;//the name of program
-extern char *UserName;
-extern OnlinePlayer localPlayer, remotePlayer;
-extern vectorStr FriendsList;
-extern bool isPlayingWithOpponent;
+extern char *UserName;//the name of local user
+extern OnlinePlayer localPlayer, remotePlayer;//as is its name describes
+extern vectorStr FriendsList;//the friend list of local user
+extern bool isPlayingWithOpponent;//as is its name describes
 
 #define MODEL 1
 
@@ -23,7 +23,8 @@ int play(GameState *gameState,Player *player,int model)
     else quit=ai_play(gameState,player,model);
     return quit;
 }
-
+//the play function for online
+//same as above
 int onlinePlay(GameState *gameState)
 {
     if(gameState->playerTurn==localPlayer.color)guio_play(gameState);
@@ -71,25 +72,20 @@ void GameOffline(){
     env_free_GameState(&gameState);
 }
 
-//a simple demo of online game(only login, and there is only one user michaelz)
+//play the online game
 void GameOnline(int argc, char *argv[])
 {
-
     GameState gameState=env_init();
     OnlinePlayCallback onlineCallback={&gameState};
-
     //end of test code insertion
     int portNb=InitPlayBetweenServer(&onlineCallback);//inits the local server
-
     if (argc < 3)
     {
         printf("Usage: %s host_address port\n", argv[0]);
 	    exit(10);
     }
     init_connection2server(argv[0],argv[1],argv[2]);
-
     LoginOrRegister();
-
     msgChat_init();//for message map
     int friendNb=vectorStr_count(&FriendsList);
     char temp[MAX_USERNAME_LEN];
@@ -98,16 +94,13 @@ void GameOnline(int argc, char *argv[])
     }
 
     init_connection2qport();
-
     InitQueryTimeredTask();//starts a new thread that do routine query to server
-
     while(true){
-        
         guio_ChatsMenu();//opens the chat menu
 
         strcpy(localPlayer.UserName,UserName);
         guio_gameplay_window(&gameState);
-
+        
         int quit=0;
         while(quit==0){
             if(!isPlayingWithOpponent)break;
@@ -129,9 +122,6 @@ void GameOnline(int argc, char *argv[])
         }
         env_reset_GameState(&gameState);
     }
-    
-
-
     env_free_GameState(&gameState);
 }
 

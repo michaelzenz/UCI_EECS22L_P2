@@ -3,9 +3,6 @@
 //check that these above include statements are necessary
 #include"stack.h"
 
-
-
-
 //return a new stack node
 Node* stack_newNode(char *new_log)
 {
@@ -52,6 +49,7 @@ void stack_peek(Node* top, char *ret_str)
     }
 }
 
+//as is its name describes
 void stack_free(Node** head_ref)
 {
     while(!stack_isEmpty(*head_ref)){

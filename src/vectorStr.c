@@ -4,7 +4,8 @@
 
 #include "vectorStr.h"
 
-
+//almost the same as vector.c
+//thus no more explanation
 
 void vectorStr_init(vectorStr *v)//intializes vector
 {
