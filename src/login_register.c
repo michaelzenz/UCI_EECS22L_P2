@@ -134,13 +134,17 @@ PackAnswerLR handleLoginRegister(PackUnamePasswd packUP, char *host)
         if(database_isUserExist(packUP.UserName)){
             palr.successflag=USER_ALREADY_EXIST;
         }
-        database_add_user(packUP.UserName,packUP.Password,packUP.port,true);
-        database_set_host(packUP.UserName,host);
-        palr.successflag=USER_REGISTER;
-        vectorStr dummyFriends;
-        vectorStr_init(&dummyFriends);
-        palr.FriendList=dummyFriends;
-        palr.QueryPort=QueryPort;
+        else{
+            database_add_user(packUP.UserName,packUP.Password,packUP.port,true);
+            database_set_host(packUP.UserName,host);
+            palr.successflag=USER_REGISTER;
+            vectorStr dummyFriends;
+            vectorStr_init(&dummyFriends);
+            palr.FriendList=dummyFriends;
+            palr.QueryPort=QueryPort;
+            
+        }
+        
     }
     //OutputUserPack(packUP);
     return palr;
