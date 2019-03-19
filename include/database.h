@@ -18,12 +18,13 @@ void database_add_user( char* user_name, char* user_password, int port, bool use
 //reset the password of a user
 void database_set_passwd(char* user, char* passwd);
 
+//set the host address for user
 void database_set_host(char* user, char* host);
 
 //reset the port that a user uses to listen to other users
 void database_set_port(char* user, int port);
 
-//add a friend to a user`s friend list
+//add/delete a friend to a user`s friend list
 bool database_add_friend(char* user, char* friend);
 bool database_delete_friend(char* user, char *friend);
 
@@ -45,8 +46,10 @@ QNodeChallenger database_get_nextChallenger(char* user);
 //get password
 char* database_get_password(char* user);
 
+//read from function name
 char* database_get_host(char* user);
 
+//same as function name
 bool database_get_onlineStatus(char* user);
 
 //returns true if user does not exist
@@ -58,6 +61,7 @@ vectorStr database_get_friends(char* user);
 //get port
 int database_get_port(char* user);
 
+//just a test function
 void test_database();
 
 #endif

@@ -15,6 +15,7 @@ void FatalError(		/* print error diagnostics and abort */
     exit(20);
 } /* end of FatalError */
 
+//check if the userString matches the regex pattern
 bool matchRegex(const char* pattern, const char* userString)
 {
     bool result = false;

@@ -119,6 +119,7 @@ typedef struct _PackPlay
      uchar promotion;//the promotion that the user selects
 } PackPlay;
 
+//for search for username, not yet used
 typedef struct _PackSearch
 {
     char *targetUserName;

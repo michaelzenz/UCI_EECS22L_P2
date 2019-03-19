@@ -20,6 +20,7 @@
 #define BUFFERSIZE 256
 #define MAX_SERVICE_NAME_LEN 20
 
+//a property of a service
 typedef struct _Service{
     char ServiceName[30];
     int ServiceID;

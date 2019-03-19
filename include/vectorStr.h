@@ -13,6 +13,7 @@ typedef struct vectorStr_ {
     int count;
 } vectorStr;
 
+//same as vector.h
 void vectorStr_init(vectorStr*);
 int vectorStr_count(vectorStr*);
 void vectorStr_add(vectorStr *v, char *str);

@@ -9,20 +9,19 @@ extern const char *Program;//the name of program
 int Shutdown = 0;/* keep running until Shutdown == 1 */
 char buffer[BUFFERSIZE];//the buffer to store message
 
-vectorStr services;
-vector RotateLineDirections;
-char StatusLine[STATUS_LINE_SIZE];
+vectorStr services;//the vector that contains the name of all services
+vector RotateLineDirections;//the vector taht contains the direction of all rotating lines for all services
+
+char StatusLine[STATUS_LINE_SIZE];//a buffer for printing rotating lines
 char RotateLine[]={'-','\\','|','/'};//for showing a rotating line after still waiting...
 uchar RotateDirection=0;//the current rotate direction
 bool FirstTimeOut=false;//if the timeout handle function is called for the first time after the last processing request
 
 int TimeOutMicroSec=250000;//Modify this if you want
 
-typedef void (*ClientHandler)(int DataSocketFD);
-typedef void (*TimeoutHandler)(void);
+pthread_mutex_t ShowServiceStatusMutex;//the mutex for printing lines
 
-pthread_mutex_t ShowServiceStatusMutex;
-
+//as is its name describes
 void InitServiceStatusViewer()
 {
     vectorStr_init(&services);
@@ -31,6 +30,7 @@ void InitServiceStatusViewer()
     pthread_mutex_init(&ShowServiceStatusMutex, NULL);
 }
 
+//register an id for a service, a service will be stored to the vector services
 int GetServiceID(char *service)
 {
     pthread_mutex_lock(&ShowServiceStatusMutex);
@@ -41,7 +41,7 @@ int GetServiceID(char *service)
     pthread_mutex_unlock(&ShowServiceStatusMutex);
     return ServiceID;
 }
-
+//as is its name describes
 void PrintStatus(Service service)
 {
     // pthread_mutex_lock(&ShowServiceStatusMutex);

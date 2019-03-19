@@ -1,20 +1,19 @@
 
 #include"queueChat.h"
 
-
-
+//call this to init a queue
 void queueChat_init(QueueChat *queue)
 {
     queue->head=NULL;
     queue->tail=NULL;
     queue->size=0;
 }
-
+//as is its name describes
 uchar queueChat_isEmpty(QueueChat *queue)
 {
     return queue->size==0;
 }
-
+//as is its name describes
 QNodeMsg* _newMsgNode(char *new_msg, char *srcUser)
 {
     QNodeMsg *newNode;
@@ -28,7 +27,7 @@ QNodeMsg* _newMsgNode(char *new_msg, char *srcUser)
 
     return newNode;
 }
-
+//as is its name describes
 QNodeChallenger* _newChallengerNode(char *challenger, char *host, int port)
 {
     QNodeChallenger *newNode;
@@ -44,6 +43,7 @@ QNodeChallenger* _newChallengerNode(char *challenger, char *host, int port)
     return newNode;
 }
 
+//as is its name describes
 //WARNING: please make sure you are calling the correct function
 void queueChat_enqueueMsg(QueueChat *queue, char *new_msg, char *srcUser)
 {
@@ -61,6 +61,7 @@ void queueChat_enqueueMsg(QueueChat *queue, char *new_msg, char *srcUser)
     queue->size++;
 }
 
+//as is its name describes
 //WARNING: please make sure you are calling the correct function
 void queueChat_enqueueChallenger(QueueChat *queue, char *challenger, char *host, int port)
 {
@@ -77,13 +78,13 @@ void queueChat_enqueueChallenger(QueueChat *queue, char *challenger, char *host,
     }
     queue->size++;
 }
-
+//as is its name describes
 void queueChat_freeMsgNode(QNodeMsg *pNode)
 {
     free(pNode->msg);
     free(pNode->srcUser);
 }
-
+//as is its name describes
 void queueChat_freeChallengerNode(QNodeChallenger *pNode)
 {
     free(pNode->challenger);
@@ -109,7 +110,7 @@ QNodeMsg queueChat_dequeueMsg(QueueChat *queue)
     queue->size--;
     return retNode;
 }
-
+//as is its name describes
 QNodeChallenger queueChat_dequeueChallenger(QueueChat *queue)
 {
     if(queue->size==0){
@@ -126,7 +127,7 @@ QNodeChallenger queueChat_dequeueChallenger(QueueChat *queue)
     queue->size--;
     return retNode;
 }
-
+//as is its name describes
 void queueChat_printAllMsg(QueueChat *queue)
 {
     if(queue->head==NULL)return;
@@ -138,7 +139,7 @@ void queueChat_printAllMsg(QueueChat *queue)
     }
     printf("End printing\n\n");
 }
-
+//as is its name describes
 void queueChat_printAllChallenger(QueueChat *queue)
 {
     if(queue->head==NULL)return;
@@ -150,7 +151,7 @@ void queueChat_printAllChallenger(QueueChat *queue)
     }
     printf("End printing\n\n");
 }
-
+//as is its name describes
 void queueChat_freeMsgQueue(QueueChat *queue)
 {
     if(queue->head==NULL)return;
@@ -163,7 +164,7 @@ void queueChat_freeMsgQueue(QueueChat *queue)
     queue->tail=NULL;
     queue->size=0;
 }
-
+//as is its name describes
 void queueChat_freeChallengerQueue(QueueChat *queue)
 {
     if(queue->head==NULL)return;

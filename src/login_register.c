@@ -2,16 +2,17 @@
 
 extern const char *Program;//the name of program
 
-Service ServiceUserPackListener={"UserPackListener", -1, false};
-bool UserPackListenerShutdown=false;
+//this file process the login and register
+
+Service ServiceUserPackListener={"UserPackListener", -1, false};//create a service
+bool UserPackListenerShutdown=false;//as is its name describes
 int UserPortSocketFD; /* socket file descriptor for service */
 
-pthread_t UserPortLooperID;
-extern int QueryPort;
+pthread_t UserPortLooperID;//the thread id of the login and register listener
+extern int QueryPort;//as is its name describes
 
-extern int TimeOutMicroSec;
+extern int TimeOutMicroSec;//as is its name describes
 
-bool isUserServStatusPrinting=false;
 
 void UserServTimeOutHandler()//the hanle function for timeout
 {
@@ -22,7 +23,6 @@ void UserServTimeOutHandler()//the hanle function for timeout
     }
     //PrintStatus(ServiceUserPackListener);
     printf("UserPackListener Running\n");
-    isUserServStatusPrinting=false;
 }
 
 void OutputUserPack(PackUnamePasswd packUP)
@@ -109,6 +109,9 @@ void OutputUserPack(PackUnamePasswd packUP)
     }
 }
 
+//as is its name describes
+//packUP: the pack that contains username and password
+//returns an answer login/register pack
 PackAnswerLR handleLoginRegister(PackUnamePasswd packUP, char *host)
 {
     //setting up the package to return packAnswerLR
@@ -143,6 +146,7 @@ PackAnswerLR handleLoginRegister(PackUnamePasswd packUP, char *host)
     return palr;
 }
 
+//the listener of UserPack, calls handleLoginRegister
 void UserPackListener(		/* process a time request by a client */
 	int DataSocketFD, char *host)
 {
@@ -172,6 +176,7 @@ void UserPackListener(		/* process a time request by a client */
     if (LastSendLen < 0)FatalError("writing to data socket failed");
 } /* end of ProcessRequest */
 
+//the main looper of login/register listener
 void UserPortLooper()
 {
     int Timeout=TimeOutMicroSec;
@@ -200,12 +205,8 @@ void UserPortLooper()
 	}
 	if (res == 0)	/* timeout occurred */
 	{
-        if(!isUserServStatusPrinting){
-            isUserServStatusPrinting=true;
-            // pthread_t new_printer;
-            // pthread_create(&new_printer,NULL,(void*)UserServTimeOutHandler,NULL);
-            UserServTimeOutHandler();
-        }
+        UserServTimeOutHandler();
+        
 	}
 	else		/* some FDs have data ready to read */
 	{   for(i=0; i<FD_SETSIZE; i++)
@@ -249,8 +250,7 @@ void UserPortLooper()
     }
 } /* end of ServerMainLoop */
 
-
-
+//inits the user pack listener
 void InitUserPackListener(int PortNo)
 {
     if(PortNo<11000||PortNo>=12000)FatalError("Invalid Port Number, must be between 11000 and 11999");
@@ -277,6 +277,7 @@ void InitUserPackListener(int PortNo)
     }
 }
 
+//as is its name describes
 void ShutUserPackListener()
 {
     #ifdef PRINT_LOG

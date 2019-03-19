@@ -27,7 +27,9 @@ int main(int argc, char *argv[]){
     }
 
     database_intialize();
+    
     #ifdef TEST_MSGING
+    //demo users
     database_add_user("michaelz","25619",-1,false);
     database_add_user("aria","no",-1,false);
     database_add_user("keenan","1",-1,false);
@@ -39,10 +41,10 @@ int main(int argc, char *argv[]){
     #endif
 
     InitServiceStatusViewer();
+
+    //init the listeners
     int QueryPort=InitQueryPackListener();
     InitUserPackListener(atoi(argv[1]));
-
-
 
     while(true){
         //do sth if necessary

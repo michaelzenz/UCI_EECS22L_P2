@@ -1,17 +1,18 @@
 #include"server.h"
 
+//this file handles the queries
+
 extern const char *Program;//the name of program
 
+//create a service structure for this service
 Service ServiceQueryListener={"QueryListener", -1, false};
-bool QueryListenerShutdown=false;
+bool QueryListenerShutdown=false;//as is what the variable name describes
 int QueryPortSocketFD; /* socket file descriptor for service */
 
-pthread_t QueryPortLooperID;
+pthread_t QueryPortLooperID;//the thread id of the query listener 
 extern int TimeOutMicroSec;//Modify this if you want
 
-int QueryPort;
-
-bool isQueryServStatusPrinting=false;
+int QueryPort;//the port that query listener uses
 
 void QueryServTimeOutHandler()//the hanle function for timeout
 {
@@ -21,10 +22,10 @@ void QueryServTimeOutHandler()//the hanle function for timeout
         ServiceQueryListener.isServiceRunning=true;
     }
     //PrintStatus(ServiceQueryListener);
-    isQueryServStatusPrinting=false;
     printf("QueryPackListener Running\n");
 }
 
+//handle QueryPack, returns a corresponding AnswerQuery Pack
 PackAnswerQuery handleQuery(PackQuery pack,char *host)
 {
     //setting up the package to return packAnswerLR
@@ -103,6 +104,7 @@ PackAnswerQuery handleQuery(PackQuery pack,char *host)
     return paq;
 }
 
+//the listener for query pack
 void QueryPackListener(		/* process a time request by a client */
 	int DataSocketFD, char *host)
 {
@@ -131,6 +133,7 @@ void QueryPackListener(		/* process a time request by a client */
     if (LastSendLen < 0)FatalError("writing to data socket failed");
 } /* end of ProcessRequest */
 
+//the main looper for query listener
 void QueryPortLooper()
 {
     int Timeout=TimeOutMicroSec;
@@ -159,12 +162,7 @@ void QueryPortLooper()
 	}
 	if (res == 0)	/* timeout occurred */
 	{
-        if(!isQueryServStatusPrinting){
-            isQueryServStatusPrinting=true;
-            // pthread_t new_printer;
-            // pthread_create(&new_printer,NULL,(void*)QueryServTimeOutHandler,NULL);
-            QueryServTimeOutHandler();
-        }
+        QueryServTimeOutHandler();
 	}
 	else		/* some FDs have data ready to read */
 	{   for(i=0; i<FD_SETSIZE; i++)
@@ -233,6 +231,7 @@ int InitQueryPackListener()
     return PortNb;
 }
 
+//shutdown the query pack listener
 void ShutQueryPackListener()
 {
     #ifdef PRINT_LOG
